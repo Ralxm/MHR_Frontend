@@ -1,0 +1,32 @@
+.page-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-box {
+    border: 1px solid #ddd;
+    width: 30%;
+    padding: 20px;
+    background-color: #ffffff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+}
+
+@media (max-width: 768px) {
+    .login-box {
+        width: 80%;
+        /* Wider on smaller screens */
+    }
+}
+
+.w-80 {
+    width: 75%;
+}
