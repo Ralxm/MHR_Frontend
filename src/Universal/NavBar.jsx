@@ -7,7 +7,7 @@ export default function NavBar() {
   //Fazer como no PINT e guardar no localstorage o item user.
   useEffect(() => {
     const user = localStorage.getItem('user');
-    if (user) { //Tirar o || 1 quando o login estiver a funcionar
+    if (user || 1) { //Tirar o || 1 quando o login estiver a funcionar
       setIsLoggedIn(true);
     }
   }, []);
@@ -21,11 +21,11 @@ export default function NavBar() {
 
         {isLoggedIn && (
           <div className="navbar-items">
-            <span>Vagas</span>
-            <span>Calendário</span>
-            <span>Projetos</span>
-            <span>Despesas</span>
-            <span>Blog</span>
+            <a style={{textDecoration: "none", color: "black"}} href='/vagas'>Vagas</a>
+            <a style={{textDecoration: "none", color: "black"}} href='/calendario'>Calendário</a>
+            <a style={{textDecoration: "none", color: "black"}} href='/projetos'>Projetos</a>
+            <a style={{textDecoration: "none", color: "black"}} href='/despesas'>Despesas</a>
+            <a style={{textDecoration: "none", color: "black"}} href='/blog'>Blog</a>
           </div>
         )}
       </div>

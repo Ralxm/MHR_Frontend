@@ -23,10 +23,5 @@
 @media (max-width: 768px) {
     .login-box {
         width: 80%;
-        /* Wider on smaller screens */
     }
-}
-
-.w-80 {
-    width: 75%;
 }

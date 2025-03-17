@@ -1,14 +1,7 @@
 import { Route, Routes } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
-import NavBar from "../../Universal/NavBar";
-import Footer from "../../Universal/Footer";
 import './Login.css'
-
-//Background na página de login
-//repeat
-//space
-//round
-
+import '../../index.css'
 
 export default function Login() {
     return (
@@ -17,34 +10,37 @@ export default function Login() {
                 background: `url('${process.env.PUBLIC_URL}/Logosvg.svg')`,
                 backgroundRepeat: "no-repeat",
                 backgroundPosition: "center",
-                backgroundSize: "auto",
-                transform: "rotate(-25deg) scale(1.5)",
+                backgroundSize: "cover",
                 backgroundAttachment: "fixed",
                 position: "fixed",
                 top: 0,
                 left: 0,
                 width: "100vw",
                 height: "100vh",
-                overflow: "hidden"
+                overflow: "hidden",
+                opacity: 0.4
             }}>
-                <div className="login-box" style={{transform: "rotate(25deg) scale(0.75)"}}>
+            </div>
+            <div className="d-flex justify-content-center align-items-center vh-100">
+                <div className="login-box" style={{zIndex: 1000, backgroundColor: "#eee", boxShadow: "2px 2px 50px #777"}}>
                     <h2 className="text-center mb-4">Login</h2>
                     <form className="w-80 mx-auto">
                         <div className="mb-3">
                             <label htmlFor="username" className="form-label">Utilizador</label>
-                            <input type="text" className="form-control" id="username" placeholder="Introduza o seu nome" />
+                            <input type="text" className="form-control" id="username" placeholder="Introduza o seu nickname" />
                         </div>
                         <div className="mb-3">
                             <label htmlFor="password" className="form-label">Password</label>
                             <input type="password" className="form-control" id="password" placeholder="Introduza a sua password" />
                         </div>
-                        <button type="submit" className="btn btn-dark w-100">Login</button>
+                        <button type="submit" className="btn btn-info w-100">Entra na tua conta</button>
                     </form>
                     <div style={{margin: "30px"}}>
-                        <h5 className="text-center mb-4">Não tem conta?</h5>
-                        <div className="text-center mb-4">
-                            <a href="/registar">Registar</a>
-                        </div>
+                        <h5 className="text-center mb-4" style={{fontSize: "15px", cursor: "pointer"}}>&nbsp;<a style={{color: "black"}} href="/registar">Esqueceu-se da password?</a></h5>
+                    </div>
+                    <hr></hr>
+                    <div style={{padding: "15px"}}>
+                        <h5 className="text-center" style={{fontSize: "15px"}}>Não tem conta?&nbsp;<a style={{color: "black"}} href="/registar">Registar</a></h5>
                     </div>
                 </div>
             </div>
