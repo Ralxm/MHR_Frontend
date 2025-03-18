@@ -3,8 +3,6 @@ import NavBar from "../../Universal/NavBar";
 import Footer from "../../Universal/Footer";
 import './Despesas.css';
 import '../../index.css'
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 let despesas = [{
@@ -76,6 +74,10 @@ export default function Despesas() {
         setSelectedDespesa(null);
     };
 
+    useEffect(() =>{
+        document.title = "Despesas"
+    }, [])
+
     return (
         <div id="root">
             <div className="content" style={{
@@ -101,7 +103,7 @@ export default function Despesas() {
                         <div className="col-md-6" style={{ zIndex: 1000 }}>
 
                             {/* Listagem de uma despesa */}
-                            <div className="items-container" style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                            <div className="items-container" style={{ minHeight: '80vh', maxHeight: '80vh', overflowY: 'auto' }}>
                                 <div className="d-flex align-items-center justify-content-between mb-3">
                                     <h3 className="mb-0">Despesas</h3>
                                     <strong><span className='m-0' style={{ cursor: 'pointer', fontSize: '32px' }} onClick={toggleCreateDespesa}>+</span></strong>

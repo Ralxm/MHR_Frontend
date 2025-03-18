@@ -1,0 +1,23 @@
+.shadow-justificada {
+    box-shadow: 0 0 5px green;
+}
+
+.shadow-por-justificar {
+    box-shadow: 0 0 5px yellow;
+}
+
+.shadow-em-analise {
+    box-shadow: 0 0 5px orange;
+}
+
+.shadow-injustificada {
+    box-shadow: 0 0 5px red;
+}
+
+.shadow-aprovadas {
+    box-shadow: 0 0 5px green;
+}
+
+.shadow-rejeitadas {
+    box-shadow: 0 0 5px red;
+}
