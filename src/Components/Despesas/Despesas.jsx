@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from 'react';
-import { createSwapy } from 'swapy';
+import React, { useEffect, useRef, useState } from 'react';
 import NavBar from "../../Universal/NavBar";
 import Footer from "../../Universal/Footer";
 import './Despesas.css';
@@ -60,22 +59,22 @@ let despesas = [{
 }];
 
 export default function Despesas() {
-    const swapy = useRef(null);
-    const container = useRef(null);
+    const [isFormVisible, setIsFormVisible] = useState(false);
+    const [selectedDespesa, setSelectedDespesa] = useState(null);
 
-    useEffect(() => {
-        if (container.current) {
-            swapy.current = createSwapy(container.current);
+    const toggleCreateDespesa = () => {
+        setIsFormVisible(!isFormVisible);
+        setSelectedDespesa(null);
+    };
 
-            swapy.current.onSwap((event) => {
-                console.log('swap', event);
-            });
-        }
+    const handleVerDetalhes = (despesa) => {
+        setSelectedDespesa(despesa);
+        setIsFormVisible(false);
+    };
 
-        return () => {
-            swapy.current?.destroy();
-        };
-    }, []);
+    const handleCloseDetalhes = () => {
+        setSelectedDespesa(null);
+    };
 
     return (
         <div id="root">
@@ -95,14 +94,44 @@ export default function Despesas() {
             }}> </div>
             <div></div>
             <NavBar />
-            <div className="page-container-despesas" ref={container} >
+            <div className="page-container-despesas">
                 <div className="container-fluid">
                     <div className="row" >
                         {/* Coluna da esquerda */}
                         <div className="col-md-6" style={{ zIndex: 1000 }}>
-                            <div data-swapy-slot="form" className='col-md-12'>
-                                <div className="form-container" data-swapy-item="form">
-                                    <h3>Criar uma despesa</h3>
+
+                            {/* Listagem de uma despesa */}
+                            <div className="items-container" style={{ maxHeight: '600px', overflowY: 'auto' }}>
+                                <div className="d-flex align-items-center justify-content-between mb-3">
+                                    <h3 className="mb-0">Despesas</h3>
+                                    <strong><span className='m-0' style={{ cursor: 'pointer', fontSize: '32px' }} onClick={toggleCreateDespesa}>+</span></strong>
+                                </div>
+                                <ExemplosDespesas onVerDetalhes={handleVerDetalhes} />
+                            </div>
+
+                            {/* Sumario de despesas quando os detalhes ou criação estão ativos */}
+                            {(isFormVisible || selectedDespesa != null) && (
+                                <div className='row'>
+                                    <div className="col-md-6 my-4">
+                                        <div className="items-container">
+                                            <h3>Sumário de despesas</h3>
+                                            <SumarioDespesas />
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Coluna da direita */}
+                        <div className="col-md-6" style={{ zIndex: 1000 }}>
+
+                            {/* Criação de uma despesa */}
+                            <div className='col-md-12 mb-4' style={{ display: isFormVisible ? "block" : "none" }} id="despesaCreate">
+                                <div className="form-container">
+                                    <div className="d-flex align-items-center justify-content-between mb-3">
+                                        <h3 className="mb-0">Criar uma despesa</h3>
+                                        <strong><span className='m-0' style={{ cursor: 'pointer', fontSize: '32px' }} onClick={toggleCreateDespesa}>x</span></strong>
+                                    </div>
                                     <form>
                                         <div className="mb-3 mx-5">
                                             <label htmlFor="input1" className="form-label">Data</label>
@@ -120,44 +149,35 @@ export default function Despesas() {
                                             <label htmlFor="input3" className="form-label">Anexo</label>
                                             <input type="file" className="form-control" id="input3" />
                                         </div>
-                                        <button type="submit" className="btn btn-primary">Submit</button>
+                                        <button type="submit" className="btn btn-primary">Criar</button>
                                     </form>
                                 </div>
                             </div>
 
-                            <div className="mt-4" data-swapy-slot="calendar">
-                                <div className="form-container" data-swapy-item="calendar">
-                                    <h3>Calendário</h3>
-                                    <CalendarComponent />
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Coluna da direita */}
-                        <div className="col-md-6" style={{ zIndex: 1000 }}>
-                            <div className="" data-swapy-slot="despesas">
-                                <div className="items-container" data-swapy-item="despesas" style={{ maxHeight: '600px', overflowY: 'auto' }}>
-                                    <h3>Despesas</h3>
-                                    <ExemplosDespesas />
-                                </div>
-                            </div>
-
-                            <div className='row'>
-
-                                <div className="my-4 col-md-6" data-swapy-slot="items">
-                                    <div className="items-container" data-swapy-item="items" style={{ maxHeight: '600px', overflowY: 'auto' }}>
-                                        <h3>Sumário de despesas</h3>
-                                        <SumarioDespesas />
+                            {/* Detalhes Despesa */}
+                            {selectedDespesa && (
+                                <div className='col-md-12 mb-4' id="detalhesDespesa">
+                                    <div className="form-container">
+                                        <div className="d-flex align-items-center justify-content-between mb-3">
+                                            <h3 className="mb-0">Detalhes da Despesa</h3>
+                                            <strong><span className='m-0' style={{ cursor: 'pointer', fontSize: '32px' }} onClick={handleCloseDetalhes}>x</span></strong>
+                                        </div>
+                                        <DetalhesDespesa despesa={selectedDespesa} />
                                     </div>
                                 </div>
+                            )}
 
-                                <div className="my-4 col-md-6" data-swapy-slot="recente">
-                                    <div className="items-container" data-swapy-item="recente" style={{ maxHeight: '600px', overflowY: 'auto' }}>
-                                        <h3>Despesa mais recente</h3>
-                                        <DespesaRecente />
+                            {/* Sumário Despesas */}
+                            {(!isFormVisible && selectedDespesa == null) && (
+                                <div className='row'>
+                                    <div className="col-md-6">
+                                        <div className="items-container">
+                                            <h3>Sumário de despesas</h3>
+                                            <SumarioDespesas />
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -167,57 +187,87 @@ export default function Despesas() {
     );
 }
 
-const CalendarComponent = ({ events }) => {
-    moment.locale("pt")
-    const localizer = momentLocalizer(moment);
+function DetalhesDespesa({ despesa }) {
     return (
-        <div style={{ height: '500px' }}>
-            <Calendar
-                localizer={localizer}
-                events={events}
-                startAccessor="start"
-                endAccessor="end"
-                style={{ height: 500 }}
-            />
+        <div>
+            <div className="mb-3 mx-5">
+                <label className="form-label"><strong>Data:</strong></label>
+                <p>{despesa.data}</p>
+            </div>
+            <div className="mb-3 mx-5">
+                <label className="form-label"><strong>Descrição:</strong></label>
+                <p>{despesa.descricao}</p>
+            </div>
+            <div className="mb-3 mx-5">
+                <label className="form-label"><strong>Valor:</strong></label>
+                <p>{despesa.valor}</p>
+            </div>
+            <div className="mb-3 mx-5">
+                <label className="form-label"><strong>Anexo:</strong></label>
+                <p>{despesa.anexo}</p>
+            </div>
+            <div className="mb-3 mx-5">
+                <label className="form-label"><strong>Validador:</strong></label>
+                <p>{despesa.validador}</p>
+            </div>
+            <div className="mb-3 mx-5">
+                <label className="form-label"><strong>Estado:</strong></label>
+                <p>{despesa.estado}</p>
+            </div>
+            <div className="mb-3 mx-5">
+                <label className="form-label"><strong>Reembolsada por:</strong></label>
+                <p>{despesa.reembolsada_por}</p>
+            </div>
+            <div className="mb-3 mx-5">
+                <label className="form-label"><strong>Comentários:</strong></label>
+                <p>{despesa.comentarios}</p>
+            </div>
         </div>
     );
-};
+}
 
-function ExemplosDespesas() {
-    return despesas.map((despesa, index) => (
-        <div key={index} className="container mb-3 p-3 border rounded">
-            <div className="row">
-                <div className="col-md-3">
-                    <strong>Data:</strong> {despesa.data}
+function ExemplosDespesas({ onVerDetalhes }) {
+    const getShadowClass = (estado) => {
+        switch (estado) {
+            case "Aprovada":
+                return "shadow-aprovada";
+            case "Em análise":
+                return "shadow-em-analise";
+            case "Rejeitada":
+                return "shadow-rejeitada";
+            case "Reembolsada":
+                return "shadow-reembolsada";
+            default:
+                return "";
+        }
+    };
+
+    return (
+        <div className="row">
+            {despesas.map((despesa, index) => (
+                <div key={index} className="col-md-6 mb-3">
+                    <div className={`border rounded p-3 ${getShadowClass(despesa.estado)}`}>
+                        <div className="row">
+                            <div className="col-md-6">
+                                <strong>Data:</strong> {despesa.data}
+                            </div>
+                            <div className="col-md-6">
+                                <strong>Valor:</strong> {despesa.valor}
+                            </div>
+                        </div>
+                        <div className="row mt-3 align-items-center">
+                            <div className="col-md-6">
+                                <strong>Estado:</strong> {despesa.estado}
+                            </div>
+                            <div className="col-md-6">
+                                <button className='btn btn-secondary' onClick={() => onVerDetalhes(despesa)}>Ver detalhes</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div className="col-md-3">
-                    <strong>Descrição:</strong> {despesa.descricao}
-                </div>
-                <div className="col-md-2">
-                    <strong>Valor:</strong> {despesa.valor}
-                </div>
-                <div className="col-md-2">
-                    <strong>Estado:</strong> {despesa.estado}
-                </div>
-                <div className="col-md-2">
-                    <strong>Reembolsada por:</strong> {despesa.reembolsada_por}
-                </div>
-            </div>
-            <div className="row mt-2">
-                <div className="col-md-6">
-                    <strong>Validador:</strong> {despesa.validador}
-                </div>
-                <div className="col-md-6">
-                    <strong>Comentários:</strong> {despesa.comentarios}
-                </div>
-            </div>
-            <div className="row mt-2">
-                <div className="col-md-12">
-                    <strong>Anexo:</strong> <a href={despesa.anexo} target="_blank" rel="noopener noreferrer">Link para o ficheiro</a>
-                </div>
-            </div>
+            ))}
         </div>
-    ));
+    );
 }
 
 function SumarioDespesas() {
@@ -286,38 +336,6 @@ function SumarioDespesas() {
                         <td><strong>Total</strong></td>
                         <td>{totalAprovado + totalEmAnalise + totalReembolsado + totalRejeitado}</td>
                         <td>{valorAprovado + valorEmAnalise + valorReembolsado + valorRejeitado}€</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    )
-}
-
-function DespesaRecente() {
-    let despesa = despesas[0];
-    return (
-        <div>
-            <table className="table table-bordered">
-                <tbody>
-                    <tr>
-                        <td><strong>Data</strong></td>
-                        <td>{despesa.data}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Descrição</strong></td>
-                        <td>{despesa.descricao}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Valor</strong></td>
-                        <td>{despesa.valor}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Estado</strong></td>
-                        <td>{despesa.estado}</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Anexo</strong></td>
-                        <td>{despesa.anexo}</td>
                     </tr>
                 </tbody>
             </table>

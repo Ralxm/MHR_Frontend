@@ -77,3 +77,19 @@ h3{
 label{
     font-family: 'ronysiswadi'
 }
+
+.shadow-aprovada {
+    box-shadow: 0 0 5px green;
+}
+
+.shadow-em-analise {
+    box-shadow: 0 0 5px yellow;
+}
+
+.shadow-rejeitada {
+    box-shadow: 0 0 5px red;
+}
+
+.shadow-reembolsada {
+    box-shadow: 0 0 5px lime;
+}
