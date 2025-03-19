@@ -3,9 +3,11 @@ import NavBar from "../../Universal/NavBar";
 import './Despesas.css';
 import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Stack, Button, Modal, Paper, Typography, TextField, Chip } from '@mui/material';
+import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab } from '@mui/material';
 import FileDropZone from '../../Universal/FileDropZone'
 import DoughnutPieChart from '../../Universal/DoughnutPieChart';
+import Table from './TabelaDespesas';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
 
 let despesas = [{
     data: "19-02-2023",
@@ -62,6 +64,11 @@ export default function Despesas() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedDespesa, setSelectedDespesa] = useState(null);
     const [despesasData, setDespesasData] = useState([]);
+    const [tab, setTab] = useState('1')
+
+    const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
+        setTab(newValue);
+    };
 
     const toggleCreateDespesa = () => {
         setIsCreateModalOpen(!isCreateModalOpen);
@@ -108,7 +115,7 @@ export default function Despesas() {
                         {/* Coluna da esquerda */}
                         <div className="col-md-4" style={{ zIndex: 1000 }}>
                             <div className='row'>
-                                <div className="items-container" style={{ height: '85vh' }}>   
+                                <div className="items-container" style={{ height: '85vh' }}>
                                     <h3>Sumário de despesas</h3>
                                     <div className='row my-5'>
                                         <DoughnutPieChart data={despesasData} />
@@ -124,11 +131,35 @@ export default function Despesas() {
                         <div className="col-md-8" style={{ zIndex: 1000 }}>
                             {/* Listagem de uma despesa */}
                             <div className="items-container" style={{ height: '85vh', overflowY: 'auto' }}>
-                                <div className="d-flex align-items-center justify-content-between mb-3">
-                                    <h3 className="mb-0">Despesas</h3>
-                                    <button className='btn btn-outline-secondary' onClick={toggleCreateDespesa}>Criar despesa</button>
+                                <div className="d-flex mb-3">
+                                    <Box sx={{ width: 1, typography: 'body1' }}>
+                                        <TabContext value={tab}>
+                                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <TabList onChange={handleChangeTab} aria-label="lab API tabs example" style={{ flexGrow: 1 }}>
+                                                        <Tab label="As minhas despesas" value="1" />
+                                                        <Tab label="por aprovar" value="2" />
+
+                                                        {/* Esta tab só aparece se a conta logada for manager */}
+                                                        <Tab label="Gestão de despesas" value="3" />
+                                                        {/* Esta tab só aparece se a conta logada for manager */}
+                                                    </TabList>
+
+                                                    <button className='btn btn-outline-secondary mb-2' onClick={toggleCreateDespesa}>
+                                                        Criar despesa
+                                                    </button>
+                                                </div>
+                                            </Box>
+
+                                            <TabPanel value="1">
+                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} tipo={'Todas'}></Table>
+                                            </TabPanel>
+                                            <TabPanel value="2">
+                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} tipo={'Por Aprovar'}></Table>
+                                            </TabPanel>
+                                        </TabContext>
+                                    </Box>
                                 </div>
-                                <ExemplosDespesas onVerDetalhes={handleVerDetalhes} />
                             </div>
                         </div>
                     </div>
@@ -149,7 +180,7 @@ export default function Despesas() {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: { xs: 300, sm: 500 },
-                        height: {xs: 500, sm: 850},
+                        height: { xs: 500, sm: 850 },
                         borderRadius: 4,
                         p: 4,
                         overflowY: 'scroll'
@@ -251,10 +282,9 @@ function DetalhesDespesa({ despesa }) {
     const handleSubmit = (e) => {
         e.preventDefault();
         //código para depois fazer as alterações na base de dados
-        console.log('Updated Despesa:', formData);
     };
 
-    if(despesa.estado == "Em análise" || despesa.estado == "Pendente"){
+    if (despesa.estado == "Em análise" || despesa.estado == "Pendente") {
         return (
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
@@ -343,7 +373,7 @@ function DetalhesDespesa({ despesa }) {
                         className="form-control"
                         rows="3"
                         disabled
-                        style={{resize: 'none'}}
+                        style={{ resize: 'none' }}
                     />
                 </div>
                 <button type="submit" className="btn btn-primary col-md-12 mb-1">
@@ -352,7 +382,7 @@ function DetalhesDespesa({ despesa }) {
             </form>
         );
     }
-    else{
+    else {
         return (
             <form onSubmit={handleSubmit}>
                 <div className="mb-3">
@@ -445,7 +475,7 @@ function DetalhesDespesa({ despesa }) {
                         className="form-control"
                         rows="3"
                         disabled
-                        style={{resize: 'none'}}
+                        style={{ resize: 'none' }}
                     />
                 </div>
                 <button type="submit" className="btn btn-primary col-md-12 mb-1">
@@ -454,7 +484,7 @@ function DetalhesDespesa({ despesa }) {
             </form>
         );
     }
-    
+
 }
 
 function ExemplosDespesas({ onVerDetalhes }) {
