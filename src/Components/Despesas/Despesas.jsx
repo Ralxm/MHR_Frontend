@@ -1,9 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 import NavBar from "../../Universal/NavBar";
-import Footer from "../../Universal/Footer";
 import './Despesas.css';
 import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import { Stack, Button, Modal, Paper, Typography, TextField, Chip } from '@mui/material';
+import FileDropZone from '../../Universal/FileDropZone'
+import DoughnutPieChart from '../../Universal/DoughnutPieChart';
 
 let despesas = [{
     data: "19-02-2023",
@@ -57,26 +59,31 @@ let despesas = [{
 }];
 
 export default function Despesas() {
-    const [isFormVisible, setIsFormVisible] = useState(false);
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedDespesa, setSelectedDespesa] = useState(null);
+    const [despesasData, setDespesasData] = useState([]);
 
     const toggleCreateDespesa = () => {
-        setIsFormVisible(!isFormVisible);
-        setSelectedDespesa(null);
+        setIsCreateModalOpen(!isCreateModalOpen);
     };
 
     const handleVerDetalhes = (despesa) => {
         setSelectedDespesa(despesa);
-        setIsFormVisible(false);
     };
 
     const handleCloseDetalhes = () => {
         setSelectedDespesa(null);
     };
 
-    useEffect(() =>{
-        document.title = "Despesas"
-    }, [])
+    const handleFileDrop = (acceptedFiles) => {
+        console.log('Arquivos aceitos:', acceptedFiles);
+    };
+
+    useEffect(() => {
+        document.title = "Despesas";
+        const summarizedData = summarizeDespesas(despesas);
+        setDespesasData(summarizedData);
+    }, []);
 
     return (
         <div id="root">
@@ -94,150 +101,373 @@ export default function Despesas() {
                 overflow: "hidden",
                 opacity: 0.4
             }}> </div>
-            <div></div>
             <NavBar />
             <div className="page-container-despesas">
                 <div className="container-fluid">
-                    <div className="row" >
+                    <div className="row">
                         {/* Coluna da esquerda */}
-                        <div className="col-md-6" style={{ zIndex: 1000 }}>
-
-                            {/* Listagem de uma despesa */}
-                            <div className="items-container" style={{ minHeight: '80vh', maxHeight: '80vh', overflowY: 'auto' }}>
-                                <div className="d-flex align-items-center justify-content-between mb-3">
-                                    <h3 className="mb-0">Despesas</h3>
-                                    <strong><span className='m-0' style={{ cursor: 'pointer', fontSize: '32px' }} onClick={toggleCreateDespesa}>+</span></strong>
-                                </div>
-                                <ExemplosDespesas onVerDetalhes={handleVerDetalhes} />
-                            </div>
-
-                            {/* Sumario de despesas quando os detalhes ou criação estão ativos */}
-                            {(isFormVisible || selectedDespesa != null) && (
-                                <div className='row'>
-                                    <div className="col-md-6 my-4">
-                                        <div className="items-container">
-                                            <h3>Sumário de despesas</h3>
-                                            <SumarioDespesas />
-                                        </div>
+                        <div className="col-md-4" style={{ zIndex: 1000 }}>
+                            <div className='row'>
+                                <div className="items-container" style={{ height: '85vh' }}>   
+                                    <h3>Sumário de despesas</h3>
+                                    <div className='row my-5'>
+                                        <DoughnutPieChart data={despesasData} />
+                                    </div>
+                                    <div className='row'>
+                                        <SumarioDespesas />
                                     </div>
                                 </div>
-                            )}
+                            </div>
                         </div>
 
                         {/* Coluna da direita */}
-                        <div className="col-md-6" style={{ zIndex: 1000 }}>
-
-                            {/* Criação de uma despesa */}
-                            <div className='col-md-12 mb-4' style={{ display: isFormVisible ? "block" : "none" }} id="despesaCreate">
-                                <div className="form-container">
-                                    <div className="d-flex align-items-center justify-content-between mb-3">
-                                        <h3 className="mb-0">Criar uma despesa</h3>
-                                        <strong><span className='m-0' style={{ cursor: 'pointer', fontSize: '32px' }} onClick={toggleCreateDespesa}>x</span></strong>
-                                    </div>
-                                    <form>
-                                        <div className="mb-3 mx-5">
-                                            <label htmlFor="input1" className="form-label">Data</label>
-                                            <input type="date" className="form-control" id="input1" />
-                                        </div>
-                                        <div className="mb-3 mx-5">
-                                            <label htmlFor="input2" className="form-label">Descrição</label>
-                                            <input type="text" className="form-control" id="input2" />
-                                        </div>
-                                        <div className="mb-3 mx-5">
-                                            <label htmlFor="input3" className="form-label">Valor</label>
-                                            <input type="text" className="form-control" id="input3" />
-                                        </div>
-                                        <div className="mb-3 mx-5">
-                                            <label htmlFor="input3" className="form-label">Anexo</label>
-                                            <input type="file" className="form-control" id="input3" />
-                                        </div>
-                                        <button type="submit" className="btn btn-primary">Criar</button>
-                                    </form>
+                        <div className="col-md-8" style={{ zIndex: 1000 }}>
+                            {/* Listagem de uma despesa */}
+                            <div className="items-container" style={{ height: '85vh', overflowY: 'auto' }}>
+                                <div className="d-flex align-items-center justify-content-between mb-3">
+                                    <h3 className="mb-0">Despesas</h3>
+                                    <button className='btn btn-outline-secondary' onClick={toggleCreateDespesa}>Criar despesa</button>
                                 </div>
+                                <ExemplosDespesas onVerDetalhes={handleVerDetalhes} />
                             </div>
-
-                            {/* Detalhes Despesa */}
-                            {selectedDespesa && (
-                                <div className='col-md-12 mb-4' id="detalhesDespesa">
-                                    <div className="form-container">
-                                        <div className="d-flex align-items-center justify-content-between mb-3">
-                                            <h3 className="mb-0">Detalhes da Despesa</h3>
-                                            <strong><span className='m-0' style={{ cursor: 'pointer', fontSize: '32px' }} onClick={handleCloseDetalhes}>x</span></strong>
-                                        </div>
-                                        <DetalhesDespesa despesa={selectedDespesa} />
-                                    </div>
-                                </div>
-                            )}
-
-                            {/* Sumário Despesas */}
-                            {(!isFormVisible && selectedDespesa == null) && (
-                                <div className='row'>
-                                    <div className="col-md-6">
-                                        <div className="items-container">
-                                            <h3>Sumário de despesas</h3>
-                                            <SumarioDespesas />
-                                        </div>
-                                    </div>
-                                </div>
-                            )}
                         </div>
                     </div>
                 </div>
             </div>
+
+            {/* Modal para mostrar os detalhes de uma despesa */}
+            <Modal
+                open={selectedDespesa}
+                onClose={handleCloseDetalhes}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 500 },
+                        height: {xs: 500, sm: 850},
+                        borderRadius: 4,
+                        p: 4,
+                        overflowY: 'scroll'
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6">
+                        Detalhes da Despesa
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        {selectedDespesa && <DetalhesDespesa despesa={selectedDespesa} />}
+                    </Typography>
+                    <Button onClick={handleCloseDetalhes} className='col-md-12'>Fechar</Button>
+                </Paper>
+            </Modal>
+
+            {/* Modal para a criação de uma despesa */}
+            <Modal
+                open={isCreateModalOpen}
+                onClose={toggleCreateDespesa}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 500 },
+                        borderRadius: 4,
+                        p: 4,
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                        Criar uma Despesa
+                    </Typography>
+                    <form>
+                        <Stack spacing={2}>
+                            <TextField
+                                label="Data"
+                                type="date"
+                                InputLabelProps={{ shrink: true }}
+                                fullWidth
+                            />
+                            <TextField
+                                label="Descrição"
+                                fullWidth
+                            />
+                            <TextField
+                                label="Valor"
+                                type="number"
+                                fullWidth
+                            />
+                            <FileDropZone
+                                onDrop={handleFileDrop}
+                                accept={{
+                                    'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+                                    'application/pdf': ['.pdf'],
+                                }}
+                                maxSize={2 * 1024 * 1024} //2 megabytes
+                            />
+
+                            <Button type="submit" variant="contained" color="primary">
+                                Criar
+                            </Button>
+                        </Stack>
+                    </form>
+                </Paper>
+            </Modal>
         </div>
     );
 }
 
 function DetalhesDespesa({ despesa }) {
-    return (
-        <div>
-            <div className="mb-3 mx-5">
-                <label className="form-label"><strong>Data:</strong></label>
-                <p>{despesa.data}</p>
-            </div>
-            <div className="mb-3 mx-5">
-                <label className="form-label"><strong>Descrição:</strong></label>
-                <p>{despesa.descricao}</p>
-            </div>
-            <div className="mb-3 mx-5">
-                <label className="form-label"><strong>Valor:</strong></label>
-                <p>{despesa.valor}</p>
-            </div>
-            <div className="mb-3 mx-5">
-                <label className="form-label"><strong>Anexo:</strong></label>
-                <p>{despesa.anexo}</p>
-            </div>
-            <div className="mb-3 mx-5">
-                <label className="form-label"><strong>Validador:</strong></label>
-                <p>{despesa.validador}</p>
-            </div>
-            <div className="mb-3 mx-5">
-                <label className="form-label"><strong>Estado:</strong></label>
-                <p>{despesa.estado}</p>
-            </div>
-            <div className="mb-3 mx-5">
-                <label className="form-label"><strong>Reembolsada por:</strong></label>
-                <p>{despesa.reembolsada_por}</p>
-            </div>
-            <div className="mb-3 mx-5">
-                <label className="form-label"><strong>Comentários:</strong></label>
-                <p>{despesa.comentarios}</p>
-            </div>
-        </div>
-    );
+    const convertDateToInputFormat = (date) => {
+        const [day, month, year] = date.split('-');
+        return `${year}-${month}-${day}`;
+    };
+
+    const [formData, setFormData] = useState({
+        data: convertDateToInputFormat(despesa.data),
+        descricao: despesa.descricao,
+        valor: despesa.valor,
+        anexo: despesa.anexo,
+        validador: despesa.validador,
+        estado: despesa.estado,
+        reembolsada_por: despesa.reembolsada_por,
+        comentarios: despesa.comentarios,
+    });
+
+    const handleChange = (e) => {
+        const { name, value } = e.target;
+        setFormData((prevData) => ({
+            ...prevData,
+            [name]: value,
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        //código para depois fazer as alterações na base de dados
+        console.log('Updated Despesa:', formData);
+    };
+
+    if(despesa.estado == "Em análise" || despesa.estado == "Pendente"){
+        return (
+            <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Data:</strong></label>
+                    <input
+                        type="date"
+                        name="data"
+                        value={formData.data}
+                        onChange={handleChange}
+                        className="form-control"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Descrição:</strong></label>
+                    <input
+                        type="text"
+                        name="descricao"
+                        value={formData.descricao}
+                        onChange={handleChange}
+                        className="form-control"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Valor:</strong></label>
+                    <input
+                        type="text"
+                        name="valor"
+                        value={formData.valor}
+                        onChange={handleChange}
+                        className="form-control"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Anexo:</strong></label>
+                    <input
+                        type="text"
+                        name="anexo"
+                        value={formData.anexo}
+                        onChange={handleChange}
+                        className="form-control"
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Validador:</strong></label>
+                    <input
+                        type="text"
+                        name="validador"
+                        value={formData.validador}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Estado:</strong></label>
+                    <select
+                        name="estado"
+                        value={formData.estado}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    >
+                        <option value="Aprovada">Aprovada</option>
+                        <option value="Em análise">Em análise</option>
+                        <option value="Rejeitada">Rejeitada</option>
+                        <option value="Reembolsada">Reembolsada</option>
+                    </select>
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Reembolsada por:</strong></label>
+                    <input
+                        type="text"
+                        name="reembolsada_por"
+                        value={formData.reembolsada_por}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Comentários:</strong></label>
+                    <textarea
+                        name="comentarios"
+                        value={formData.comentarios}
+                        onChange={handleChange}
+                        className="form-control"
+                        rows="3"
+                        disabled
+                        style={{resize: 'none'}}
+                    />
+                </div>
+                <button type="submit" className="btn btn-primary col-md-12 mb-1">
+                    Salvar Alterações
+                </button>
+            </form>
+        );
+    }
+    else{
+        return (
+            <form onSubmit={handleSubmit}>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Data:</strong></label>
+                    <input
+                        type="date"
+                        name="data"
+                        value={formData.data}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Descrição:</strong></label>
+                    <input
+                        type="text"
+                        name="descricao"
+                        value={formData.descricao}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Valor:</strong></label>
+                    <input
+                        type="text"
+                        name="valor"
+                        value={formData.valor}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Anexo:</strong></label>
+                    <input
+                        type="text"
+                        name="anexo"
+                        value={formData.anexo}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Validador:</strong></label>
+                    <input
+                        type="text"
+                        name="validador"
+                        value={formData.validador}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Estado:</strong></label>
+                    <select
+                        name="estado"
+                        value={formData.estado}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    >
+                        <option value="Aprovada">Aprovada</option>
+                        <option value="Em análise">Em análise</option>
+                        <option value="Rejeitada">Rejeitada</option>
+                        <option value="Reembolsada">Reembolsada</option>
+                    </select>
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Reembolsada por:</strong></label>
+                    <input
+                        type="text"
+                        name="reembolsada_por"
+                        value={formData.reembolsada_por}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Comentários:</strong></label>
+                    <textarea
+                        name="comentarios"
+                        value={formData.comentarios}
+                        onChange={handleChange}
+                        className="form-control"
+                        rows="3"
+                        disabled
+                        style={{resize: 'none'}}
+                    />
+                </div>
+                <button type="submit" className="btn btn-primary col-md-12 mb-1">
+                    Salvar Alterações
+                </button>
+            </form>
+        );
+    }
+    
 }
 
 function ExemplosDespesas({ onVerDetalhes }) {
     const getShadowClass = (estado) => {
         switch (estado) {
             case "Aprovada":
-                return "shadow-aprovada";
+                return "success";
             case "Em análise":
-                return "shadow-em-analise";
+                return "warning";
             case "Rejeitada":
-                return "shadow-rejeitada";
+                return "error";
             case "Reembolsada":
-                return "shadow-reembolsada";
+                return "success";
             default:
                 return "";
         }
@@ -246,21 +476,22 @@ function ExemplosDespesas({ onVerDetalhes }) {
     return (
         <div className="row">
             {despesas.map((despesa, index) => (
-                <div key={index} className="col-md-6 mb-3">
+                <div key={index} className="col-md-12 mb-3">
                     <div className={`border rounded p-3 ${getShadowClass(despesa.estado)}`}>
-                        <div className="row">
-                            <div className="col-md-6">
+                        <div className="row d-flex align-items-center">
+                            <div className="col-md-2">
                                 <strong>Data:</strong> {despesa.data}
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-2">
                                 <strong>Valor:</strong> {despesa.valor}
                             </div>
-                        </div>
-                        <div className="row mt-3 align-items-center">
-                            <div className="col-md-6">
-                                <strong>Estado:</strong> {despesa.estado}
+                            <div className="col-md-3">
+                                <strong>Anexo: </strong><a href={despesa.anexo} target="_blank" style={{ color: 'black' }}>Clique aqui</a>
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-3">
+                                <Chip label={despesa.estado} color={getShadowClass(despesa.estado)} size='10px'></Chip>
+                            </div>
+                            <div className="col-md-2">
                                 <button className='btn btn-secondary' onClick={() => onVerDetalhes(despesa)}>Ver detalhes</button>
                             </div>
                         </div>
@@ -300,7 +531,7 @@ function SumarioDespesas() {
         }
     });
     return (
-        <div className="container mb-3 p-3 border rounded">
+        <div className="container mb-3 p-3">
             <table className="table table-bordered">
                 <tbody>
                     <tr>
@@ -343,3 +574,22 @@ function SumarioDespesas() {
         </div>
     )
 }
+
+const summarizeDespesas = (despesas) => {
+    const summary = {};
+
+    despesas.forEach((despesa) => {
+        const estado = despesa.estado;
+        const valor = parseFloat(despesa.valor.replace(',', '.'));
+
+        if (!summary[estado]) {
+            summary[estado] = 0;
+        }
+        summary[estado] += valor;
+    });
+
+    return Object.keys(summary).map((estado) => ({
+        name: estado,
+        value: summary[estado],
+    }));
+};
