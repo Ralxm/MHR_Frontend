@@ -15,12 +15,12 @@ export default function NavBar() {
   return (
     <div className="navbar">
       <div className="navbar-content">
-        <a className="logo" onClick={() => (window.location = '/')}>
+        <a className="logo m-3" onClick={() => (window.location = '/')}>
           <img src="/Logo.png" alt="Logo" />
         </a>
 
         {isLoggedIn && (
-          <div className="navbar-items">
+          <div className="navbar-items p-3">
             <a style={{textDecoration: "none", color: "black"}} href='/vagas'>Vagas</a>
             <a style={{textDecoration: "none", color: "black"}} href='/calendario'>Calendário</a>
             <a style={{textDecoration: "none", color: "black"}} href='/projetos'>Projetos</a>

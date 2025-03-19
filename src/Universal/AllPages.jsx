@@ -5,6 +5,8 @@ import Login from '../Components/Login/Login'
 import Registar from "../Components/Registar/Registar";
 import Despesas from "../Components/Despesas/Despesas";
 import Calendario from "../Components/Calendario/Calendario";
+import Projetos from "../Components/Projetos/Projetos";
+import Projeto from "../Components/Projetos/Projeto";
 
 export default function MainPage(){
     return (
@@ -19,6 +21,10 @@ export default function MainPage(){
                 <Route path='/despesas' element={<Despesas></Despesas>}>
                 </Route>
                 <Route path='/calendario' element={<Calendario></Calendario>}>
+                </Route>
+                <Route path='/projetos' element={<Projetos></Projetos>}>
+                </Route>
+                <Route path='/projeto/:id' element={<Projeto></Projeto>}>
                 </Route>
             </Routes>
         </div>

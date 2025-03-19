@@ -163,7 +163,6 @@ export default function Calendario() {
                     </div>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 
