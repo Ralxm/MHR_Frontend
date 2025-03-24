@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import NavBar from "../../Universal/NavBar";
 import './Despesas.css';
 import '../../index.css'
@@ -8,6 +9,7 @@ import FileDropZone from '../../Universal/FileDropZone'
 import DoughnutPieChart from '../../Universal/DoughnutPieChart';
 import Table from './TabelaDespesas';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
+import authService from '../Login/auth-service';
 
 let despesas = [{
     data: "19-02-2023",
@@ -61,6 +63,7 @@ let despesas = [{
 }];
 
 export default function Despesas() {
+    const navigate = useNavigate();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedDespesa, setSelectedDespesa] = useState(null);
     const [despesasData, setDespesasData] = useState([]);
@@ -87,7 +90,12 @@ export default function Despesas() {
     };
 
     useEffect(() => {
+        if (!authService.getCurrentUser()) {
+            navigate('/login')
+        }
+
         document.title = "Despesas";
+
         const summarizedData = summarizeDespesas(despesas);
         setDespesasData(summarizedData);
     }, []);

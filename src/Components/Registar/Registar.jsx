@@ -1,10 +1,50 @@
-import { Route, Routes } from "react-router-dom";
+import { Route, Routes, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import './Registar.css'
 import '../../index.css'
+import authService  from "../Login/auth-service";
 
 
 export default function Registar() {
+    const [USERNAME, setUSERNAME] = useState('')
+    const [PASSWORD, setPASSWORD] = useState('')
+    const [loading, setloading] = useState(false);
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        document.title = "Login"
+    
+        if(authService.getCurrentUser()){
+            navigate('calendario')
+        }
+    }, [])
+
+    function HandleRegisto(event){
+            event.preventDefault();
+            setloading(true);
+            authService.registo(USERNAME, PASSWORD)
+            .then(res => {
+                if(res === "" || res === false){
+                    alert('Registo falhou 1')
+                }
+                else{
+                    if(res.success){
+                        alert("Registo feito com sucesso, faça login!")
+                        navigate('/login');
+                    }
+                    else{
+                        alert('Registo falhou 2')
+                    }
+                }
+                setloading(false);
+            })
+            .catch(err => {
+                alert('Registo falhou 3')
+                console.log(err)
+                setloading(false);
+            })
+        }
+
     return (
         <div className="page-container">
             <div className="content" style={{
@@ -28,13 +68,13 @@ export default function Registar() {
                     <form className="w-80 mx-auto">
                         <div className="mb-3">
                             <label htmlFor="username" className="form-label">Utilizador</label>
-                            <input type="text" className="form-control" id="username" placeholder="Introduza o seu nickname"/>
+                            <input type="text" className="form-control" id="username" placeholder="Introduza o seu nickname" onChange={(value) => setUSERNAME(value.target.value)}/>
                         </div>
                         <div className="mb-3">
                             <label htmlFor="password" className="form-label">Password</label>
-                            <input type="password" className="form-control" id="password" placeholder="Introduza a sua password" />
+                            <input type="password" className="form-control" id="password" placeholder="Introduza a sua password" onChange={(value) => setPASSWORD(value.target.value)} />
                         </div>
-                        <button type="submit" className="btn btn-info w-100">Fazer registo</button>
+                        <button type="submit" className="btn btn-info w-100" onClick={HandleRegisto}>Fazer registo</button>
                     </form>
                     <hr></hr>
                     <div style={{padding: "15px"}}>

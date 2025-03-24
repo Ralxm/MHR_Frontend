@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { createSwapy } from 'swapy';
 import NavBar from "../../Universal/NavBar";
-import Footer from "../../Universal/Footer";
 import './Calendario.css';
 import '../../index.css'
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
+import authService from '../Login/auth-service';
+
 
 let faltas = [{
     id_tipo_falta: "1",
@@ -63,6 +65,7 @@ let ferias = [{
 export default function Calendario() {
     const swapy = useRef(null);
     const container = useRef(null);
+    const navigate = useNavigate();
     const [isFaltasFormVisible, setIsFaltasFormVisible] = useState(false);
     const [isFeriasFormVisible, setIsFeriasFormVisible] = useState(false);
 
@@ -87,6 +90,12 @@ export default function Calendario() {
     };
 
     useEffect(() => {
+        if (!authService.getCurrentUser()) {
+            navigate('/login')
+        }
+
+        document.title = "Calendário"
+
         if (container.current) {
             swapy.current = createSwapy(container.current);
 
@@ -133,7 +142,7 @@ export default function Calendario() {
 
                             <div className='row'>
                                 <div className="col-md-6" data-swapy-slot="faltas">
-                                    <div className="items-container" data-swapy-item="faltas" style={{height: '80vh', overflowY: 'auto' }}>
+                                    <div className="items-container" data-swapy-item="faltas" style={{ height: '80vh', overflowY: 'auto' }}>
                                         <h3 className="mb-4">Faltas</h3>
                                         <ExemplosFaltas justificar={toggleJustificarFaltas}></ExemplosFaltas>
                                     </div>
