@@ -18,6 +18,7 @@ export default function Despesas() {
     const [selectedDespesa, setSelectedDespesa] = useState(null);
     const [despesasData, setDespesasData] = useState([]);
     const [tab, setTab] = useState('1')
+    const [isApagarModalOpen, setIsApagarModalOpen] = useState(false);
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -47,9 +48,16 @@ export default function Despesas() {
         setSelectedDespesa(null);
     };
 
-    const handleFileDrop = (acceptedFiles) => {
-        console.log('Arquivos aceitos:', acceptedFiles);
+    const handleApagar = (despesa) => {
+        setSelectedDespesa(despesa)
+        console.log(despesa)
+        setIsApagarModalOpen(true)
     };
+
+    const toggleApagarDespesa = () => {
+        setIsApagarModalOpen(!isApagarModalOpen)
+    }
+
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -57,12 +65,12 @@ export default function Despesas() {
         }
 
         let tipo = localStorage.getItem('tipo');
-        if(tipo == 5){
+        if (tipo == 5) {
             navigate('/vagas')
         }
 
         let user = localStorage.getItem("id_utilizador")
-        if(user){
+        if (user) {
             setUtilizador(user)
             setTipoUser(localStorage.getItem("tipo"))
         }
@@ -71,36 +79,36 @@ export default function Despesas() {
     }, []);
 
     useEffect(() => {
-        if(id_user){
+        if (id_user) {
             handleServices.find_perfil(id_user)
-            .then(res => {
-                setPerfil(res.id_perfil);
-            })
-            .catch(err => {
-                console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
-            })
+                .then(res => {
+                    setPerfil(res.id_perfil);
+                })
+                .catch(err => {
+                    console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
+                })
         }
     }, [id_user])
 
     useEffect(() => {
         handleServices.listDespesas(id_perfil)
-        .then(res => {
-            setDespesas(res);
-        })
-        .catch(err => {
-            console.log("Não foi possivel encontrar as despesas do utilizador: " + err)
-        })
+            .then(res => {
+                setDespesas(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar as despesas do utilizador: " + err)
+            })
     }, [id_perfil])
 
     useEffect(() => {
-        if(tipo_user && (tipo_user == 1 || tipo_user == 2)){
+        if (tipo_user && (tipo_user == 1 || tipo_user == 2)) {
             handleServices.listDespesasPorAprovar()
-            .then(res => {
-                setDespesasPorAprovar(res);
-            })
-            .catch(err => {
-                console.log(err)
-            })
+                .then(res => {
+                    setDespesasPorAprovar(res);
+                })
+                .catch(err => {
+                    console.log(err)
+                })
         }
     }, tipo_user)
 
@@ -109,15 +117,39 @@ export default function Despesas() {
         setDespesasData(summarizedData);
     }, [despesas])
 
-    function handleCriar(event){
+    function handleCriar(event) {
         event.preventDefault();
-        handleServices.createDespesa(id_perfil, date, descricao, valor, ficheiro)
+        const formData = new FormData();
+        formData.append('id_perfil', id_perfil);
+        formData.append('_data', date);
+        formData.append('descricao', descricao);
+        formData.append('valor', valor);
+        formData.append('estado', "Pendente");
+
+        if (ficheiro) {
+            formData.append('anexo', ficheiro);
+        }
+
+        handleServices.createDespesa(formData)
+            .then(res => {
+                alert("Despesa criada com sucesso");
+                navigate(0)
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    function handleApagarDespesa(event) {
+        event.preventDefault();
+        handleServices.apagarDespesa(selectedDespesa.id_despesa)
         .then(res => {
-            alert("Despesa criada com sucesso")
+            alert("Despesa apagada com sucesso")
+            navigate(0)
         })
         .catch(err => {
-            console.log("Erro a criar a despesa: " + err)
-        })
+            console.log("Erro a apagar a despesa: " + err);
+        });
     }
 
     return (
@@ -147,13 +179,13 @@ export default function Despesas() {
                                     <h3>Sumário de despesas</h3>
                                     <div className='row my-5'>
                                         {despesas && despesasData &&
-                                        <DoughnutPieChart data={despesasData} />
+                                            <DoughnutPieChart data={despesasData} />
                                         }
                                     </div>
                                     <div className='row'>
-                                        {despesas && 
-                                        <SumarioDespesas despesas={despesas}></SumarioDespesas>
-                                        }   
+                                        {despesas &&
+                                            <SumarioDespesas despesas={despesas}></SumarioDespesas>
+                                        }
                                     </div>
                                 </div>
                             </div>
@@ -174,7 +206,7 @@ export default function Despesas() {
 
                                                         {/* Esta tab só aparece se a conta logada for manager */}
                                                         {(tipo_user == 1 || tipo_user == 2) &&
-                                                        <Tab label="Gestão de despesas" value="3" />
+                                                            <Tab label="Gestão de despesas" value="3" />
                                                         }
                                                         {/* Esta tab só aparece se a conta logada for manager */}
                                                     </TabList>
@@ -186,7 +218,7 @@ export default function Despesas() {
                                             </Box>
 
                                             <TabPanel value="1">
-                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} tipo={'Todas'}></Table>
+                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} onApagar={handleApagar} tipo={'Todas'}></Table>
                                             </TabPanel>
                                             <TabPanel value="2">
                                                 <Table data={despesas} onVerDetalhes={handleVerDetalhes} tipo={'Por Aprovar'}></Table>
@@ -261,27 +293,30 @@ export default function Despesas() {
                                 type="date"
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
-                                onChange={(value) => {setDate(value.target.value)}}
+                                onChange={(value) => { setDate(value.target.value) }}
                             />
                             <TextField
                                 label="Descrição"
                                 fullWidth
-                                onChange={(value) => {setDescricao(value.target.value)}}
+                                onChange={(value) => { setDescricao(value.target.value) }}
                             />
                             <TextField
                                 label="Valor"
                                 type="number"
                                 fullWidth
-                                onChange={(value) => {setValor(value.target.value)}}
+                                onChange={(value) => { setValor(value.target.value) }}
                             />
                             <FileDropZone
-                                onDrop={handleFileDrop}
+                                onDrop={(files) => {
+                                    if (files && files.length > 0) {
+                                        setFicheiro(files[0]);
+                                    }
+                                }}
                                 accept={{
                                     'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
                                     'application/pdf': ['.pdf'],
                                 }}
-                                maxSize={2 * 1024 * 1024} //2 megabytes
-                                onChange={(value) => {setFicheiro(value.target.value)}}
+                                maxSize={5 * 1024 * 1024}
                             />
 
                             <Button variant="contained" color="primary" onClick={handleCriar}>
@@ -289,6 +324,48 @@ export default function Despesas() {
                             </Button>
                         </Stack>
                     </form>
+                </Paper>
+            </Modal>
+
+            {/*Modal para apagar uma despesa */}
+            <Modal
+                open={isApagarModalOpen}
+                onClose={toggleApagarDespesa}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 500 },
+                        borderRadius: 4,
+                        p: 4,
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                        Tem a certeza que quer eliminar esta despesa?
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {toggleApagarDespesa(); handleCloseDetalhes()}}
+                            sx={{ width: '50%' }}
+                        >
+                            Fechar
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={(event) => {handleApagarDespesa(event); handleCloseDetalhes(); toggleApagarDespesa()}}
+                            sx={{ width: '50%' }}
+                        >
+                            Apagar
+                        </Button>
+                    </Stack>
                 </Paper>
             </Modal>
         </div>
@@ -325,209 +402,109 @@ function DetalhesDespesa({ despesa }) {
         //código para depois fazer as alterações na base de dados
     };
 
-    if (despesa.estado == "Em análise" || despesa.estado == "Pendente") {
-        return (
-            <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Data:</strong></label>
-                    <input
-                        type="date"
-                        name="data"
-                        value={formData.data}
-                        onChange={handleChange}
-                        className="form-control"
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Descrição:</strong></label>
-                    <input
-                        type="text"
-                        name="descricao"
-                        value={formData.descricao}
-                        onChange={handleChange}
-                        className="form-control"
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Valor:</strong></label>
-                    <input
-                        type="text"
-                        name="valor"
-                        value={formData.valor}
-                        onChange={handleChange}
-                        className="form-control"
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Anexo:</strong></label>
-                    <input
-                        type="text"
-                        name="anexo"
-                        value={formData.anexo}
-                        onChange={handleChange}
-                        className="form-control"
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Validador:</strong></label>
-                    <input
-                        type="text"
-                        name="validador"
-                        value={formData.validador}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Estado:</strong></label>
-                    <select
-                        name="estado"
-                        value={formData.estado}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    >
-                        <option value="Aprovada">Aprovada</option>
-                        <option value="Em análise">Em análise</option>
-                        <option value="Rejeitada">Rejeitada</option>
-                        <option value="Reembolsada">Reembolsada</option>
-                    </select>
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Reembolsada por:</strong></label>
-                    <input
-                        type="text"
-                        name="reembolsada_por"
-                        value={formData.reembolsada_por}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Comentários:</strong></label>
-                    <textarea
-                        name="comentarios"
-                        value={formData.comentarios}
-                        onChange={handleChange}
-                        className="form-control"
-                        rows="3"
-                        disabled
-                        style={{ resize: 'none' }}
-                    />
-                </div>
-                <button type="submit" className="btn btn-primary col-md-12 mb-1">
-                    Salvar Alterações
-                </button>
-            </form>
-        );
-    }
-    else {
-        return (
-            <form onSubmit={handleSubmit}>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Data:</strong></label>
-                    <input
-                        type="date"
-                        name="data"
-                        value={formData.data}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Descrição:</strong></label>
-                    <input
-                        type="text"
-                        name="descricao"
-                        value={formData.descricao}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Valor:</strong></label>
-                    <input
-                        type="text"
-                        name="valor"
-                        value={formData.valor}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Anexo:</strong></label>
-                    <input
-                        type="text"
-                        name="anexo"
-                        value={formData.anexo}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Validador:</strong></label>
-                    <input
-                        type="text"
-                        name="validador"
-                        value={formData.validador}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Estado:</strong></label>
-                    <select
-                        name="estado"
-                        value={formData.estado}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    >
-                        <option value="Aprovada">Aprovada</option>
-                        <option value="Em análise">Em análise</option>
-                        <option value="Rejeitada">Rejeitada</option>
-                        <option value="Reembolsada">Reembolsada</option>
-                    </select>
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Reembolsada por:</strong></label>
-                    <input
-                        type="text"
-                        name="reembolsada_por"
-                        value={formData.reembolsada_por}
-                        onChange={handleChange}
-                        className="form-control"
-                        disabled
-                    />
-                </div>
-                <div className="mb-3">
-                    <label className="form-label"><strong>Comentários:</strong></label>
-                    <textarea
-                        name="comentarios"
-                        value={formData.comentarios}
-                        onChange={handleChange}
-                        className="form-control"
-                        rows="3"
-                        disabled
-                        style={{ resize: 'none' }}
-                    />
-                </div>
-                <button type="submit" className="btn btn-primary col-md-12 mb-1">
-                    Salvar Alterações
-                </button>
-            </form>
-        );
-    }
+    return (
+        <form onSubmit={handleSubmit}>
+            <div className="mb-3">
+                <label className="form-label"><strong>Data:</strong></label>
+                <input
+                    type="date"
+                    name="data"
+                    value={formData.data}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}
+                />
+            </div>
+            <div className="mb-3">
+                <label className="form-label"><strong>Descrição:</strong></label>
+                <input
+                    type="text"
+                    name="descricao"
+                    value={formData.descricao}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}
+                />
+            </div>
+            <div className="mb-3">
+                <label className="form-label"><strong>Valor:</strong></label>
+                <input
+                    type="text"
+                    name="valor"
+                    value={formData.valor}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}
+                />
+            </div>
+            <div className="mb-3">
+                <label className="form-label"><strong>Anexo:</strong></label>
+                <input
+                    type="text"
+                    name="anexo"
+                    value={formData.anexo}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}
+                />
+            </div>
+            <div className="mb-3">
+                <label className="form-label"><strong>Validador:</strong></label>
+                <input
+                    type="text"
+                    name="validador"
+                    value={formData.validador}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled
+                />
+            </div>
+            <div className="mb-3">
+                <label className="form-label"><strong>Estado:</strong></label>
+                <select
+                    name="estado"
+                    value={formData.estado}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled
+                >
+                    <option value="Aprovada">Aprovada</option>
+                    <option value="Em análise">Em análise</option>
+                    <option value="Rejeitada">Rejeitada</option>
+                    <option value="Reembolsada">Reembolsada</option>
+                </select>
+            </div>
+            <div className="mb-3">
+                <label className="form-label"><strong>Reembolsada por:</strong></label>
+                <input
+                    type="text"
+                    name="reembolsada_por"
+                    value={formData.reembolsada_por}
+                    onChange={handleChange}
+                    className="form-control"
+                    disabled
+                />
+            </div>
+            <div className="mb-3">
+                <label className="form-label"><strong>Comentários:</strong></label>
+                <textarea
+                    name="comentarios"
+                    value={formData.comentarios}
+                    onChange={handleChange}
+                    className="form-control"
+                    rows="3"
+                    disabled
+                    style={{ resize: 'none' }}
+                />
+            </div>
+            <button type="submit" className="btn btn-primary col-md-12 mb-1">
+                Salvar Alterações
+            </button>
+        </form>
+    );
 }
 
-function SumarioDespesas( {despesas} ) {
+function SumarioDespesas({ despesas }) {
     let valorAprovado = 0;
     let valorRejeitado = 0;
     let valorEmAnalise = 0;

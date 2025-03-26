@@ -12,18 +12,14 @@ class HandleServices {
             }, reason => { throw new Error('Utilizador Inválido'); });
     }
 
-    createDespesa(id_perfil, date, descricao, valor, ficheiro) {
+    createDespesa(formData) {
         let url = process.env.REACT_APP_BACKEND_LINK;
 
-        let datapost = {
-            id_perfil: id_perfil,
-            _data: date,
-            descricao: descricao,
-            valor: valor,
-            estado: "Pendente"
-        }
-
-        return axios.post(url + "despesas/create", datapost, authHeader())
+        return axios.post(url + "despesas/create", formData, {...authHeader(),
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        })
             .then(res => {
                 console.log(res)
                 if (res.data.success) {
@@ -55,10 +51,19 @@ class HandleServices {
                         ...item,
                         data: item.data.replace('T', ' ').replace(/\.\d+Z$/, '')
                     }));
-                    console.log(formattedData)
                     return formattedData;
                 }
             }, reason => { throw new Error('Erro a listar todas as despesas por aprovar'); });
+    }
+
+    apagarDespesa(id_despesa) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.put(url + "despesas/delete/" + id_despesa, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a apagar a despesa'); });
     }
 }
 
