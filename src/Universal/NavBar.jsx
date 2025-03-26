@@ -8,6 +8,7 @@ import authService from '../Components/Login/auth-service';
 
 export default function NavBar() {
   const [nome, setNome] = useState('');
+  const [tipo, setTipo] = useState();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [anchorEl, setAnchorEl] = useState(null);
   const navigate = useNavigate();
@@ -17,22 +18,23 @@ export default function NavBar() {
     if (user) {
       setIsLoggedIn(true);
       setNome(JSON.parse(localStorage.getItem('nome')))
+      setTipo(JSON.parse(localStorage.getItem('tipo')))
     }
   }, []);
 
   const handleMenu = (event) => {
-		setAnchorEl(event.currentTarget);
-	};
+    setAnchorEl(event.currentTarget);
+  };
 
   const handleClose = () => {
-		setAnchorEl(null);
-	};
+    setAnchorEl(null);
+  };
 
   const handleLogout = () => {
-		handleClose();
+    handleClose();
     authService.logout();
     navigate('/login')
-	};
+  };
 
   return (
     <div className="navbar">
@@ -40,42 +42,74 @@ export default function NavBar() {
         <a className="logo m-3" onClick={() => (window.location = '/')}>
           <img src="/Logo.png" alt="Logo" />
         </a>
-
-        {isLoggedIn && (
+        
+        {isLoggedIn && tipo != 5 ? (
           <div className="navbar-items p-3">
-            <a style={{textDecoration: "none", color: "black"}} href='/vagas'>Vagas</a>
-            <a style={{textDecoration: "none", color: "black"}} href='/calendario'>Calendário</a>
-            <a style={{textDecoration: "none", color: "black"}} href='/projetos'>Projetos</a>
-            <a style={{textDecoration: "none", color: "black"}} href='/despesas'>Despesas</a>
-            <a style={{textDecoration: "none", color: "black"}} href='/blog'>Blog</a>
+            <a style={{ textDecoration: "none", color: "black" }} href='/vagas'>Vagas</a>
+            <a style={{ textDecoration: "none", color: "black" }} href='/calendario'>Calendário</a>
+            <a style={{ textDecoration: "none", color: "black" }} href='/projetos'>Projetos</a>
+            <a style={{ textDecoration: "none", color: "black" }} href='/despesas'>Despesas</a>
+            <a style={{ textDecoration: "none", color: "black" }} href='/blog'>Blog</a>
             <IconButton
-								size="large"
-								aria-label="account of current user"
-								aria-controls="menu-appbar"
-								aria-haspopup="true"
-								onClick={handleMenu}
-								color="inherit"
-							>
-							<Icon icon="material-symbols:account-circle" sx={{ fontSize: 24 }} />
-						</IconButton>
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <Icon icon="material-symbols:account-circle" sx={{ fontSize: 24 }} />
+            </IconButton>
             <Menu
-								id="menu-appbar"
-								anchorEl={anchorEl}
-								anchorOrigin={{
-									vertical: 'bottom',
-									horizontal: 'right',
-								}}
-								keepMounted
-								transformOrigin={{
-									vertical: 'top',
-									horizontal: 'right',
-								}}
-								open={Boolean(anchorEl)}
-								onClose={handleClose}
-							>
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
               <MenuItem disabled>{nome}</MenuItem>
-							<MenuItem onClick={handleLogout}>Logout</MenuItem>
-						</Menu>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
+          </div>
+        ) : (
+          <div className="navbar-items p-3">
+            <a style={{ textDecoration: "none", color: "black" }} href='/vagas'>Vagas</a>
+            <IconButton
+              size="large"
+              aria-label="account of current user"
+              aria-controls="menu-appbar"
+              aria-haspopup="true"
+              onClick={handleMenu}
+              color="inherit"
+            >
+              <Icon icon="material-symbols:account-circle" sx={{ fontSize: 24 }} />
+            </IconButton>
+            <Menu
+              id="menu-appbar"
+              anchorEl={anchorEl}
+              anchorOrigin={{
+                vertical: 'bottom',
+                horizontal: 'right',
+              }}
+              keepMounted
+              transformOrigin={{
+                vertical: 'top',
+                horizontal: 'right',
+              }}
+              open={Boolean(anchorEl)}
+              onClose={handleClose}
+            >
+              <MenuItem disabled>{nome}</MenuItem>
+              <MenuItem onClick={handleLogout}>Logout</MenuItem>
+            </Menu>
           </div>
         )}
       </div>

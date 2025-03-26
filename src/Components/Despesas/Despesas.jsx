@@ -10,57 +10,7 @@ import DoughnutPieChart from '../../Universal/DoughnutPieChart';
 import Table from './TabelaDespesas';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import authService from '../Login/auth-service';
-
-let despesas = [{
-    data: "19-02-2023",
-    descricao: 'Uma descricao interessante',
-    valor: '49.02',
-    anexo: 'link para o ficheiro',
-    validador: 'nome do validador',
-    estado: "Aprovada",
-    reembolsada_por: "nome do reembolsador",
-    comentarios: "um comentario do validador ou reembolsador"
-},
-{
-    data: "23-11-2024",
-    descricao: 'Uma descricao interessante',
-    valor: '156.72',
-    anexo: 'link para o ficheiro',
-    validador: 'nome do validador',
-    estado: "Em análise",
-    reembolsada_por: "nome do reembolsador",
-    comentarios: "um comentario do validador ou reembolsador"
-},
-{
-    data: "11-12-2024",
-    descricao: 'Uma descricao interessante',
-    valor: '288.99',
-    anexo: 'link para o ficheiro',
-    validador: 'nome do validador',
-    estado: "Rejeitada",
-    reembolsada_por: "nome do reembolsador",
-    comentarios: "um comentario do validador ou reembolsador"
-},
-{
-    data: "04-01-2025",
-    descricao: 'Uma descricao interessante',
-    valor: '56.23',
-    anexo: 'link para o ficheiro',
-    validador: 'nome do validador',
-    estado: "Rejeitada",
-    reembolsada_por: "nome do reembolsador",
-    comentarios: "um comentario do validador ou reembolsador"
-},
-{
-    data: "23-02-2025",
-    descricao: 'Uma descricao interessante',
-    valor: '542.55',
-    anexo: 'link para o ficheiro',
-    validador: 'nome do validador',
-    estado: "Reembolsada",
-    reembolsada_por: "nome do reembolsador",
-    comentarios: "um comentario do validador ou reembolsador"
-}];
+import handleServices from './handle-services';
 
 export default function Despesas() {
     const navigate = useNavigate();
@@ -68,6 +18,18 @@ export default function Despesas() {
     const [selectedDespesa, setSelectedDespesa] = useState(null);
     const [despesasData, setDespesasData] = useState([]);
     const [tab, setTab] = useState('1')
+
+    const [id_user, setUtilizador] = useState();
+    const [tipo_user, setTipoUser] = useState();
+
+    const [despesas, setDespesas] = useState([]);
+    const [despesasPorAprovar, setDespesasPorAprovar] = useState([])
+
+    const [id_perfil, setPerfil] = useState()
+    const [date, setDate] = useState('')
+    const [descricao, setDescricao] = useState('')
+    const [valor, setValor] = useState()
+    const [ficheiro, setFicheiro] = useState('')
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         setTab(newValue);
@@ -94,11 +56,69 @@ export default function Despesas() {
             navigate('/login')
         }
 
-        document.title = "Despesas";
+        let tipo = localStorage.getItem('tipo');
+        if(tipo == 5){
+            navigate('/vagas')
+        }
 
+        let user = localStorage.getItem("id_utilizador")
+        if(user){
+            setUtilizador(user)
+            setTipoUser(localStorage.getItem("tipo"))
+        }
+
+        document.title = "Despesas";
+    }, []);
+
+    useEffect(() => {
+        if(id_user){
+            handleServices.find_perfil(id_user)
+            .then(res => {
+                setPerfil(res.id_perfil);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
+            })
+        }
+    }, [id_user])
+
+    useEffect(() => {
+        handleServices.listDespesas(id_perfil)
+        .then(res => {
+            setDespesas(res);
+        })
+        .catch(err => {
+            console.log("Não foi possivel encontrar as despesas do utilizador: " + err)
+        })
+    }, [id_perfil])
+
+    useEffect(() => {
+        if(tipo_user && (tipo_user == 1 || tipo_user == 2)){
+            handleServices.listDespesasPorAprovar()
+            .then(res => {
+                setDespesasPorAprovar(res);
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        }
+    }, tipo_user)
+
+    useEffect(() => {
         const summarizedData = summarizeDespesas(despesas);
         setDespesasData(summarizedData);
-    }, []);
+    }, [despesas])
+
+    function handleCriar(event){
+        event.preventDefault();
+        handleServices.createDespesa(id_perfil, date, descricao, valor, ficheiro)
+        .then(res => {
+            alert("Despesa criada com sucesso")
+        })
+        .catch(err => {
+            console.log("Erro a criar a despesa: " + err)
+        })
+    }
 
     return (
         <div id="root">
@@ -126,10 +146,14 @@ export default function Despesas() {
                                 <div className="items-container" style={{ height: '85vh' }}>
                                     <h3>Sumário de despesas</h3>
                                     <div className='row my-5'>
+                                        {despesas && despesasData &&
                                         <DoughnutPieChart data={despesasData} />
+                                        }
                                     </div>
                                     <div className='row'>
-                                        <SumarioDespesas />
+                                        {despesas && 
+                                        <SumarioDespesas despesas={despesas}></SumarioDespesas>
+                                        }   
                                     </div>
                                 </div>
                             </div>
@@ -149,7 +173,9 @@ export default function Despesas() {
                                                         <Tab label="por aprovar" value="2" />
 
                                                         {/* Esta tab só aparece se a conta logada for manager */}
+                                                        {(tipo_user == 1 || tipo_user == 2) &&
                                                         <Tab label="Gestão de despesas" value="3" />
+                                                        }
                                                         {/* Esta tab só aparece se a conta logada for manager */}
                                                     </TabList>
 
@@ -164,6 +190,9 @@ export default function Despesas() {
                                             </TabPanel>
                                             <TabPanel value="2">
                                                 <Table data={despesas} onVerDetalhes={handleVerDetalhes} tipo={'Por Aprovar'}></Table>
+                                            </TabPanel>
+                                            <TabPanel value="3">
+                                                <Table data={despesasPorAprovar} onVerDetalhes={handleVerDetalhes} tipo={'Analisar'}></Table>
                                             </TabPanel>
                                         </TabContext>
                                     </Box>
@@ -232,15 +261,18 @@ export default function Despesas() {
                                 type="date"
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
+                                onChange={(value) => {setDate(value.target.value)}}
                             />
                             <TextField
                                 label="Descrição"
                                 fullWidth
+                                onChange={(value) => {setDescricao(value.target.value)}}
                             />
                             <TextField
                                 label="Valor"
                                 type="number"
                                 fullWidth
+                                onChange={(value) => {setValor(value.target.value)}}
                             />
                             <FileDropZone
                                 onDrop={handleFileDrop}
@@ -249,9 +281,10 @@ export default function Despesas() {
                                     'application/pdf': ['.pdf'],
                                 }}
                                 maxSize={2 * 1024 * 1024} //2 megabytes
+                                onChange={(value) => {setFicheiro(value.target.value)}}
                             />
 
-                            <Button type="submit" variant="contained" color="primary">
+                            <Button variant="contained" color="primary" onClick={handleCriar}>
                                 Criar
                             </Button>
                         </Stack>
@@ -264,8 +297,8 @@ export default function Despesas() {
 
 function DetalhesDespesa({ despesa }) {
     const convertDateToInputFormat = (date) => {
-        const [day, month, year] = date.split('-');
-        return `${year}-${month}-${day}`;
+        const datePart = date.split(' ')[0];
+        return datePart;
     };
 
     const [formData, setFormData] = useState({
@@ -492,64 +525,21 @@ function DetalhesDespesa({ despesa }) {
             </form>
         );
     }
-
 }
 
-function ExemplosDespesas({ onVerDetalhes }) {
-    const getShadowClass = (estado) => {
-        switch (estado) {
-            case "Aprovada":
-                return "success";
-            case "Em análise":
-                return "warning";
-            case "Rejeitada":
-                return "error";
-            case "Reembolsada":
-                return "success";
-            default:
-                return "";
-        }
-    };
-
-    return (
-        <div className="row">
-            {despesas.map((despesa, index) => (
-                <div key={index} className="col-md-12 mb-3">
-                    <div className={`border rounded p-3 ${getShadowClass(despesa.estado)}`}>
-                        <div className="row d-flex align-items-center">
-                            <div className="col-md-2">
-                                <strong>Data:</strong> {despesa.data}
-                            </div>
-                            <div className="col-md-2">
-                                <strong>Valor:</strong> {despesa.valor}
-                            </div>
-                            <div className="col-md-3">
-                                <strong>Anexo: </strong><a href={despesa.anexo} target="_blank" style={{ color: 'black' }}>Clique aqui</a>
-                            </div>
-                            <div className="col-md-3">
-                                <Chip label={despesa.estado} color={getShadowClass(despesa.estado)} size='10px'></Chip>
-                            </div>
-                            <div className="col-md-2">
-                                <button className='btn btn-secondary' onClick={() => onVerDetalhes(despesa)}>Ver detalhes</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            ))}
-        </div>
-    );
-}
-
-function SumarioDespesas() {
+function SumarioDespesas( {despesas} ) {
     let valorAprovado = 0;
     let valorRejeitado = 0;
     let valorEmAnalise = 0;
     let valorReembolsado = 0;
+    let valorPendente = 0;
 
     let totalAprovado = 0;
     let totalRejeitado = 0;
     let totalEmAnalise = 0;
     let totalReembolsado = 0;
+    let totalPendente = 0;
+
     despesas.map((despesa) => {
         if (despesa.estado === "Aprovada") {
             valorAprovado += parseFloat(despesa.valor);
@@ -566,6 +556,10 @@ function SumarioDespesas() {
         else if (despesa.estado === "Reembolsada") {
             valorReembolsado += parseFloat(despesa.valor);
             totalReembolsado++;
+        }
+        else if (despesa.estado === "Pendente") {
+            valorPendente += parseFloat(despesa.valor);
+            totalPendente++;
         }
     });
     return (
@@ -597,6 +591,11 @@ function SumarioDespesas() {
                         <td>{totalRejeitado}</td>
                         <td>{valorRejeitado}€</td>
                     </tr>
+                    <tr>
+                        <td>Pendentes</td>
+                        <td>{totalPendente}</td>
+                        <td>{valorPendente}€</td>
+                    </tr>
                 </tbody>
             </table>
 
@@ -604,14 +603,15 @@ function SumarioDespesas() {
                 <tbody>
                     <tr>
                         <td><strong>Total</strong></td>
-                        <td>{totalAprovado + totalEmAnalise + totalReembolsado + totalRejeitado}</td>
-                        <td>{valorAprovado + valorEmAnalise + valorReembolsado + valorRejeitado}€</td>
+                        <td>{totalAprovado + totalEmAnalise + totalReembolsado + totalRejeitado + totalPendente}</td>
+                        <td>{valorAprovado + valorEmAnalise + valorReembolsado + valorRejeitado + valorPendente}€</td>
                     </tr>
                 </tbody>
             </table>
         </div>
     )
 }
+
 
 const summarizeDespesas = (despesas) => {
     const summary = {};

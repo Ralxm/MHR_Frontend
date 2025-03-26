@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from "react-router-dom";
-import { createSwapy } from 'swapy';
 import NavBar from "../../Universal/NavBar";
 import './Calendario.css';
 import '../../index.css'
@@ -63,11 +62,10 @@ let ferias = [{
 }]
 
 export default function Calendario() {
-    const swapy = useRef(null);
-    const container = useRef(null);
     const navigate = useNavigate();
     const [isFaltasFormVisible, setIsFaltasFormVisible] = useState(false);
     const [isFeriasFormVisible, setIsFeriasFormVisible] = useState(false);
+    const [tipoUser, setTipoUser] = useState();
 
     const [selectedFalta, setSelectedFalta] = useState(null);
 
@@ -94,19 +92,14 @@ export default function Calendario() {
             navigate('/login')
         }
 
-        document.title = "Calendário"
-
-        if (container.current) {
-            swapy.current = createSwapy(container.current);
-
-            swapy.current.onSwap((event) => {
-                console.log('swap', event);
-            });
+        let tipo = localStorage.getItem('tipo');
+        if(tipo == 5){
+            navigate('/vagas')
         }
 
-        return () => {
-            swapy.current?.destroy();
-        };
+        document.title = "Calendário"
+
+        
     }, []);
 
     return (
@@ -127,7 +120,7 @@ export default function Calendario() {
             }}> </div>
             <div></div>
             <NavBar />
-            <div className="page-container-despesas" ref={container} >
+            <div className="page-container-despesas">
                 <div className="container-fluid">
                     <div className="row" >
                         {/* Coluna da esquerda */}
@@ -141,15 +134,15 @@ export default function Calendario() {
                             </div>
 
                             <div className='row'>
-                                <div className="col-md-6" data-swapy-slot="faltas">
-                                    <div className="items-container" data-swapy-item="faltas" style={{ height: '80vh', overflowY: 'auto' }}>
+                                <div className="col-md-6">
+                                    <div className="items-container" style={{ height: '80vh', overflowY: 'auto' }}>
                                         <h3 className="mb-4">Faltas</h3>
                                         <ExemplosFaltas justificar={toggleJustificarFaltas}></ExemplosFaltas>
                                     </div>
                                 </div>
 
-                                <div className="col-md-6" data-swapy-slot="ferias">
-                                    <div className="items-container" data-swapy-item="ferias" style={{ height: '80vh', overflowY: 'auto' }}>
+                                <div className="col-md-6">
+                                    <div className="items-container" style={{ height: '80vh', overflowY: 'auto' }}>
                                         <div className="d-flex align-items-center justify-content-between mb-3">
                                             <h3 className="mb-0">Férias</h3>
                                             <button className='btn btn-outline-secondary' onClick={toggleCreateFerias}> Marcar Férias</button>
@@ -162,12 +155,10 @@ export default function Calendario() {
 
                         {/* Coluna da direita */}
                         <div className="col-md-6" style={{ zIndex: 1000 }}>
-                            <div className="" data-swapy-slot="calendar">
-                                <div className="form-container" data-swapy-item="calendar">
+                                <div className="form-container" >
                                     <h3>Calendário</h3>
                                     <CalendarComponent></CalendarComponent>
                                 </div>
-                            </div>
                         </div>
                     </div>
                 </div>

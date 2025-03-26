@@ -3,7 +3,7 @@ import axios from 'axios';
 class AuthService{
     
     login(nome_utilizador, password){
-        let url = "http://localhost:8080/";
+        let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.post(url + "utilizadores/login", {nome_utilizador, password, headers: { 'Authorization' : 'Bearer ESTGV'}})
         .then(res => {
             if(res.data.token){
@@ -17,7 +17,7 @@ class AuthService{
     }
 
     registo(nome_utilizador, password){
-        let url = "http://localhost:8080/";
+        let url = process.env.REACT_APP_BACKEND_LINK;
 
         const datapost = {
             id_tipo: 5,
@@ -41,7 +41,7 @@ class AuthService{
     }
 
     recuperar(nome_utilizador){
-        let url = "http://localhost:8080/";
+        let url = process.env.REACT_APP_BACKEND_LINK;
 
         const datapost = {
             nome_utilizador: nome_utilizador,
@@ -61,7 +61,7 @@ class AuthService{
     }
 
     alterar(nome_utilizador, password, token){
-        let url = "http://localhost:8080/";
+        let url = process.env.REACT_APP_BACKEND_LINK;
 
         const datapost = {
             nome_utilizador: nome_utilizador,

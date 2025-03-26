@@ -106,7 +106,7 @@ export default function Recuperar() {
                             <label htmlFor="username" className="form-label">Utilizador</label>
                             <input type="text" className="form-control" id="username" placeholder="Introduza o seu nickname" onChange={(value) => setUSERNAME(value.target.value)} />
                         </div>
-                        <button type="submit" className="btn btn-info w-100" onClick={HandleRecuperar}>Entra na tua conta</button>
+                        <button type="submit" className="btn btn-info w-100" onClick={HandleRecuperar}>Recuperar password</button>
                     </form>
                     <hr></hr>
                     <div style={{padding: "15px"}}>

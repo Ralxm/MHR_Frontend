@@ -8,6 +8,7 @@ import Despesas from "../Components/Despesas/Despesas";
 import Calendario from "../Components/Calendario/Calendario";
 import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
+import Vagas from "../Components/Vagas/Vagas";
 
 export default function MainPage(){
     return (
@@ -28,6 +29,8 @@ export default function MainPage(){
                 <Route path='/projetos' element={<Projetos></Projetos>}>
                 </Route>
                 <Route path='/projeto/:id' element={<Projeto></Projeto>}>
+                </Route>
+                <Route path='/vagas' element={<Projeto></Projeto>}>
                 </Route>
             </Routes>
         </div>

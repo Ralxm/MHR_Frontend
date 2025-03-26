@@ -33,6 +33,37 @@ export default function BasicTable( {data, onVerDetalhes, tipo} ){
             }
         })
     }
+
+    if(tipo == "Analisar"){
+        return (
+            <TableContainer component={Box} sx={{ pl: 0 }}>
+                <Table sx={{ minWidth: 750 }} aria-label="simple table" className="disable-edge-padding">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="left">Data</TableCell>
+                            <TableCell align="left">Valor</TableCell>
+                            <TableCell align="left">Anexo</TableCell>
+                            <TableCell align="left">Estado</TableCell>
+                            <TableCell align="right"></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {rows.map((row) => (
+                            <TableRow
+                                key={row.name}
+                            >
+                                <TableCell align="left">{row.data}</TableCell>
+                                <TableCell align="left">{row.valor}</TableCell>
+                                <TableCell align="left">{row.anexo}</TableCell>
+                                <TableCell align="left"><Chip label={row.estado} color={getShadowClass(row.estado)} size='10px'></Chip></TableCell>
+                                <TableCell align="right"><button className='btn btn-secondary' onClick={() => onVerDetalhes(row)}>Analisar</button></TableCell>
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        );
+    }
     
 
 	return (
