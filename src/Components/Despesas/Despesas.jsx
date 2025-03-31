@@ -16,6 +16,7 @@ export default function Despesas() {
     const navigate = useNavigate();
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedDespesa, setSelectedDespesa] = useState(null);
+    const [acao, setAcao] = useState(null);
     const [despesasData, setDespesasData] = useState([]);
     const [tab, setTab] = useState('1')
     const [isApagarModalOpen, setIsApagarModalOpen] = useState(false);
@@ -40,8 +41,17 @@ export default function Despesas() {
         setIsCreateModalOpen(!isCreateModalOpen);
     };
 
-    const handleVerDetalhes = (despesa) => {
+    const handleVerDetalhes = (despesa, acao) => {
         setSelectedDespesa(despesa);
+        setAcao(acao);
+    };
+
+    const handleVerDetalhesEAnalisar = (despesa, acao) => {
+        setSelectedDespesa(despesa);
+        if(despesa.estado == "Pendente"){
+            handleAnalisar(despesa)
+        }
+        setAcao(acao);
     };
 
     const handleCloseDetalhes = () => {
@@ -50,7 +60,6 @@ export default function Despesas() {
 
     const handleApagar = (despesa) => {
         setSelectedDespesa(despesa)
-        console.log(despesa)
         setIsApagarModalOpen(true)
     };
 
@@ -95,6 +104,7 @@ export default function Despesas() {
             .then(res => {
                 setDespesas(res);
             })
+            
             .catch(err => {
                 console.log("Não foi possivel encontrar as despesas do utilizador: " + err)
             })
@@ -143,13 +153,39 @@ export default function Despesas() {
     function handleApagarDespesa(event) {
         event.preventDefault();
         handleServices.apagarDespesa(selectedDespesa.id_despesa)
+            .then(res => {
+                alert("Despesa apagada com sucesso")
+                navigate(0)
+            })
+            .catch(err => {
+                console.log("Erro a apagar a despesa: " + err);
+            });
+    }
+
+    function handleAnalisar(despesa) {
+        const formDataToSend = new FormData();
+
+        formDataToSend.append('id_departamento', despesa.id_departamento);
+        formDataToSend.append('id_projeto', despesa.id_projeto);
+        formDataToSend.append('id_perfil', despesa.id_perfil);
+        formDataToSend.append('id_despesa', despesa.id_despesa);
+        formDataToSend.append('_data', despesa._data);
+        formDataToSend.append('descricao', despesa.descricao);
+        formDataToSend.append('valor', despesa.valor);
+        formDataToSend.append('validador', id_perfil);
+        formDataToSend.append('estado', "Em análise");
+        formDataToSend.append('reembolsado_por', despesa.reembolsada_por);
+        formDataToSend.append('comentarios', despesa.comentarios);
+
+        handleServices.atualizarDespesa(formDataToSend)
         .then(res => {
-            alert("Despesa apagada com sucesso")
-            navigate(0)
+            despesa.estado = "Em análise"
+            despesa.validador = id_perfil
         })
         .catch(err => {
-            console.log("Erro a apagar a despesa: " + err);
-        });
+            alert(err)
+        })
+
     }
 
     return (
@@ -224,7 +260,7 @@ export default function Despesas() {
                                                 <Table data={despesas} onVerDetalhes={handleVerDetalhes} tipo={'Por Aprovar'}></Table>
                                             </TabPanel>
                                             <TabPanel value="3">
-                                                <Table data={despesasPorAprovar} onVerDetalhes={handleVerDetalhes} tipo={'Analisar'}></Table>
+                                                <Table data={despesasPorAprovar} onVerDetalhes={handleVerDetalhesEAnalisar} tipo={'Analisar'}></Table>
                                             </TabPanel>
                                         </TabContext>
                                     </Box>
@@ -352,7 +388,7 @@ export default function Despesas() {
                         <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => {toggleApagarDespesa(); handleCloseDetalhes()}}
+                            onClick={() => { toggleApagarDespesa(); handleCloseDetalhes() }}
                             sx={{ width: '50%' }}
                         >
                             Fechar
@@ -360,7 +396,7 @@ export default function Despesas() {
                         <Button
                             variant="contained"
                             color="error"
-                            onClick={(event) => {handleApagarDespesa(event); handleCloseDetalhes(); toggleApagarDespesa()}}
+                            onClick={(event) => { handleApagarDespesa(event); handleCloseDetalhes(); toggleApagarDespesa() }}
                             sx={{ width: '50%' }}
                         >
                             Apagar
@@ -370,139 +406,193 @@ export default function Despesas() {
             </Modal>
         </div>
     );
+
+    function DetalhesDespesa({ despesa }) {
+        console.log(despesa)
+        const [newFile, setNewFile] = useState(null);
+        const [fileName, setFileName] = useState(despesa.anexo ? despesa.anexo.split('/').pop() : '');
+
+        const convertDateToInputFormat = (date) => {
+            const datePart = date.split(' ')[0];
+            return datePart;
+        };
+
+        const [formData, setFormData] = useState({
+            _data: convertDateToInputFormat(despesa._data),
+            descricao: despesa.descricao,
+            valor: despesa.valor,
+            anexo: despesa.anexo,
+            validador: despesa.validador,
+            estado: despesa.estado,
+            reembolsada_por: despesa.reembolsada_por,
+            comentarios: despesa.comentarios,
+        });
+
+        const handleChange = (e) => {
+            const { name, value } = e.target;
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        };
+
+        const handleFileDrop = (files) => {
+            if (files && files.length > 0) {
+                setNewFile(files[0]);
+                setFileName(files[0].name);
+            }
+        };
+
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+
+            const formDataToSend = new FormData();
+
+            formDataToSend.append('id_departamento', despesa.id_departamento);
+            formDataToSend.append('id_projeto', despesa.id_projeto);
+            formDataToSend.append('id_perfil', despesa.id_perfil);
+
+            formDataToSend.append('id_despesa', despesa.id_despesa);
+            formDataToSend.append('_data', formData._data);
+            formDataToSend.append('descricao', formData.descricao);
+            formDataToSend.append('valor', formData.valor);
+
+            if (newFile) {
+                formDataToSend.append('anexo', newFile);
+            }
+
+            formDataToSend.append('validador', formData.validador);
+            formDataToSend.append('estado', formData.estado);
+            formDataToSend.append('reembolsado_por', formData.reembolsada_por);
+            formDataToSend.append('comentarios', formData.comentarios);
+
+            handleServices.atualizarDespesa(formDataToSend)
+                .then(res => {
+                    alert("Despesa atualizada com sucesso")
+                    navigate(0);
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+        };
+
+        return (
+            <form onSubmit={handleSubmit}>
+                <div className='mb-3'>
+                    <label><strong>Nome do criador:</strong>&nbsp;<span>{despesa.perfil.nome}</span></label>
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Data:</strong></label>
+                    <input
+                        type="date"
+                        name="_data"
+                        value={formData._data}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada" || acao == "analisar"}
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Descrição:</strong></label>
+                    <input
+                        type="text"
+                        name="descricao"
+                        value={formData.descricao}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada" || acao == "analisar"}
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Valor:</strong></label>
+                    <input
+                        type="text"
+                        name="valor"
+                        value={formData.valor}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada" || acao == "analisar"}
+                    />
+                </div>
+                <div className="mb-3">
+                    <div className='d-flex justify-content-between align-items-center my-2'>
+                        <label className="form-label"><strong>Anexo:</strong></label>
+                        {formData.anexo && (
+                            <a href={formData.anexo} target="_blank">
+                                <button type="button" className='btn btn-outline-info'>Abrir</button>
+                            </a>
+                        )}
+                    </div>
+
+                    <FileDropZone
+                        onDrop={handleFileDrop}
+                        accept={{
+                            'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+                            'application/pdf': ['.pdf'],
+                        }}
+                        maxSize={5 * 1024 * 1024}
+                        currentFile={fileName}
+                        disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada" || acao == "analisar"}
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Validador:</strong></label>
+                    <input
+                        type="text"
+                        name="validador"
+                        value={despesa.validadorPerfil ? despesa.validadorPerfil.nome : "Sem validador"}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled = {true}
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Estado:</strong></label>
+                    <select
+                        name="estado"
+                        value={formData.estado}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled = {acao == "editar"}
+                    >
+                        <option value="Aprovada">Aprovada</option>
+                        <option value="Em análise">Em análise</option>
+                        <option value="Rejeitada">Rejeitada</option>
+                        <option value="Reembolsada">Reembolsada</option>
+                    </select>
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Reembolsada por:</strong></label>
+                    <input
+                        type="text"
+                        name="reembolsada_por"
+                        value={formData.reembolsada_por}
+                        onChange={handleChange}
+                        className="form-control"
+                        disabled = {true}
+                    />
+                </div>
+                <div className="mb-3">
+                    <label className="form-label"><strong>Comentários:</strong></label>
+                    <textarea
+                        name="comentarios"
+                        value={formData.comentarios}
+                        onChange={handleChange}
+                        className="form-control"
+                        rows="3"
+                        disabled = {acao == "editar"}
+                        style={{ resize: 'none' }}
+                    />
+                </div>
+                <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1" disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}>
+                    Salvar Alterações
+                </button>
+            </form>
+        );
+    }
 }
 
-function DetalhesDespesa({ despesa }) {
-    const convertDateToInputFormat = (date) => {
-        const datePart = date.split(' ')[0];
-        return datePart;
-    };
 
-    const [formData, setFormData] = useState({
-        data: convertDateToInputFormat(despesa.data),
-        descricao: despesa.descricao,
-        valor: despesa.valor,
-        anexo: despesa.anexo,
-        validador: despesa.validador,
-        estado: despesa.estado,
-        reembolsada_por: despesa.reembolsada_por,
-        comentarios: despesa.comentarios,
-    });
-
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        //código para depois fazer as alterações na base de dados
-    };
-
-    return (
-        <form onSubmit={handleSubmit}>
-            <div className="mb-3">
-                <label className="form-label"><strong>Data:</strong></label>
-                <input
-                    type="date"
-                    name="data"
-                    value={formData.data}
-                    onChange={handleChange}
-                    className="form-control"
-                    disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label"><strong>Descrição:</strong></label>
-                <input
-                    type="text"
-                    name="descricao"
-                    value={formData.descricao}
-                    onChange={handleChange}
-                    className="form-control"
-                    disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label"><strong>Valor:</strong></label>
-                <input
-                    type="text"
-                    name="valor"
-                    value={formData.valor}
-                    onChange={handleChange}
-                    className="form-control"
-                    disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label"><strong>Anexo:</strong></label>
-                <input
-                    type="text"
-                    name="anexo"
-                    value={formData.anexo}
-                    onChange={handleChange}
-                    className="form-control"
-                    disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label"><strong>Validador:</strong></label>
-                <input
-                    type="text"
-                    name="validador"
-                    value={formData.validador}
-                    onChange={handleChange}
-                    className="form-control"
-                    disabled
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label"><strong>Estado:</strong></label>
-                <select
-                    name="estado"
-                    value={formData.estado}
-                    onChange={handleChange}
-                    className="form-control"
-                    disabled
-                >
-                    <option value="Aprovada">Aprovada</option>
-                    <option value="Em análise">Em análise</option>
-                    <option value="Rejeitada">Rejeitada</option>
-                    <option value="Reembolsada">Reembolsada</option>
-                </select>
-            </div>
-            <div className="mb-3">
-                <label className="form-label"><strong>Reembolsada por:</strong></label>
-                <input
-                    type="text"
-                    name="reembolsada_por"
-                    value={formData.reembolsada_por}
-                    onChange={handleChange}
-                    className="form-control"
-                    disabled
-                />
-            </div>
-            <div className="mb-3">
-                <label className="form-label"><strong>Comentários:</strong></label>
-                <textarea
-                    name="comentarios"
-                    value={formData.comentarios}
-                    onChange={handleChange}
-                    className="form-control"
-                    rows="3"
-                    disabled
-                    style={{ resize: 'none' }}
-                />
-            </div>
-            <button type="submit" className="btn btn-primary col-md-12 mb-1">
-                Salvar Alterações
-            </button>
-        </form>
-    );
-}
 
 function SumarioDespesas({ despesas }) {
     let valorAprovado = 0;

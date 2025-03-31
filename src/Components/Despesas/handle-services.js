@@ -15,7 +15,8 @@ class HandleServices {
     createDespesa(formData) {
         let url = process.env.REACT_APP_BACKEND_LINK;
 
-        return axios.post(url + "despesas/create", formData, {...authHeader(),
+        return axios.post(url + "despesas/create", formData, {
+            ...authHeader(),
             headers: {
                 'Content-Type': 'multipart/form-data'
             }
@@ -30,6 +31,7 @@ class HandleServices {
 
     listDespesas(id_perfil) {
         let url = process.env.REACT_APP_BACKEND_LINK;
+        console.log(id_perfil)
         return axios.get(url + "despesas/listUser/" + id_perfil, authHeader())
             .then(res => {
                 if (res.data.success) {
@@ -64,6 +66,19 @@ class HandleServices {
                     return res.data.data;
                 }
             }, reason => { throw new Error('Erro a apagar a despesa'); });
+    }
+
+    atualizarDespesa(despesa) {
+        console.log(despesa)
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.post(url + "despesas/update/" + despesa.get('id_despesa'), despesa, {...authHeader(), headers: {'Content-Type': 'multipart/form-data'}})
+        .then(res => {
+            if (res.data.success) {
+                return res.data.data;
+            }
+        }, reason => {
+            throw new Error('Erro a atualizar a despesa');
+        });
     }
 }
 

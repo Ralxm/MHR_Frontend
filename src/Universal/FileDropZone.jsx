@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { Typography, Box, Button, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const FileDropZone = ({ onDrop, accept, maxSize }) => {
+const FileDropZone = ({ onDrop, accept, maxSize, disabled }) => {
     const [uploadedFile, setUploadedFile] = useState(null);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -16,14 +16,18 @@ const FileDropZone = ({ onDrop, accept, maxSize }) => {
         },
         accept,
         maxSize,
+        disabled
     });
 
     const handleRemoveFile = () => {
-        setUploadedFile(null);
+        if(!disabled){
+            setUploadedFile(null);
+        }  
     };
 
     return (
         <Box>
+            {!disabled &&
             <Box
                 {...getRootProps()}
                 sx={{
@@ -42,6 +46,7 @@ const FileDropZone = ({ onDrop, accept, maxSize }) => {
                         : 'Arraste e solte o anexo aqui, ou clique para escolher'}
                 </Typography>
             </Box>
+            }
 
             {/* Mostrar o anexo que foi enviado */}
             {uploadedFile && (
