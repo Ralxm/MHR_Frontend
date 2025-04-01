@@ -30,10 +30,45 @@
 .navbar-items {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 24px;
     margin-left: auto;
 }
 
+.nav-item {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: black;
+    padding: 8px 0;
+    transition: color 0.4s ease;
+}
+
+.nav-link.active {
+    color: #145da0;
+}
+
+.underline {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #145da0;
+    transition: width 0.4s ease;
+}
+
+.underline.active {
+    width: 100%;
+}
+
+.nav-item:not(.active):hover .underline {
+    width: 100%;
+}
 
 @media (max-width: 768px) {
     .navbar-content {

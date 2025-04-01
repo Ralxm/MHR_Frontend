@@ -44,9 +44,23 @@ class HandleServices {
             }, reason => { throw new Error('Erro a listar todas as despesas do utilizador'); });
     }
 
-    listDespesasPorAprovar() {
+    listDespesasGestao() {
         let url = process.env.REACT_APP_BACKEND_LINK;
-        return axios.get(url + "despesas/listPorAprovar", authHeader())
+        return axios.get(url + "despesas/listGestao", authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    const formattedData = res.data.data.map(item => ({
+                        ...item,
+                        data: item.data.replace('T', ' ').replace(/\.\d+Z$/, '')
+                    }));
+                    return formattedData;
+                }
+            }, reason => { throw new Error('Erro a listar todas as despesas por aprovar'); });
+    }
+
+    listDespesasHistorico() {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "despesas/listHistorico", authHeader())
             .then(res => {
                 if (res.data.success) {
                     const formattedData = res.data.data.map(item => ({

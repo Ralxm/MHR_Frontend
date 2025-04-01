@@ -14,7 +14,7 @@ const DoughnutPieChart = ({ data }) => {
     const getColorForEstado = (estado) => {
         switch (estado) {
             case "Aprovada":
-                return palette.success.main;
+                return palette.primary.main;
             case "Em análise":
                 return palette.warning.main;
             case "Rejeitada":

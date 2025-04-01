@@ -8,6 +8,7 @@ import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab } fr
 import FileDropZone from '../../Universal/FileDropZone'
 import DoughnutPieChart from '../../Universal/DoughnutPieChart';
 import Table from './TabelaDespesas';
+import TableSumarios from './TabelaSumario'
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
@@ -21,17 +22,28 @@ export default function Despesas() {
     const [tab, setTab] = useState('1')
     const [isApagarModalOpen, setIsApagarModalOpen] = useState(false);
 
+    const [despesaApagar, setDespesaApagar] = useState(null)
+
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
 
     const [despesas, setDespesas] = useState([]);
-    const [despesasPorAprovar, setDespesasPorAprovar] = useState([])
+    const [despesasGestao, setDespesasGestao] = useState([])
+    const [despesasHistorico, setDespesasHistorico] = useState([])
+
+    const [despesasChart, setDespesasChart] = useState([]);
+    const [tipoDespesas, setTipoDespesas] = useState('Pessoal')
 
     const [id_perfil, setPerfil] = useState()
     const [date, setDate] = useState('')
     const [descricao, setDescricao] = useState('')
     const [valor, setValor] = useState()
     const [ficheiro, setFicheiro] = useState('')
+
+    const [despesaAnalisar, setDespesaAnalisar] = useState(null)
+    const [acaoAnalisar, setAcaoAnalisar] = useState('')
+
+    const [action, setAction] = useState(false)
 
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         setTab(newValue);
@@ -44,14 +56,18 @@ export default function Despesas() {
     const handleVerDetalhes = (despesa, acao) => {
         setSelectedDespesa(despesa);
         setAcao(acao);
+        if (selectedDespesa) {
+            selectedDespesa.estado = "Em análise";
+            selectedDespesa.validador = id_perfil;
+        }
     };
 
     const handleVerDetalhesEAnalisar = (despesa, acao) => {
-        setSelectedDespesa(despesa);
-        if(despesa.estado == "Pendente"){
+        if (despesa.estado == "Pendente") {
             handleAnalisar(despesa)
         }
-        setAcao(acao);
+        setDespesaAnalisar(despesa)
+        setAcaoAnalisar(acao)
     };
 
     const handleCloseDetalhes = () => {
@@ -59,7 +75,7 @@ export default function Despesas() {
     };
 
     const handleApagar = (despesa) => {
-        setSelectedDespesa(despesa)
+        setDespesaApagar(despesa)
         setIsApagarModalOpen(true)
     };
 
@@ -67,6 +83,9 @@ export default function Despesas() {
         setIsApagarModalOpen(!isApagarModalOpen)
     }
 
+    const toggleAction = () => {
+        setAction(!action)
+    }
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -104,7 +123,7 @@ export default function Despesas() {
             .then(res => {
                 setDespesas(res);
             })
-            
+
             .catch(err => {
                 console.log("Não foi possivel encontrar as despesas do utilizador: " + err)
             })
@@ -112,9 +131,16 @@ export default function Despesas() {
 
     useEffect(() => {
         if (tipo_user && (tipo_user == 1 || tipo_user == 2)) {
-            handleServices.listDespesasPorAprovar()
+            handleServices.listDespesasGestao()
                 .then(res => {
-                    setDespesasPorAprovar(res);
+                    setDespesasGestao(res);
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            handleServices.listDespesasHistorico()
+                .then(res => {
+                    setDespesasHistorico(res);
                 })
                 .catch(err => {
                     console.log(err)
@@ -123,9 +149,40 @@ export default function Despesas() {
     }, tipo_user)
 
     useEffect(() => {
-        const summarizedData = summarizeDespesas(despesas);
-        setDespesasData(summarizedData);
+        setDespesasChart(despesas)
     }, [despesas])
+
+    useEffect(() => {
+        const summarizedData = summarizeDespesas(despesasChart);
+        setDespesasData(summarizedData);
+    }, [despesasChart])
+
+    useEffect(() => {
+        toggleAction()
+        setSelectedDespesa(despesaAnalisar);
+        setAcao(acaoAnalisar);
+    }, [despesaAnalisar, acaoAnalisar])
+
+    useEffect(() => {
+        switch (tab) {
+            case '1':
+                setDespesasChart(despesas);
+                setTipoDespesas("Pessoal")
+                break;
+            case '2':
+                setDespesasChart(despesas)
+                setTipoDespesas("Pessoal")
+                break;
+            case '3':
+                setDespesasChart(despesasGestao)
+                setTipoDespesas("Empresa")
+                break;
+            case '4':
+                setDespesasChart(despesasHistorico)
+                setTipoDespesas("Empresa")
+                break;
+        }
+    }, [tab])
 
     function handleCriar(event) {
         event.preventDefault();
@@ -140,6 +197,8 @@ export default function Despesas() {
             formData.append('anexo', ficheiro);
         }
 
+        console.log(formData)
+
         handleServices.createDespesa(formData)
             .then(res => {
                 alert("Despesa criada com sucesso");
@@ -152,7 +211,7 @@ export default function Despesas() {
 
     function handleApagarDespesa(event) {
         event.preventDefault();
-        handleServices.apagarDespesa(selectedDespesa.id_despesa)
+        handleServices.apagarDespesa(despesaApagar.id_despesa)
             .then(res => {
                 alert("Despesa apagada com sucesso")
                 navigate(0)
@@ -163,29 +222,36 @@ export default function Despesas() {
     }
 
     function handleAnalisar(despesa) {
-        const formDataToSend = new FormData();
+        if (despesa.estado == "Pendente") {
+            const formDataToSend = new FormData();
 
-        formDataToSend.append('id_departamento', despesa.id_departamento);
-        formDataToSend.append('id_projeto', despesa.id_projeto);
-        formDataToSend.append('id_perfil', despesa.id_perfil);
-        formDataToSend.append('id_despesa', despesa.id_despesa);
-        formDataToSend.append('_data', despesa._data);
-        formDataToSend.append('descricao', despesa.descricao);
-        formDataToSend.append('valor', despesa.valor);
-        formDataToSend.append('validador', id_perfil);
-        formDataToSend.append('estado', "Em análise");
-        formDataToSend.append('reembolsado_por', despesa.reembolsada_por);
-        formDataToSend.append('comentarios', despesa.comentarios);
+            formDataToSend.append('id_departamento', despesa.id_departamento);
+            formDataToSend.append('id_projeto', despesa.id_projeto);
+            formDataToSend.append('id_perfil', despesa.id_perfil);
+            formDataToSend.append('id_despesa', despesa.id_despesa);
+            formDataToSend.append('_data', despesa._data);
+            formDataToSend.append('descricao', despesa.descricao);
+            formDataToSend.append('valor', despesa.valor);
+            formDataToSend.append('validador', id_perfil);
+            formDataToSend.append('estado', "Em análise");
+            formDataToSend.append('reembolsado_por', despesa.reembolsada_por);
+            formDataToSend.append('comentarios', despesa.comentarios);
 
-        handleServices.atualizarDespesa(formDataToSend)
-        .then(res => {
-            despesa.estado = "Em análise"
-            despesa.validador = id_perfil
-        })
-        .catch(err => {
-            alert(err)
-        })
+            handleServices.atualizarDespesa(formDataToSend)
+                .then(res => {
+                    despesasGestao.map((des) => {
+                        if (des.id_despesa == despesa.id_despesa) {
+                            des.estado = "Em análise"
+                            des.validador = id_perfil
+                        }
+                        setAcao('analisar')
+                    })
 
+                })
+                .catch(err => {
+                    alert(err)
+                })
+        }
     }
 
     return (
@@ -211,16 +277,32 @@ export default function Despesas() {
                         {/* Coluna da esquerda */}
                         <div className="col-md-4" style={{ zIndex: 1000 }}>
                             <div className='row'>
-                                <div className="items-container" style={{ height: '85vh' }}>
-                                    <h3>Sumário de despesas</h3>
-                                    <div className='row my-5'>
+                                <div className="items-container p-3" style={{ height: '85vh' }}>
+                                    <div className='d-flex justify-content-between align-items-center'>
+                                        <span><strong>Sumário de Despesas</strong></span>
+                                        {(tipo_user == 1 || tipo_user == 2) && tipoDespesas == "Pessoal" ?
+                                            <div>
+                                                <Chip label="Pessoal" color='primary' className='mx-2'></Chip>
+                                                <Chip label="Empresa" color='gray'></Chip>
+                                            </div>
+
+                                            :
+
+                                            <div>
+                                                <Chip label="Pessoal" color='gray' className='mx-2'></Chip>
+                                                <Chip label="Empresa" color='primary'></Chip>
+                                            </div>
+                                        }
+                                    </div>
+
+                                    <div className='row my-3'>
                                         {despesas && despesasData &&
                                             <DoughnutPieChart data={despesasData} />
                                         }
                                     </div>
                                     <div className='row'>
                                         {despesas &&
-                                            <SumarioDespesas despesas={despesas}></SumarioDespesas>
+                                            <SumarioDespesas despesas={despesasChart}></SumarioDespesas>
                                         }
                                     </div>
                                 </div>
@@ -237,12 +319,15 @@ export default function Despesas() {
                                             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                                                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                                                     <TabList onChange={handleChangeTab} aria-label="lab API tabs example" style={{ flexGrow: 1 }}>
-                                                        <Tab label="As minhas despesas" value="1" />
-                                                        <Tab label="por aprovar" value="2" />
+                                                        <Tab label="As minhas despesas" value="1" sx={{ textTransform: 'none' }} />
+                                                        <Tab label="As minhas despesas por aprovar" value="2" sx={{ textTransform: 'none' }} />
 
                                                         {/* Esta tab só aparece se a conta logada for manager */}
                                                         {(tipo_user == 1 || tipo_user == 2) &&
-                                                            <Tab label="Gestão de despesas" value="3" />
+                                                            <Tab label="Gestão de despesas" value="3" sx={{ textTransform: 'none' }} />
+                                                        }
+                                                        {(tipo_user == 1 || tipo_user == 2) &&
+                                                            <Tab label="Histórico" value="4" sx={{ textTransform: 'none' }} />
                                                         }
                                                         {/* Esta tab só aparece se a conta logada for manager */}
                                                     </TabList>
@@ -254,13 +339,16 @@ export default function Despesas() {
                                             </Box>
 
                                             <TabPanel value="1">
-                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} onApagar={handleApagar} tipo={'Todas'}></Table>
+                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} onApagar={handleApagar} tipo={'Todas'} action={action}></Table>
                                             </TabPanel>
                                             <TabPanel value="2">
-                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} tipo={'Por Aprovar'}></Table>
+                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} tipo={'Por Aprovar'} action={action}></Table>
                                             </TabPanel>
                                             <TabPanel value="3">
-                                                <Table data={despesasPorAprovar} onVerDetalhes={handleVerDetalhesEAnalisar} tipo={'Analisar'}></Table>
+                                                <Table data={despesasGestao} onVerDetalhes={handleVerDetalhesEAnalisar} tipo={'Analisar'} action={action}></Table>
+                                            </TabPanel>
+                                            <TabPanel value="4">
+                                                <Table data={despesasHistorico} onVerDetalhes={handleVerDetalhes} tipo={'Historico'} action={action}></Table>
                                             </TabPanel>
                                         </TabContext>
                                     </Box>
@@ -388,7 +476,7 @@ export default function Despesas() {
                         <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => { toggleApagarDespesa(); handleCloseDetalhes() }}
+                            onClick={() => { toggleApagarDespesa() }}
                             sx={{ width: '50%' }}
                         >
                             Fechar
@@ -396,7 +484,7 @@ export default function Despesas() {
                         <Button
                             variant="contained"
                             color="error"
-                            onClick={(event) => { handleApagarDespesa(event); handleCloseDetalhes(); toggleApagarDespesa() }}
+                            onClick={(event) => { handleApagarDespesa(event); toggleApagarDespesa() }}
                             sx={{ width: '50%' }}
                         >
                             Apagar
@@ -408,7 +496,6 @@ export default function Despesas() {
     );
 
     function DetalhesDespesa({ despesa }) {
-        console.log(despesa)
         const [newFile, setNewFile] = useState(null);
         const [fileName, setFileName] = useState(despesa.anexo ? despesa.anexo.split('/').pop() : '');
 
@@ -422,9 +509,9 @@ export default function Despesas() {
             descricao: despesa.descricao,
             valor: despesa.valor,
             anexo: despesa.anexo,
-            validador: despesa.validador,
-            estado: despesa.estado,
-            reembolsada_por: despesa.reembolsada_por,
+            validador: selectedDespesa.validador,
+            estado: selectedDespesa.estado,
+            reembolsado_por: despesa.reembolsado_por,
             comentarios: despesa.comentarios,
         });
 
@@ -461,20 +548,37 @@ export default function Despesas() {
                 formDataToSend.append('anexo', newFile);
             }
 
+            if (acao == "reembolsar") {
+                formData.estado = "Reembolsada";
+                formData.reembolsado_por = id_perfil;
+            }
+
+            if (formData.estado == "Pendente" && acao == "analisar") {
+                formData.estado = "Em análise"
+            }
+
+            if (formData.estado == "Em análise" && acao == "editar") {
+                formData.estado = "Pendente"
+            }
+
             formDataToSend.append('validador', formData.validador);
             formDataToSend.append('estado', formData.estado);
-            formDataToSend.append('reembolsado_por', formData.reembolsada_por);
+            formDataToSend.append('reembolsado_por', formData.reembolsado_por);
             formDataToSend.append('comentarios', formData.comentarios);
+
+            console.log(formDataToSend)
 
             handleServices.atualizarDespesa(formDataToSend)
                 .then(res => {
                     alert("Despesa atualizada com sucesso")
+                    setAcao(null)
                     navigate(0);
                 })
                 .catch(err => {
                     console.log(err);
                 })
         };
+
 
         return (
             <form onSubmit={handleSubmit}>
@@ -506,7 +610,9 @@ export default function Despesas() {
                 <div className="mb-3">
                     <label className="form-label"><strong>Valor:</strong></label>
                     <input
-                        type="text"
+                        type="number"
+                        step="0.01"
+                        min="0"
                         name="valor"
                         value={formData.valor}
                         onChange={handleChange}
@@ -543,7 +649,7 @@ export default function Despesas() {
                         value={despesa.validadorPerfil ? despesa.validadorPerfil.nome : "Sem validador"}
                         onChange={handleChange}
                         className="form-control"
-                        disabled = {true}
+                        disabled={true}
                     />
                 </div>
                 <div className="mb-3">
@@ -553,12 +659,12 @@ export default function Despesas() {
                         value={formData.estado}
                         onChange={handleChange}
                         className="form-control"
-                        disabled = {acao == "editar"}
+                        disabled={acao == "editar"}
                     >
-                        <option value="Aprovada">Aprovada</option>
-                        <option value="Em análise">Em análise</option>
-                        <option value="Rejeitada">Rejeitada</option>
-                        <option value="Reembolsada">Reembolsada</option>
+                        {(despesa.estado == "Aprovada" || despesa.estado == "Reembolsada") && <option value="Reembolsada">Reembolsada</option>}
+                        {despesa.estado != "Aprovada" && acao != "reembolsar" && <option value="Em análise">Em análise</option>}
+                        {despesa.estado != "Aprovada" && acao != "reembolsar" && <option value="Aprovada">Aprovada</option>}
+                        {despesa.estado != "Aprovada" && acao != "reembolsar" && <option value="Rejeitada">Rejeitada</option>}
                     </select>
                 </div>
                 <div className="mb-3">
@@ -566,10 +672,10 @@ export default function Despesas() {
                     <input
                         type="text"
                         name="reembolsada_por"
-                        value={formData.reembolsada_por}
+                        value={despesa.reembolsadorPerfil ? despesa.reembolsadorPerfil.nome : "Sem Reembolsador"}
                         onChange={handleChange}
                         className="form-control"
-                        disabled = {true}
+                        disabled={true}
                     />
                 </div>
                 <div className="mb-3">
@@ -580,105 +686,37 @@ export default function Despesas() {
                         onChange={handleChange}
                         className="form-control"
                         rows="3"
-                        disabled = {acao == "editar"}
+                        disabled={acao == "editar"}
                         style={{ resize: 'none' }}
                     />
                 </div>
-                <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1" disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}>
-                    Salvar Alterações
-                </button>
+
+                {despesa.estado == "Aprovada" && acao == "reembolsar" ?
+                    <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1">
+                        Reembolsar
+                    </button>
+
+                    :
+
+                    <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1" disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}>
+                        Salvar Alterações
+                    </button>
+                }
+
             </form>
         );
     }
+
+    function SumarioDespesas({ despesas }) {
+        return (
+            <div className="container">
+                <TableSumarios despesas={despesas} action={action}>
+
+                </TableSumarios>
+            </div>
+        )
+    }
 }
-
-
-
-function SumarioDespesas({ despesas }) {
-    let valorAprovado = 0;
-    let valorRejeitado = 0;
-    let valorEmAnalise = 0;
-    let valorReembolsado = 0;
-    let valorPendente = 0;
-
-    let totalAprovado = 0;
-    let totalRejeitado = 0;
-    let totalEmAnalise = 0;
-    let totalReembolsado = 0;
-    let totalPendente = 0;
-
-    despesas.map((despesa) => {
-        if (despesa.estado === "Aprovada") {
-            valorAprovado += parseFloat(despesa.valor);
-            totalAprovado++;
-        }
-        else if (despesa.estado === "Em análise") {
-            valorRejeitado += parseFloat(despesa.valor);
-            totalRejeitado++;
-        }
-        else if (despesa.estado === "Rejeitada") {
-            valorEmAnalise += parseFloat(despesa.valor);
-            totalEmAnalise++;
-        }
-        else if (despesa.estado === "Reembolsada") {
-            valorReembolsado += parseFloat(despesa.valor);
-            totalReembolsado++;
-        }
-        else if (despesa.estado === "Pendente") {
-            valorPendente += parseFloat(despesa.valor);
-            totalPendente++;
-        }
-    });
-    return (
-        <div className="container mb-3 p-3">
-            <table className="table table-bordered">
-                <tbody>
-                    <tr>
-                        <td><strong>Estado:</strong></td>
-                        <td><strong>Quantidade</strong></td>
-                        <td><strong>Valor</strong></td>
-                    </tr>
-                    <tr>
-                        <td>Reembolsadas</td>
-                        <td>{totalReembolsado}</td>
-                        <td>{valorReembolsado}€</td>
-                    </tr>
-                    <tr>
-                        <td>Aprovadas</td>
-                        <td>{totalAprovado}</td>
-                        <td>{valorAprovado}€</td>
-                    </tr>
-                    <tr>
-                        <td>Em análise</td>
-                        <td>{totalEmAnalise}</td>
-                        <td>{valorEmAnalise}€</td>
-                    </tr>
-                    <tr>
-                        <td>Rejeitadas</td>
-                        <td>{totalRejeitado}</td>
-                        <td>{valorRejeitado}€</td>
-                    </tr>
-                    <tr>
-                        <td>Pendentes</td>
-                        <td>{totalPendente}</td>
-                        <td>{valorPendente}€</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <table className="table table-bordered">
-                <tbody>
-                    <tr>
-                        <td><strong>Total</strong></td>
-                        <td>{totalAprovado + totalEmAnalise + totalReembolsado + totalRejeitado + totalPendente}</td>
-                        <td>{valorAprovado + valorEmAnalise + valorReembolsado + valorRejeitado + valorPendente}€</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    )
-}
-
 
 const summarizeDespesas = (despesas) => {
     const summary = {};

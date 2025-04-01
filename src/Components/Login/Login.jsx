@@ -9,8 +9,6 @@ export default function Login() {
 
     const [USERNAME, setUSERNAME] = useState('')
     const [PASSWORD, setPASSWORD] = useState('')
-    const [loading, setloading] = useState(false);
-    const [message, setmessage] = useState("");
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -24,32 +22,23 @@ export default function Login() {
 
     function HandleLogin(event){
         event.preventDefault();
-        setmessage('');
-        setloading(true);
         authService.login(USERNAME, PASSWORD)
         .then(res => {
             if(res === "" || res === false){
-                setmessage('Autenticação falhou');
+                alert("Erro na autenticação")
             }
             else{
                 if(res.estado == "Ativa"){
                     navigate('/calendario');
                 }
                 else{
-                    localStorage.removeItem("user")
-                    localStorage.removeItem("tipo")
-                    localStorage.removeItem("id_utilizador")
-                    localStorage.removeItem("estado")
-                    alert('Website não está disponibilizado para utilizadores normais')
+                    alert('A sua conta não está ativa!')
                 }
             }
-            setloading(false);
         })
         .catch(err => {
             alert('Autenticação falhou')
             console.log(err)
-            setmessage('Autenticação falhou');
-            setloading(false);
         })
     }
 

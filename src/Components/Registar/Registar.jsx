@@ -2,48 +2,44 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import React, { useState, useEffect } from 'react';
 import './Registar.css'
 import '../../index.css'
-import authService  from "../Login/auth-service";
+import authService from "../Login/auth-service";
 
 
 export default function Registar() {
     const [USERNAME, setUSERNAME] = useState('')
     const [PASSWORD, setPASSWORD] = useState('')
-    const [loading, setloading] = useState(false);
     const navigate = useNavigate();
 
     useEffect(() => {
         document.title = "Login"
-    
-        if(authService.getCurrentUser()){
+
+        if (authService.getCurrentUser()) {
             navigate('calendario')
         }
     }, [])
 
-    function HandleRegisto(event){
-            event.preventDefault();
-            setloading(true);
-            authService.registo(USERNAME, PASSWORD)
+    function HandleRegisto(event) {
+        event.preventDefault();
+        authService.registo(USERNAME, PASSWORD)
             .then(res => {
-                if(res === "" || res === false){
-                    alert('Registo falhou 1')
+                if (res === "" || res === false) {
+                    alert('Erro na conexão a tentar realizar o registo');
                 }
-                else{
-                    if(res.success){
-                        alert("Registo feito com sucesso, faça login!")
+                else {
+                    if (res.success) {
+                        alert("Registo feito com sucesso, faça login!");
                         navigate('/login');
                     }
-                    else{
-                        alert('Registo falhou 2')
+                    else {
+                        alert('Erro a realizar o registo');
                     }
                 }
-                setloading(false);
             })
             .catch(err => {
-                alert('Registo falhou 3')
-                console.log(err)
-                setloading(false);
+                alert('Registo falhou');
+                console.log(err);
             })
-        }
+    }
 
     return (
         <div className="page-container">
@@ -63,12 +59,12 @@ export default function Registar() {
             }}>
             </div>
             <div className="d-flex justify-content-center align-items-center vh-100">
-                <div className="login-box" style={{zIndex: 1000, backgroundColor: "#eee", boxShadow: "2px 2px 50px #777"}}>
+                <div className="login-box" style={{ zIndex: 1000, backgroundColor: "#eee", boxShadow: "2px 2px 50px #777" }}>
                     <h2 className="text-center mb-4">Registar</h2>
                     <form className="w-80 mx-auto">
                         <div className="mb-3">
                             <label htmlFor="username" className="form-label">Utilizador</label>
-                            <input type="text" className="form-control" id="username" placeholder="Introduza o seu nickname" onChange={(value) => setUSERNAME(value.target.value)}/>
+                            <input type="text" className="form-control" id="username" placeholder="Introduza o seu nickname" onChange={(value) => setUSERNAME(value.target.value)} />
                         </div>
                         <div className="mb-3">
                             <label htmlFor="password" className="form-label">Password</label>
@@ -77,8 +73,8 @@ export default function Registar() {
                         <button type="submit" className="btn btn-info w-100" onClick={HandleRegisto}>Fazer registo</button>
                     </form>
                     <hr></hr>
-                    <div style={{padding: "15px"}}>
-                        <h5 className="text-center" style={{fontSize: "15px"}}>Já tem conta?&nbsp;<a style={{color: "black"}} href="/login">Faça login!</a></h5>
+                    <div style={{ padding: "15px" }}>
+                        <h5 className="text-center" style={{ fontSize: "15px" }}>Já tem conta?&nbsp;<a style={{ color: "black" }} href="/login">Faça login!</a></h5>
                     </div>
                 </div>
             </div>

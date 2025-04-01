@@ -11,31 +11,3 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
-
-@font-face {
-  font-family: 'mouldy-cheese';
-  src: url('./fonts/MouldyCheeseRegular-WyMWG.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'home-video';
-  src: url('./fonts/HomeVideo-BLG6G.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'home-video-bold';
-  src: url('./fonts/HomeVideoBold-R90Dv.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'ronysiswadi';
-  src: url('./fonts/RonysiswadiArchitect4-qZmp2.ttf') format('truetype');
-  font-weight: normal;
-  font-style: normal;
-}
