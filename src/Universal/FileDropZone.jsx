@@ -3,25 +3,25 @@ import { useDropzone } from 'react-dropzone';
 import { Typography, Box, Button, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const FileDropZone = ({ onDrop, accept, maxSize, disabled }) => {
-    const [uploadedFile, setUploadedFile] = useState(null);
+const FileDropZone = ({ onDrop, accept, maxSize, disabled, multiple = true }) => {
+    const [uploadedFiles, setUploadedFiles] = useState([]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop: (acceptedFiles) => {
             if (acceptedFiles.length > 0) {
-                const file = acceptedFiles[0];
-                setUploadedFile(file);
+                setUploadedFiles(prev => [...prev, ...acceptedFiles]);
                 onDrop(acceptedFiles);
             }
         },
         accept,
         maxSize,
-        disabled
+        disabled,
+        multiple
     });
 
-    const handleRemoveFile = () => {
+    const handleRemoveFile = (index) => {
         if(!disabled){
-            setUploadedFile(null);
+            setUploadedFiles(prev => prev.filter((_, i) => i !== index));
         }  
     };
 
@@ -48,9 +48,10 @@ const FileDropZone = ({ onDrop, accept, maxSize, disabled }) => {
             </Box>
             }
 
-            {/* Mostrar o anexo que foi enviado */}
-            {uploadedFile && (
+            {/* Mostrar os anexos que foram enviados */}
+            {uploadedFiles && uploadedFiles.map((file, index) => (
                 <Box
+                    key={index}
                     sx={{
                         mt: 2,
                         display: 'flex',
@@ -62,13 +63,13 @@ const FileDropZone = ({ onDrop, accept, maxSize, disabled }) => {
                     }}
                 >
                     <Typography variant="body2">
-                        {uploadedFile.name} ({Math.round(uploadedFile.size / 1024)} KB)
+                        {file.name} ({Math.round(file.size / 1024)} KB)
                     </Typography>
-                    <IconButton onClick={handleRemoveFile} size="small">
+                    <IconButton onClick={() => handleRemoveFile(index)} size="small">
                         <DeleteIcon fontSize="small" />
                     </IconButton>
                 </Box>
-            )}
+            ))}
         </Box>
     );
 };

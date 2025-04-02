@@ -72,27 +72,27 @@ export default function BasicTable({ despesas, action }) {
                         <TableRow>
                             <TableCell align="left"><Chip label="Pendente" color={getShadowClass("Pendente")}></Chip></TableCell>
                             <TableCell align="left">{totalPendente}</TableCell>
-                            <TableCell align="left">{valorPendente}</TableCell>
+                            <TableCell align="left">{Math.round(valorPendente * 100) / 100}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell align="left"><Chip label="Em análise" color={getShadowClass("Em análise")}></Chip></TableCell>
                             <TableCell align="left">{totalEmAnalise}</TableCell>
-                            <TableCell align="left">{valorEmAnalise}</TableCell>
+                            <TableCell align="left">{Math.round(valorEmAnalise * 100) / 100}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell align="left"><Chip label="Rejeitadas" color={getShadowClass("Rejeitada")}></Chip></TableCell>
                             <TableCell align="left">{totalRejeitado}</TableCell>
-                            <TableCell align="left">{valorRejeitado}</TableCell>
+                            <TableCell align="left">{Math.round(valorRejeitado * 100) / 100}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell align="left"><Chip label="Aprovadas" color={getShadowClass("Aprovada")}></Chip></TableCell>
                             <TableCell align="left">{totalAprovado}</TableCell>
-                            <TableCell align="left">{valorAprovado}</TableCell>
+                            <TableCell align="left">{Math.round(valorAprovado * 100) / 100}</TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell align="left"><Chip label="Reembolsadas" color={getShadowClass("Reembolsada")}></Chip></TableCell>
                             <TableCell align="left">{totalReembolsado}</TableCell>
-                            <TableCell align="left">{valorReembolsado}</TableCell>
+                            <TableCell align="left">{Math.round(valorReembolsado * 100) / 100}</TableCell>
                         </TableRow>
                 </TableBody>
             </Table>

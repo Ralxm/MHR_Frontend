@@ -38,7 +38,7 @@ export default function Despesas() {
     const [date, setDate] = useState('')
     const [descricao, setDescricao] = useState('')
     const [valor, setValor] = useState()
-    const [ficheiro, setFicheiro] = useState('')
+    const [ficheiros, setFicheiros] = useState([])
 
     const [despesaAnalisar, setDespesaAnalisar] = useState(null)
     const [acaoAnalisar, setAcaoAnalisar] = useState('')
@@ -193,8 +193,10 @@ export default function Despesas() {
         formData.append('valor', valor);
         formData.append('estado', "Pendente");
 
-        if (ficheiro) {
-            formData.append('anexo', ficheiro);
+        if (ficheiros && ficheiros.length > 0) {
+            ficheiros.forEach(file => {
+                formData.append('anexos', file);
+            });
         }
 
         console.log(formData)
@@ -433,7 +435,10 @@ export default function Despesas() {
                             <FileDropZone
                                 onDrop={(files) => {
                                     if (files && files.length > 0) {
-                                        setFicheiro(files[0]);
+                                        setFicheiros(prevFiles => {
+                                            const previousFiles = Array.isArray(prevFiles) ? prevFiles : [];
+                                            return [...previousFiles, ...files];
+                                        });
                                     }
                                 }}
                                 accept={{
@@ -441,6 +446,7 @@ export default function Despesas() {
                                     'application/pdf': ['.pdf'],
                                 }}
                                 maxSize={5 * 1024 * 1024}
+                                multiple={true}
                             />
 
                             <Button variant="contained" color="primary" onClick={handleCriar}>
@@ -496,8 +502,10 @@ export default function Despesas() {
     );
 
     function DetalhesDespesa({ despesa }) {
-        const [newFile, setNewFile] = useState(null);
-        const [fileName, setFileName] = useState(despesa.anexo ? despesa.anexo.split('/').pop() : '');
+        const [newFiles, setNewFiles] = useState([]);
+        const [existingFiles, setExistingFiles] = useState(
+            despesa.anexo ? JSON.parse(despesa.anexo) : []
+        );
 
         const convertDateToInputFormat = (date) => {
             const datePart = date.split(' ')[0];
@@ -525,8 +533,15 @@ export default function Despesas() {
 
         const handleFileDrop = (files) => {
             if (files && files.length > 0) {
-                setNewFile(files[0]);
-                setFileName(files[0].name);
+                setNewFiles(prevFiles => [...prevFiles, ...files]);
+            }
+        };
+
+        const handleRemoveFile = (index, isNewFile) => {
+            if (isNewFile) {
+                setNewFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
+            } else {
+                setExistingFiles(prevFiles => prevFiles.filter((_, i) => i !== index));
             }
         };
 
@@ -544,9 +559,11 @@ export default function Despesas() {
             formDataToSend.append('descricao', formData.descricao);
             formDataToSend.append('valor', formData.valor);
 
-            if (newFile) {
-                formDataToSend.append('anexo', newFile);
-            }
+            newFiles.forEach(file => {
+                formDataToSend.append('anexos', file);
+            });
+
+            formDataToSend.append('existingAnexos', JSON.stringify(existingFiles));
 
             if (acao == "reembolsar") {
                 formData.estado = "Reembolsada";
@@ -622,13 +639,24 @@ export default function Despesas() {
                 </div>
                 <div className="mb-3">
                     <div className='d-flex justify-content-between align-items-center my-2'>
-                        <label className="form-label"><strong>Anexo:</strong></label>
-                        {formData.anexo && (
-                            <a href={formData.anexo} target="_blank">
-                                <button type="button" className='btn btn-outline-info'>Abrir</button>
-                            </a>
-                        )}
+                        <label className="form-label"><strong>Anexos:</strong></label>
                     </div>
+
+                    {existingFiles.map((filePath, index) => (
+                        <div key={`existing-${index}`} className="d-flex justify-content-between align-items-center mb-2">
+                            <a href={"http://localhost:8080/" +filePath} target="_blank" rel="noopener noreferrer">
+                                <button type="button" className='btn btn-outline-info btn-sm'>Anexo {index+1}</button>
+                            </a>
+                            <button
+                                type="button"
+                                className="btn btn-sm btn-outline-danger"
+                                onClick={() => handleRemoveFile(index, false)}
+                                disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada" || acao == "analisar"}
+                            >
+                                Remover
+                            </button>
+                        </div>
+                    ))}
 
                     <FileDropZone
                         onDrop={handleFileDrop}
@@ -637,7 +665,7 @@ export default function Despesas() {
                             'application/pdf': ['.pdf'],
                         }}
                         maxSize={5 * 1024 * 1024}
-                        currentFile={fileName}
+                        multiple={true}
                         disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada" || acao == "analisar"}
                     />
                 </div>
