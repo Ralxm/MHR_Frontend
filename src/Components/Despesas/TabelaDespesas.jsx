@@ -63,26 +63,26 @@ export default function BasicTable({ data, onVerDetalhes, tipo, onApagar, action
                                 <TableCell align="left">{row._data}</TableCell>
                                 <TableCell align="left">{row.valor}</TableCell>
                                 <TableCell align="left">
-                                {row.anexo && (
-                                    <Dropdown>
-                                        <Dropdown.Toggle variant="secondary" id="dropdown-anexos">
-                                            Anexos ({JSON.parse(row.anexo).length})
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            {JSON.parse(row.anexo).map((filePath, index) => (
-                                                <Dropdown.Item
-                                                    key={index}
-                                                    href={"http://localhost:8080/" + filePath.replace(/\\/g, '/')}
-                                                    target="_blank"
-                                                    as="a"
-                                                >
-                                                    Anexo {index + 1}
-                                                </Dropdown.Item>
-                                            ))}
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                )}
-                            </TableCell>
+                                    {row.anexo && (
+                                        <Dropdown>
+                                            <Dropdown.Toggle variant="secondary" id="dropdown-anexos">
+                                                Anexos ({JSON.parse(row.anexo).length})
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                {JSON.parse(row.anexo).map((filePath, index) => (
+                                                    <Dropdown.Item
+                                                        key={index}
+                                                        href={"http://localhost:8080/" + filePath.replace(/\\/g, '/')}
+                                                        target="_blank"
+                                                        as="a"
+                                                    >
+                                                        Anexo {index + 1}
+                                                    </Dropdown.Item>
+                                                ))}
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    )}
+                                </TableCell>
                                 <TableCell align="left"><Chip label={row.estado} color={getShadowClass(row.estado)} size='10px'></Chip></TableCell>
                                 {row.estado == "Aprovada" ?
                                     <TableCell align="right"><button className='btn btn-secondary' onClick={() => onVerDetalhes(row, "reembolsar")}>Reembolsar</button></TableCell>
@@ -118,26 +118,26 @@ export default function BasicTable({ data, onVerDetalhes, tipo, onApagar, action
                                 <TableCell align="left">{row._data}</TableCell>
                                 <TableCell align="left">{row.valor}</TableCell>
                                 <TableCell align="left">
-                                {row.anexo && (
-                                    <Dropdown>
-                                        <Dropdown.Toggle variant="secondary" id="dropdown-anexos">
-                                            Anexos ({JSON.parse(row.anexo).length})
-                                        </Dropdown.Toggle>
-                                        <Dropdown.Menu>
-                                            {JSON.parse(row.anexo).map((filePath, index) => (
-                                                <Dropdown.Item
-                                                    key={index}
-                                                    href={"http://localhost:8080/" + filePath.replace(/\\/g, '/')}
-                                                    target="_blank"
-                                                    as="a"
-                                                >
-                                                    Anexo {index + 1}
-                                                </Dropdown.Item>
-                                            ))}
-                                        </Dropdown.Menu>
-                                    </Dropdown>
-                                )}
-                            </TableCell>
+                                    {row.anexo && (
+                                        <Dropdown>
+                                            <Dropdown.Toggle variant="secondary" id="dropdown-anexos">
+                                                Anexos ({JSON.parse(row.anexo).length})
+                                            </Dropdown.Toggle>
+                                            <Dropdown.Menu>
+                                                {JSON.parse(row.anexo).map((filePath, index) => (
+                                                    <Dropdown.Item
+                                                        key={index}
+                                                        href={"http://localhost:8080/" + filePath.replace(/\\/g, '/')}
+                                                        target="_blank"
+                                                        as="a"
+                                                    >
+                                                        Anexo {index + 1}
+                                                    </Dropdown.Item>
+                                                ))}
+                                            </Dropdown.Menu>
+                                        </Dropdown>
+                                    )}
+                                </TableCell>
                                 <TableCell align="left"><Chip label={row.estado} color={getShadowClass(row.estado)} size='10px'></Chip></TableCell>
                                 <TableCell align="right"><button className='btn btn-secondary' onClick={() => onVerDetalhes(row, "reembolsar")}>Reembolsar</button></TableCell>
                             </TableRow>

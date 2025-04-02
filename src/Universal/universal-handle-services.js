@@ -12,3 +12,5 @@ class UniversalHandleServices{
             }, reason => { throw new Error('Utilizador Inválido'); });
     }
 }
+
+export default new UniversalHandleServices();

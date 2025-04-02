@@ -22,7 +22,6 @@ class HandleServices {
             }
         })
             .then(res => {
-                console.log(res)
                 if (res.data.success) {
                     return res.data.data;
                 }

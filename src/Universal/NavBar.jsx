@@ -21,7 +21,6 @@ export default function NavBar() {
       setNome(JSON.parse(localStorage.getItem('nome')))
       setTipo(JSON.parse(localStorage.getItem('tipo')))
     }
-    console.log(link)
   }, []);
 
   useEffect(() => {

@@ -727,7 +727,7 @@ export default function Despesas() {
                     :
 
                     <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1" disabled={despesa.estado === "Aprovada" || despesa.estado === "Reembolsada" || despesa.estado === "Rejeitada"}>
-                        Salvar Alterações
+                        Guardar Alterações
                     </button>
                 }
 

@@ -30,7 +30,7 @@ export default function MainPage(){
                 </Route>
                 <Route path='/projeto/:id' element={<Projeto></Projeto>}>
                 </Route>
-                <Route path='/vagas' element={<Projeto></Projeto>}>
+                <Route path='/vagas' element={<Vagas></Vagas>}>
                 </Route>
             </Routes>
         </div>
