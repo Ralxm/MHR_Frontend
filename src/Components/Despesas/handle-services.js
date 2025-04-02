@@ -14,13 +14,12 @@ class HandleServices {
 
     createDespesa(formData) {
         let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'multipart/form-data'
+        };
 
-        return axios.post(url + "despesas/create", formData, {
-            ...authHeader(),
-            headers: {
-                'Content-Type': 'multipart/form-data'
-            }
-        })
+        return axios.post(url + "despesas/create", formData, { headers })
             .then(res => {
                 if (res.data.success) {
                     return res.data.data;
@@ -84,14 +83,18 @@ class HandleServices {
     atualizarDespesa(despesa) {
         console.log(despesa)
         let url = process.env.REACT_APP_BACKEND_LINK;
-        return axios.post(url + "despesas/update/" + despesa.get('id_despesa'), despesa, {...authHeader(), headers: {'Content-Type': 'multipart/form-data'}})
-        .then(res => {
-            if (res.data.success) {
-                return res.data.data;
-            }
-        }, reason => {
-            throw new Error('Erro a atualizar a despesa');
-        });
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'multipart/form-data'
+        };
+        return axios.post(url + "despesas/update/" + despesa.get('id_despesa'), despesa, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => {
+                throw new Error('Erro a atualizar a despesa');
+            });
     }
 }
 

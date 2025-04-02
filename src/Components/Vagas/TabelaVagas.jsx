@@ -1,9 +1,17 @@
 import { create } from "@mui/material/styles/createTransitions";
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { TableCell, TableRow, TableBody, Table, TableHead, Box, TableContainer, Chip } from "@mui/material";
 
 
 export default function BasicTable({ vagas, departamentos, selectedDepartamento, onVerDetalhes, onCandidatar }) {
+    let tipo_user = localStorage.getItem("tipo")
+
+    const [candidaturas, setCandidaturas] = useState([]);
+
+    useEffect(() => {
+        
+    }, [])
+
 
     return (
         <TableContainer component={Box} sx={{ pl: 0 }}>
@@ -46,8 +54,9 @@ export default function BasicTable({ vagas, departamentos, selectedDepartamento,
                                     <TableCell align="left">{vaga.descricao}</TableCell>
                                     <TableCell align="left">{vaga.requisitos}</TableCell>
                                     <TableCell align="right">
-                                        <button className="btn btn-outline-secondary mx-2" onClick={() => { onCandidatar(vaga) }}>Candidatar</button>
-                                        <button className="btn btn-outline-secondary" onClick={() => { onVerDetalhes(vaga) }}>Ver Detalhes</button>
+                                        <button className="btn btn-outline-warning mx-2" onClick={() => { onCandidatar(vaga) }}>Candidatar</button>
+                                        {(tipo_user == 1 || tipo_user == 2) && <button className="btn btn-outline-danger mx-2 my-1" onClick={() => { onVerDetalhes(vaga) }}>Ver Candidaturas</button>}
+                                        <button className="btn btn-secondary" onClick={() => { onVerDetalhes(vaga) }}>Ver Detalhes</button>
                                     </TableCell>
                                 </TableRow>
                             )
