@@ -282,19 +282,19 @@ export default function Despesas() {
                                 <div className="items-container p-3" style={{ height: '85vh' }}>
                                     <div className='d-flex justify-content-between align-items-center'>
                                         <span><strong>Sumário de Despesas</strong></span>
-                                        {(tipo_user == 1 || tipo_user == 2) && tipoDespesas == "Pessoal" ?
-                                            <div>
-                                                <Chip label="Pessoal" color='primary' className='mx-2'></Chip>
-                                                <Chip label="Empresa" color='gray'></Chip>
-                                            </div>
-
-                                            :
-
-                                            <div>
-                                                <Chip label="Pessoal" color='gray' className='mx-2'></Chip>
-                                                <Chip label="Empresa" color='primary'></Chip>
-                                            </div>
-                                        }
+                                        {(tipo_user == 1 || tipo_user == 2) && (
+                                            tipoDespesas === "Pessoal" ? (
+                                                <div>
+                                                    <Chip label="Pessoal" color='primary' className='mx-2'></Chip>
+                                                    <Chip label="Empresa" color='gray'></Chip>
+                                                </div>
+                                            ) : (
+                                                <div>
+                                                    <Chip label="Pessoal" color='gray' className='mx-2'></Chip>
+                                                    <Chip label="Empresa" color='primary'></Chip>
+                                                </div>
+                                            )
+                                        )}
                                     </div>
 
                                     <div className='row my-3'>
@@ -644,8 +644,8 @@ export default function Despesas() {
 
                     {existingFiles.map((filePath, index) => (
                         <div key={`existing-${index}`} className="d-flex justify-content-between align-items-center mb-2">
-                            <a href={"http://localhost:8080/" +filePath} target="_blank" rel="noopener noreferrer">
-                                <button type="button" className='btn btn-outline-info btn-sm'>Anexo {index+1}</button>
+                            <a href={"http://localhost:8080/" + filePath} target="_blank" rel="noopener noreferrer">
+                                <button type="button" className='btn btn-outline-info btn-sm'>Anexo {index + 1}</button>
                             </a>
                             <button
                                 type="button"
