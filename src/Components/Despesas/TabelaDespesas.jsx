@@ -13,8 +13,6 @@ export default function BasicTable({ data, onVerDetalhes, tipo, onApagar, action
         return createData(despesa.id_despesa, despesa.id_departamento, despesa.id_projeto, despesa.id_perfil, despesa.data, despesa.descricao, despesa.valor, despesa.anexo, despesa.validador, despesa.estado, despesa.reembolsado_por, despesa.comentarios, despesa.perfil, despesa.validadorPerfil, despesa.reembolsadorPerfil);
     })
 
-    console.log(rows)
-
     useEffect(() => {
 
     }, [action])

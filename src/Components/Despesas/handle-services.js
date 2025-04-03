@@ -29,7 +29,6 @@ class HandleServices {
 
     listDespesas(id_perfil) {
         let url = process.env.REACT_APP_BACKEND_LINK;
-        console.log(id_perfil)
         return axios.get(url + "despesas/listUser/" + id_perfil, authHeader())
             .then(res => {
                 if (res.data.success) {
@@ -72,7 +71,10 @@ class HandleServices {
 
     apagarDespesa(id_despesa) {
         let url = process.env.REACT_APP_BACKEND_LINK;
-        return axios.put(url + "despesas/delete/" + id_despesa, authHeader())
+        const headers = {
+            ...authHeader().headers,
+        };
+        return axios.put(url + "despesas/delete/" + id_despesa, null, authHeader())
             .then(res => {
                 if (res.data.success) {
                     return res.data.data;
@@ -81,7 +83,6 @@ class HandleServices {
     }
 
     atualizarDespesa(despesa) {
-        console.log(despesa)
         let url = process.env.REACT_APP_BACKEND_LINK;
         const headers = {
             ...authHeader().headers,

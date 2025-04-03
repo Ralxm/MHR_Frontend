@@ -20,6 +20,8 @@ export default function Vagas() {
     const [isCreateVagaModalOpen, setIsCreateVagaModalOpen] = useState(false)
     const [isCreateCandidaturaModalOpen, setIsCreateCandidaturaModalOpen] = useState(false)
 
+    const [isListagem, setIsListagem] = useState(true)
+
     const [departamentos, setDepartamentos] = useState([]);
     const [vagas, setVagas] = useState([])
 
@@ -70,6 +72,14 @@ export default function Vagas() {
     const toggleCreateVagaModal = (departamento) => {
         setDepartamentoVaga(departamento)
         setIsCreateVagaModalOpen(!isCreateVagaModalOpen)
+    }
+
+    const handleOpenGrafico = () => {
+        setIsListagem(false)
+    }
+
+    const handleOpenListagem = () => {
+        setIsListagem(true)
     }
 
     useEffect(() => {
@@ -135,7 +145,7 @@ export default function Vagas() {
             });
     }
 
-    function handleCriarCandidatura(event){
+    function handleCriarCandidatura(event) {
         event.preventDefault();
 
         const formData = new FormData();
@@ -146,7 +156,7 @@ export default function Vagas() {
         formData.append('email', email);
         formData.append('status', "Pendente");
 
-        if(curriculo && curriculo.length > 0){
+        if (curriculo && curriculo.length > 0) {
             formData.append('curriculo', curriculo)
         }
 
@@ -188,11 +198,29 @@ export default function Vagas() {
                                 <div className="items-container p-3" style={{ height: '85vh' }}>
                                     <div className='d-flex justify-content-between align-items-center'>
                                         <span><strong>Departamentos</strong></span>
+                                        {isListagem ?
+                                            <div>
+                                                <button className='btn btn-primary btn-sm mx-1'>Listagem</button>
+                                                <button className='btn btn-outline-secondary btn-sm' onClick={handleOpenGrafico}>Gráfico</button>
+                                            </div>
+                                            :
+                                            <div>
+                                                <button className='btn btn-outline-secondary btn-sm mx-1' onClick={handleOpenListagem}>Listagem</button>
+                                                <button className='btn btn-primary btn-sm' >Gráfico</button>
+                                            </div>
+                                        }
                                     </div>
 
-                                    <div className='row my-3'>
-                                        <ListDepartamentos departamentos={departamentos}></ListDepartamentos>
-                                    </div>
+                                    {isListagem ?
+                                            <div className='row my-3'>
+                                            <ListDepartamentos departamentos={departamentos}></ListDepartamentos>
+                                            </div>
+                                            :
+                                            <div>
+                                                {/*código com o gráfico */}
+                                            </div>
+                                        }
+                                    
                                 </div>
                             </div>
                         </div>

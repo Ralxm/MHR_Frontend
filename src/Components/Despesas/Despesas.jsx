@@ -199,8 +199,6 @@ export default function Despesas() {
             });
         }
 
-        console.log(formData)
-
         handleServices.createDespesa(formData)
             .then(res => {
                 alert("Despesa criada com sucesso");
@@ -582,8 +580,6 @@ export default function Despesas() {
             formDataToSend.append('estado', formData.estado);
             formDataToSend.append('reembolsado_por', formData.reembolsado_por);
             formDataToSend.append('comentarios', formData.comentarios);
-
-            console.log(formDataToSend)
 
             handleServices.atualizarDespesa(formDataToSend)
                 .then(res => {
