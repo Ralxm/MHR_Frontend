@@ -6,7 +6,7 @@ import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab } from '@mui/material';
 import FileDropZone from '../../Universal/FileDropZone'
-import DoughnutPieChart from '../../Universal/DoughnutPieChart';
+import DoughnutPieChart from './DoughnutPieChart';
 import Table from './TabelaDespesas';
 import TableSumarios from './TabelaSumario'
 import { TabContext, TabList, TabPanel } from '@mui/lab';
@@ -86,6 +86,10 @@ export default function Despesas() {
     const toggleAction = () => {
         setAction(!action)
     }
+
+    const handleRemoveFile = (index) => {
+        setFicheiros(prev => prev.filter((_, i) => i !== index))
+    };
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -444,6 +448,7 @@ export default function Despesas() {
                                     'application/pdf': ['.pdf'],
                                 }}
                                 maxSize={5 * 1024 * 1024}
+                                handleRemoveFile={handleRemoveFile}
                                 multiple={true}
                             />
 

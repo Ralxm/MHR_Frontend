@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { Typography, Box, Button, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 
-const FileDropZone = ({ onDrop, accept, maxSize, disabled, multiple = true }) => {
+const FileDropZone = ({ onDrop, accept, maxSize, disabled, handleRemoveFile, multiple = true }) => {
     const [uploadedFiles, setUploadedFiles] = useState([]);
 
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
@@ -19,7 +19,7 @@ const FileDropZone = ({ onDrop, accept, maxSize, disabled, multiple = true }) =>
         multiple
     });
 
-    const handleRemoveFile = (index) => {
+    const _handleRemoveFile = (index) => {
         if(!disabled){
             setUploadedFiles(prev => prev.filter((_, i) => i !== index));
         }  
@@ -65,7 +65,7 @@ const FileDropZone = ({ onDrop, accept, maxSize, disabled, multiple = true }) =>
                     <Typography variant="body2">
                         {file.name} ({Math.round(file.size / 1024)} KB)
                     </Typography>
-                    <IconButton onClick={() => handleRemoveFile(index)} size="small">
+                    <IconButton onClick={() => {handleRemoveFile(index); _handleRemoveFile(index)}} size="small">
                         <DeleteIcon fontSize="small" />
                     </IconButton>
                 </Box>
