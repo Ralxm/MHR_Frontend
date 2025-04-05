@@ -1,12 +1,14 @@
 import { create } from "@mui/material/styles/createTransitions";
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { TableCell, TableRow, TableBody, Table, TableHead, Box, TableContainer, Chip, Stack, Card, Typography, Divider } from "@mui/material";
 
 
 export default function BasicTable({ vagas, departamentos, selectedDepartamento, onVerDetalhes, onApagar, onEditar }) {
     let tipo_user = localStorage.getItem("tipo")
+    const navigate = useNavigate();
     useEffect(() => {
-        
+
     }, [])
 
     const filteredVagas = selectedDepartamento
@@ -17,9 +19,11 @@ export default function BasicTable({ vagas, departamentos, selectedDepartamento,
         <>
             {filteredVagas.map((vaga) => {
                 let nome;
+                let dep;
                 departamentos.map((departamento) => {
                     if (vaga.id_departamento == departamento.id_departamento) {
                         nome = departamento.nome_departamento;
+                        dep = departamento;
                     }
                 })
                 return (
@@ -32,7 +36,15 @@ export default function BasicTable({ vagas, departamentos, selectedDepartamento,
                                             {nome}
                                         </div>
                                         <div>
-                                            <a href={"/vagas/" + vaga.id_vaga} ><button className="btn btn-outline-primary btn-sm">Ver detalhes</button></a>
+                                            <a
+                                                href={`/vagas/${vaga.id_vaga}`}
+                                                onClick={(e) => {
+                                                    e.preventDefault();
+                                                    navigate(`/vagas/${vaga.id_vaga}`, { state: { vaga, dep } });
+                                                }}
+                                            >
+                                                <button className="btn btn-outline-primary btn-sm">Ver detalhes</button>
+                                            </a>
                                         </div>
                                     </Typography>
                                     <Typography gutterBottom variant="h7" component="div">

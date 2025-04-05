@@ -9,6 +9,7 @@ import Calendario from "../Components/Calendario/Calendario";
 import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
 import Vagas from "../Components/Vagas/Vagas";
+import Vaga from '../Components/Vagas/Vaga'
 
 export default function MainPage(){
     return (
@@ -31,6 +32,8 @@ export default function MainPage(){
                 <Route path='/projeto/:id' element={<Projeto></Projeto>}>
                 </Route>
                 <Route path='/vagas' element={<Vagas></Vagas>}>
+                </Route>
+                <Route path='/vagas/:id' element={<Vaga></Vaga>}>
                 </Route>
             </Routes>
         </div>

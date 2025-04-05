@@ -41,6 +41,7 @@ export default function NavBar() {
     navigate('/login')
   };
 
+  console.log(link)
   return (
     <div className="navbar">
       <div className="navbar-content">
@@ -53,12 +54,12 @@ export default function NavBar() {
             {/* Vagas Link */}
             <div className="nav-item">
               <a
-                className={`nav-link ${link === "vagas" ? "active" : ""}`}
+                className={`nav-link ${link.includes("vagas") ? "active" : ""}`}
                 href='/vagas'
               >
                 Vagas
               </a>
-              <div className={`underline ${link === "vagas" ? "active" : ""}`} />
+              <div className={`underline ${link.includes("vagas") ? "active" : ""}`} />
             </div>
 
             {/* Calendário Link */}

@@ -60,7 +60,7 @@ class HandleServices {
             }, reason => { throw new Error('Erro a apagar a vaga'); });
     }
 
-    listCandidaturas(){
+    listCandidaturas() {
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.get(url + "candidaturas/list", authHeader())
             .then(res => {
@@ -83,6 +83,36 @@ class HandleServices {
                     return res.data.data;
                 }
             }, reason => { throw new Error('Erro a criar a candidatura: ' + reason); });
+    }
+
+    getVaga(id_vaga) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "vaga/get/" + id_vaga, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar todas as vagas'); });
+    }
+
+    getVaga(id_vaga) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "vaga/get/" + id_vaga, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar todas as vagas'); });
+    }
+
+    listCandidaturasPorVaga(id_vaga){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "candidaturas/listVaga/" + id_vaga, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar todas as vagas'); });
     }
 
     findResponsavel(id_responsavel) {
