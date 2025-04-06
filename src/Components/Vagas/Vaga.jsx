@@ -18,6 +18,7 @@ export default function Vagas() {
     const navigate = useNavigate();
 
     const [isLoading, setIsLoading] = useState(false);
+    const [isVagaLoading, setIsVagaLoading] = useState(true);
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -69,8 +70,6 @@ export default function Vagas() {
         setAction('')
     }
 
-
-
     useEffect(() => {
         if (!authService.getCurrentUser()) {
             navigate('/login')
@@ -87,15 +86,21 @@ export default function Vagas() {
             setTipoUser(localStorage.getItem("tipo"))
         }
 
-        if (!vaga && !isLoading) {
+        if (!vaga) {
+            console.log("loading vaga")
             carregarVaga(id);
         }
-    }, [vaga, id, isLoading]);
+        else{
+            setIsVagaLoading(false)
+            vaga.data_inicio = convertDate(vaga.data_inicio)
+            vaga.data_fecho = convertDate(vaga.data_fecho)
+        }
+    }, []);
 
     useEffect(() => {
         if (vaga) {
-        document.title = "Vaga: " + vaga.titulo_vaga;
-        carregarCandidaturas(vaga.id_vaga);
+            document.title = "Vaga: " + vaga.titulo_vaga;
+            carregarCandidaturas(vaga.id_vaga);
         }
     }, [vaga])
 
@@ -115,19 +120,20 @@ export default function Vagas() {
     }
 
     async function carregarVaga(id) {
-        handleServices.getVaga(id)
-            .then(res => {
-                const vagaAPI = res.Box
-                vagaAPI = {
-                    ...vagaAPI,
-                    data_inicio: convertDate(vagaAPI.data_inicio),
-                    data_fecho: convertDate(vagaAPI.data_fecho)
-                };
-                setVaga(vagaAPI)
-            })
-            .catch(err => {
-                console.log(err)
-            })
+        setIsVagaLoading(true);
+        try {
+            const res = await handleServices.getVaga(id);
+            const processedVaga = {
+                ...res[0],
+                data_inicio: convertDate(res[0].data_inicio),
+                data_fecho: convertDate(res[0].data_fecho)
+            };
+            setVaga(processedVaga);
+        } catch (err) {
+            console.log(err);
+        } finally {
+            setIsVagaLoading(false);
+        }
     }
 
     function carregarComentarios(id) {
@@ -192,6 +198,15 @@ export default function Vagas() {
                 console.log(err);
             });
     }
+
+    if (isVagaLoading) {
+        return <div>Loading...</div>;
+    }
+
+    if (!vaga) {
+        return <div>Error loading vaga.</div>;
+    }
+
 
     return (
         <div id="root">
@@ -585,7 +600,7 @@ export default function Vagas() {
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    onClick={() => {handleCloseDecidirCandidaturas()}}
+                                    onClick={() => { handleCloseDecidirCandidaturas() }}
                                     sx={{ width: '50%' }}
                                 >
                                     Fechar
@@ -610,7 +625,7 @@ export default function Vagas() {
                                 <Button
                                     variant="contained"
                                     color="primary"
-                                    onClick={() => {handleCloseDecidirCandidaturas()}}
+                                    onClick={() => { handleCloseDecidirCandidaturas() }}
                                     sx={{ width: '50%' }}
                                 >
                                     Fechar
