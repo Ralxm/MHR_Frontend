@@ -115,6 +115,31 @@ class HandleServices {
             }, reason => { throw new Error('Erro a listar todas as vagas'); });
     }
 
+    createComentario(formData) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json',
+        };
+
+        return axios.post(url + "comentarios/create", formData, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a criar a candidatura: ' + reason); });
+    }
+
+    listComentarios(id_candidatura){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "comentarios/listCandidatura/" + id_candidatura, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar todas as vagas'); });
+    }
+
     findResponsavel(id_responsavel) {
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.get(url + "perfis/getUtilizador/" + id_responsavel, authHeader())

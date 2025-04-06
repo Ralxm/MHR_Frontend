@@ -11,7 +11,7 @@ export default function Registar() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        document.title = "Login"
+        document.title = "Registar"
 
         if (authService.getCurrentUser()) {
             navigate('calendario')

@@ -41,7 +41,6 @@ export default function NavBar() {
     navigate('/login')
   };
 
-  console.log(link)
   return (
     <div className="navbar">
       <div className="navbar-content">

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import authHeader from '../../Universal/auth-header';
 
 class AuthService{
     
@@ -55,7 +56,7 @@ class AuthService{
 
         return axios.post(url + "utilizadores/resgatepassword", datapost, {headers: { 'Authorization' : 'Bearer ESTGV'}})
         .then(res => {
-            axios.post(url + "auditlog/create", datapostAuditLog);
+            //axios.post(url + "auditlog/create", datapostAuditLog, authHeader());
             return res.data;
         }, reason => {throw new Error('Erro a criar o utiliazador na base de dados');});
     }
@@ -77,7 +78,7 @@ class AuthService{
 
         return axios.post(url + "utilizadores/resetpassword", datapost, {headers: { 'Authorization' : 'Bearer ESTGV'}})
         .then(res => {
-            axios.post(url + "auditlog/create", datapostAuditLog);
+            axios.post(url + "auditlog/create", datapostAuditLog, authHeader());
             return res.data;
         }, reason => {throw new Error('Erro a alterar a password');});
     }

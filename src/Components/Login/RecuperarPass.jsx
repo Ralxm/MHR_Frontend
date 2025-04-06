@@ -21,7 +21,7 @@ export default function Recuperar() {
     const navigate = useNavigate();
 
     useEffect(() => {
-        document.title = "Login"
+        document.title = "Recuperar password"
 
         if(authService.getCurrentUser()){
             navigate('calendario')
@@ -134,15 +134,15 @@ export default function Recuperar() {
             {alterarPhase &&
             <div className="d-flex justify-content-center align-items-center vh-100">
                 <div className="login-box" style={{zIndex: 1000, backgroundColor: "#eee", boxShadow: "2px 2px 50px #777"}}>
-                    <h2 className="text-center mb-4">Verificação do token</h2>
+                    <h2 className="text-center mb-4">Criação de uma nova password</h2>
                     <form className="w-80 mx-auto">
                         <div className="mb-3">
                             <label htmlFor="password" className="form-label">Password</label>
-                            <input type="text" className="form-control" id="password" placeholder="Introduza a sua nova password" onChange={(value) => setPassword(value.target.value)} />
+                            <input type="password" className="form-control" id="password" placeholder="Introduza a sua nova password" onChange={(value) => setPassword(value.target.value)} />
                         </div>
                         <div className="mb-3">
                             <label htmlFor="passwordD" className="form-label">Repita password</label>
-                            <input type="text" className="form-control" id="passwordD" placeholder="Introduza a password uma vez mais" onChange={(value) => setpasswordD(value.target.value)} />
+                            <input type="password" className="form-control" id="passwordD" placeholder="Introduza a password uma vez mais" onChange={(value) => setpasswordD(value.target.value)} />
                         </div>
                         <button type="submit" className="btn btn-info w-100" onClick={HandleAlterar}>Alterar palavra-passe</button>
                     </form>
