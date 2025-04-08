@@ -8,27 +8,51 @@ import ReactEchart from 'echarts-for-react';
 
 echarts.use([TooltipComponent, PieChart, CanvasRenderer]);
 
-const DoughnutPieChart = ({ vagas, departamentos, onSetDepartamento }) => {
+const DoughnutPieChart = ({ vagas, departamentos, candidaturas, onSetDepartamento, tipo }) => {
     const { palette } = useTheme();
 
     const data = useMemo(() => {
         const departamentoMap = {};
+        const vagaMap = {};
+        
         departamentos.forEach(dept => {
             departamentoMap[dept.id_departamento] = dept;
         });
-
-        const counts = {};
+        
         vagas.forEach(vaga => {
-            const deptId = vaga.id_departamento;
-            counts[deptId] = (counts[deptId] || 0) + 1;
+            vagaMap[vaga.id_vaga] = vaga;
         });
 
-        return Object.entries(counts).map(([deptId, count]) => ({
-            value: count,
-            name: departamentoMap[deptId] || `Departamento ${deptId}`,
-            departamento: departamentoMap[deptId]
-        }));
-    }, [vagas, departamentos]);
+        if(tipo == 'vagas'){
+            const counts = {};
+            vagas.forEach(vaga => {
+                const deptId = vaga.id_departamento;
+                counts[deptId] = (counts[deptId] || 0) + 1;
+            });
+    
+            return Object.entries(counts).map(([deptId, count]) => ({
+                value: count,
+                name: departamentoMap[deptId]?.nome_departamento || `Departamento ${deptId}`,
+                departamento: departamentoMap[deptId]
+            }));
+        }
+        else if(tipo == 'candidaturas'){
+            const counts = {};
+            candidaturas.forEach(candidatura => {
+                const vaga = vagaMap[candidatura.id_vaga];
+                if (vaga) {
+                    const deptId = vaga.id_departamento;
+                    counts[deptId] = (counts[deptId] || 0) + 1;
+                }
+            });
+    
+            return Object.entries(counts).map(([deptId, count]) => ({
+                value: count,
+                name: departamentoMap[deptId]?.nome_departamento || `Departamento ${deptId}`,
+                departamento: departamentoMap[deptId]
+            }));
+        }
+    }, [vagas, departamentos, candidaturas, tipo]);
 
     const colors = useMemo(() => {
         const colorPalette = [
@@ -42,7 +66,7 @@ const DoughnutPieChart = ({ vagas, departamentos, onSetDepartamento }) => {
         return data.map((_, index) => colorPalette[index % colorPalette.length]);
     }, [data, palette]);
 
-    const totalVagas = useMemo(() => {
+    const total = useMemo(() => {
         return data.reduce((sum, item) => sum + item.value, 0);
     }, [data]);
 
@@ -51,8 +75,10 @@ const DoughnutPieChart = ({ vagas, departamentos, onSetDepartamento }) => {
             color: colors,
             tooltip: {
                 trigger: 'item',
-                formatter: (params) =>
-                    `<strong>${params.name}:</strong> ${params.value} vaga(s) (${params.percent}%)`,
+                formatter: (params) => {
+                    const label = tipo === 'vagas' ? 'vaga(s)' : 'candidatura(s)';
+                    return `<strong>${params.name}:</strong> ${params.value} ${label} (${params.percent}%)`;
+                },
             },
             legend: {
                 show: false
@@ -77,7 +103,7 @@ const DoughnutPieChart = ({ vagas, departamentos, onSetDepartamento }) => {
                     label: {
                         show: true,
                         position: 'center',
-                        formatter: `{x|${totalVagas}}\n{y|Vagas}`,
+                        formatter: `{x|${total}}\n{y|${tipo === 'vagas' ? 'Vagas' : 'Candidaturas'}}`,
                         rich: {
                             x: {
                                 fontSize: 24,
@@ -97,7 +123,7 @@ const DoughnutPieChart = ({ vagas, departamentos, onSetDepartamento }) => {
             ],
             grid: { containLabel: true },
         }),
-        [palette, data, totalVagas, colors]
+        [palette, data, total, colors, tipo]
     );
 
     const onChartClick = (params) => {
@@ -110,7 +136,7 @@ const DoughnutPieChart = ({ vagas, departamentos, onSetDepartamento }) => {
         <ReactEchart
             echarts={echarts}
             option={getOptions}
-            style={{ width: '100%', height: '300px' }}
+            style={{ width: '45%', height: '270px' }}
             onEvents={{
                 click: onChartClick
             }}

@@ -1,130 +1,191 @@
 import { create } from "@mui/material/styles/createTransitions";
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TableCell, TableRow, TableBody, Table, TableHead, Box, TableContainer, Chip, Stack, Card, Typography, Divider } from "@mui/material";
+import { Box, Chip, Stack, Card, Typography, Divider, CardContent, Button } from "@mui/material";
+import { LockOpen, Lock, People, Business, CalendarToday, ArrowForward } from '@mui/icons-material'
 
 
-export default function BasicTable({ vagas, departamentos, selectedDepartamento, onVerDetalhes, onApagar, onEditar }) {
-    let tipo_user = localStorage.getItem("tipo")
-    const navigate = useNavigate();
-    useEffect(() => {
+export default function BasicTable({ vagas, departamentos, selectedDepartamento, onVerDetalhes, onApagar, onEditar, filtro }) {
+  let tipo_user = localStorage.getItem("tipo")
+  const navigate = useNavigate();
+  useEffect(() => {
 
-    }, [])
+  }, [])
 
-    const filteredVagas = selectedDepartamento
-        ? vagas.filter(vaga => vaga.id_departamento === selectedDepartamento.id_departamento)
-        : vagas;
+  function convertDate(d) {
+    const date = new Date(d);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const year = date.getFullYear();
+    const formattedDate = `${day}-${month}-${year}`;
 
-    return (
-        <>
-            {filteredVagas.map((vaga) => {
-                let nome;
-                let dep;
-                departamentos.map((departamento) => {
-                    if (vaga.id_departamento == departamento.id_departamento) {
-                        nome = departamento.nome_departamento;
-                        dep = departamento;
+    return formattedDate
+  }
+
+  const filteredVagas = vagas.filter(vaga => {
+    if (selectedDepartamento && vaga.id_departamento !== selectedDepartamento.id_departamento) {
+      return false;
+    }
+    
+    if (filtro && filtro.trim() !== '') {
+      const searchTerm = filtro.toLowerCase();
+      const title = vaga.titulo_vaga.toLowerCase();
+      if (!title.includes(searchTerm)) {
+        return false;
+      }
+    }
+    
+    return true;
+  });
+
+  return (
+    <>
+      {filteredVagas.map((vaga) => {
+        let nome;
+        let dep;
+        departamentos.map((departamento) => {
+          if (vaga.id_departamento == departamento.id_departamento) {
+            nome = departamento.nome_departamento;
+            dep = departamento;
+          }
+        })
+        return (
+          <div className="col-md-4 mb-4" key={vaga.id_vaga} style={{zIndex: 1001}}>
+            <Card
+              sx={{
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                transition: 'transform 0.2s, box-shadow 0.2s',
+                '&:hover': {
+                  transform: 'translateY(-4px)',
+                  boxShadow: '0 6px 15px rgba(0,0,0,0.1)'
+                },
+                backgroundColor: "white"
+              }}
+            >
+              <CardContent sx={{
+                flexGrow: 1,
+                display: 'flex',
+                flexDirection: 'column',
+                height: '100%'
+              }}>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  alignItems="center"
+                  spacing={1}
+                  mb={2}
+                >
+                  <Chip
+                    icon={<Business fontSize="small" />}
+                    label={dep?.nome_departamento || 'Departamento'}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                  <Chip
+                    icon={vaga.estado === 'Aberta' ? <LockOpen fontSize="small" /> :
+                      vaga.estado === 'Ocupada' ? <Lock fontSize="small" /> :
+                        <People fontSize="small" />}
+                    label={vaga.estado}
+                    size="small"
+                    color={
+                      vaga.estado === 'Aberta' ? 'success' :
+                        vaga.estado === 'Ocupada' ? 'error' :
+                          'warning'
                     }
-                })
-                return (
-                    <div className="col-md-4" key={vaga.id_vaga}>
-                        <Card variant="outlined" className="h-100">
-                            <Box className="pt-2 px-2">
-                                <Stack sx={{ justifyContent: 'space-between', alignItems: 'left' }}>
-                                    <Typography gutterBottom variant="h6" component="div" className="d-flex justify-content-between align-items-center">
-                                        <div>
-                                            {nome}
-                                        </div>
-                                        <div>
-                                            <a
-                                                href={`/vagas/${vaga.id_vaga}`}
-                                                onClick={(e) => {
-                                                    e.preventDefault();
-                                                    navigate(`/vagas/${vaga.id_vaga}`, { state: { vaga, dep } });
-                                                }}
-                                            >
-                                                <button className="btn btn-outline-primary btn-sm">Ver detalhes</button>
-                                            </a>
-                                        </div>
-                                    </Typography>
-                                    <Typography gutterBottom variant="h7" component="div">
-                                        {vaga.titulo_vaga}
-                                    </Typography>
-                                </Stack>
-                                <Typography color="text.secondary" variant="body2">
-                                    {vaga.requisitos}
-                                </Typography>
-                                {(tipo_user == 1 || tipo_user == 2) &&
-                                    <>
-                                        <Divider variant="fullWidth" className="mb-2"></Divider>
-                                        <Typography gutterBottom variant="h6" component="div" className="d-flex justify-content-between">
-                                            <div>
+                    sx={{ fontWeight: 500 }}
+                  />
+                </Stack>
 
-                                            </div>
-                                            <div>
-                                                <button className="btn btn-outline-danger btn-sm mx-2" onClick={() => onApagar(vaga.id_vaga)}>Apagar Vaga</button>
-                                                <button className="btn btn-primary btn-sm" onClick={() => onVerDetalhes(vaga)}>Editar Vaga</button>
-                                            </div>
-                                        </Typography>
-                                    </>
-                                }
-                            </Box>
-                        </Card>
-                    </div>
-                )
-            })}
-        </>
-    )
-    /*<TableContainer component={Box} sx={{ pl: 0 }}>
-        <Table sx={{ minWidth: 300 }} aria-label="simple table" className="disable-edge-padding">
-            <TableHead>
-                <TableRow>
-                    <TableCell align="left">Departamento</TableCell>
-                    <TableCell align="left">Título</TableCell>
-                    <TableCell align="left">Descrição</TableCell>
-                    <TableCell align="left">Requisitos</TableCell>
-                    <TableCell align="right"></TableCell>
-                </TableRow>
-            </TableHead>
-            <TableBody>
-                {vagas.map((vaga) => {
-                    if (selectedDepartamento) {
-                        if (vaga.id_departamento == selectedDepartamento.id_departamento) {
-                            return (
-                                <TableRow>
-                                    <TableCell align="left">{selectedDepartamento.nome_departamento}</TableCell>
-                                    <TableCell align="left">{vaga.titulo_vaga}</TableCell>
-                                    <TableCell align="left">{vaga.descricao}</TableCell>
-                                    <TableCell align="left">{vaga.requisitos}</TableCell>
-                                    <TableCell align="right"><button className="btn btn-outline-secondary" onClick={() => { onVerDetalhes(vaga) }}>Ver detalhes</button></TableCell>
-                                </TableRow>
-                            )
-                        }
-                    }
-                    else {
-                        let nome;
-                        departamentos.map((departamento) => {
-                            if (vaga.id_departamento == departamento.id_departamento) {
-                                nome = departamento.nome_departamento;
-                            }
-                        })
-                        return (
-                            <TableRow>
-                                <TableCell align="left">{nome}</TableCell>
-                                <TableCell align="left">{vaga.titulo_vaga}</TableCell>
-                                <TableCell align="left">{vaga.descricao}</TableCell>
-                                <TableCell align="left">{vaga.requisitos}</TableCell>
-                                <TableCell align="right">
-                                    <button className="btn btn-outline-warning mx-2" onClick={() => { onCandidatar(vaga) }}>Candidatar</button>
-                                    {(tipo_user == 1 || tipo_user == 2) && <button className="btn btn-outline-danger mx-2 my-1" onClick={() => { onVerDetalhes(vaga) }}>Ver Candidaturas</button>}
-                                    <button className="btn btn-secondary" onClick={() => { onVerDetalhes(vaga) }}>Ver Detalhes</button>
-                                </TableCell>
-                            </TableRow>
-                        )
-                    }
-                })}
-            </TableBody>
-        </Table>
-    </TableContainer>*/
+                <Typography
+                  variant="h6"
+                  component="h3"
+                  sx={{
+                    fontWeight: 600,
+                    mb: 1,
+                    minHeight: '64px'
+                  }}
+                >
+                  {vaga.titulo_vaga}
+                </Typography>
+
+                <Stack direction="row" spacing={1} mb={2}>
+                  <Chip
+                    icon={<People fontSize="small" />}
+                    label={`${vaga.numero_vagas} vaga(s)`}
+                    size="small"
+                    variant="outlined"
+                    color="info"
+                  />
+                  <Chip
+                    icon={<CalendarToday fontSize="small" />}
+                    label={`Fecha ${convertDate(vaga.data_fecho)}`}
+                    size="small"
+                    variant="outlined"
+                    color="secondary"
+                  />
+                </Stack>
+
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  sx={{
+                    mb: 2,
+                    display: '-webkit-box',
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: 'vertical',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis'
+                  }}
+                >
+                  {vaga.requisitos.substring(0, 100)}...
+                </Typography>
+
+                <Box sx={{ mt: 'auto' }}>
+                  <Box sx={{ textAlign: 'center' }}>
+                    <Button
+                      variant="outlined"
+                      size="small"
+                      endIcon={<ArrowForward />}
+                      onClick={() => navigate(`/vagas/${vaga.id_vaga}`, { state: { vaga, dep } })}
+                      fullWidth
+                      sx={{ mb: 1 }}
+                    >
+                      Ver detalhes
+                    </Button>
+                  </Box>
+
+                  {(tipo_user == 1 || tipo_user == 2) && (
+                    <>
+                      <Divider sx={{ my: 1 }} />
+                      <Stack direction="row" spacing={1} justifyContent="flex-end">
+                        <Button
+                          variant="outlined"
+                          color="error"
+                          size="small"
+                          onClick={() => onApagar(vaga.id_vaga)}
+                        >
+                          Apagar
+                        </Button>
+                        <Button
+                          variant="contained"
+                          size="small"
+                          onClick={() => navigate('/vagas/editar/' + vaga.id_vaga)}
+                        >
+                          Editar
+                        </Button>
+                      </Stack>
+                    </>
+                  )}
+                </Box>
+              </CardContent>
+            </Card>
+          </div>
+        );
+      })}
+    </>
+  )
 }
 

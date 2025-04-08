@@ -30,6 +30,8 @@ export default function Vagas() {
     const [selectedVaga, setSelectedVaga] = useState(null)
     const [selectedVagaDepartamento, setSelectedVagaDepartamento] = useState(null)
 
+    const [filtroTitulo, setFiltroTitulo] = useState('')
+
     {/*Variáveis para a criação da vaga*/ }
     const [departamento, setDepartamento] = useState()
     const [descricao, setDescricao] = useState('')
@@ -261,59 +263,44 @@ export default function Vagas() {
                         {/* Coluna da esquerda */}
                         <div className="col-md-4" style={{ zIndex: 1000 }}>
                             <div className='row'>
-                                <div className="items-container p-3" style={{ height: '85vh', overflowY: 'auto'  }}>
+                                <div className="items-container " style={{ height: '85vh', overflowY: 'auto', overflowX: 'hidden' }}>
                                     <div className='d-flex justify-content-between align-items-center'>
                                         <span><strong>Departamentos</strong></span>
-                                        {isListagem ?
-                                            <div>
-                                                <button className='btn btn-outline-secondary btn-sm' onClick={handleOpenGrafico}>Gráfico</button>
-                                                <button className='btn btn-primary btn-sm mx-1'>Listagem</button>
-                                            </div>
-                                            :
-                                            <div>
-                                                <button className='btn btn-primary btn-sm' >Gráfico</button>
-                                                <button className='btn btn-outline-secondary btn-sm mx-1' onClick={handleOpenListagem}>Listagem</button>
-                                            </div>
-                                        }
                                     </div>
 
-                                    {isListagem ?
-                                        <div className='row my-3'>
-                                            <ListDepartamentos departamentos={departamentos}></ListDepartamentos>
-                                        </div>
-                                        :
-                                        <>
-                                            <div className='row mt-4'>
-                                                <DoughnutPieChart vagas={vagas} departamentos={departamentos} onSetDepartamento={setSelectedDepartamentoGrafico}></DoughnutPieChart>
-                                            </div>
-                                            <div className='row'>
-                                                <SumarioVagas vagas={vagas} departamentos={departamentos} candidaturas={candidaturas} tipo_user={tipo_user}></SumarioVagas>
-                                            </div>
-                                        </>
-
-                                    }
+                                    <div className='row d-flex justify-content-center mt-4'>
+                                        <DoughnutPieChart vagas={vagas} departamentos={departamentos} candidaturas={candidaturas} onSetDepartamento={setSelectedDepartamentoGrafico} tipo='vagas'></DoughnutPieChart>
+                                        <DoughnutPieChart vagas={vagas} departamentos={departamentos} candidaturas={candidaturas} onSetDepartamento={setSelectedDepartamentoGrafico} tipo='candidaturas'></DoughnutPieChart>
+                                    </div>
+                                    <div className='row'>
+                                        <SumarioVagas vagas={vagas} departamentos={departamentos} candidaturas={candidaturas} tipo_user={tipo_user} onSetDepartamento={setSelectedDepartamentoGrafico}></SumarioVagas>
+                                    </div>
 
                                 </div>
                             </div>
                         </div>
 
                         {/* Coluna da direita */}
-                        <div className="col-md-8" style={{ zIndex: 1000 }}>
+                        <div className="col-md-8">
                             <div className="items-container" style={{ height: '85vh', overflowY: 'auto' }}>
                                 <div className='d-flex justify-content-between align-items-center mx-3 mb-3 mt-1'>
                                     <span>{selectedDepartamento ?
-                                        <div>
+                                        <div style={{zIndex: 1001}}>
                                             <strong>Vagas do departamento: </strong>
                                             <span>{selectedDepartamento.nome_departamento}</span>
                                         </div>
                                         :
-                                        <strong>Todas as vagas</strong>}</span>
-                                    {selectedDepartamento && <button className='btn btn-warning btn-sm' onClick={() => { setSelectedDepartamento(null) }}>Remover Filtro</button>}
-                                    {(tipo_user == 1 || tipo_user == 2)  && <button className='btn btn-outline-secondary' onClick={toggleCreateVagaModal}>Criar Vaga</button>}
+                                        <strong style={{zIndex: 1001}}>Todas as vagas</strong>}</span>
+                                    <div className='d-flex' style={{zIndex: 1001}}>
+                                        <input className='mx-2' onChange={(value) => {setFiltroTitulo(value.target.value)}}></input>
+                                        {selectedDepartamento && <button className='btn btn-warning mx-2' onClick={() => { setSelectedDepartamento(null) }}>Remover Filtro</button>}
+                                        {(tipo_user == 1 || tipo_user == 2) && <a href='/vagas/criar'><button className='btn btn-outline-secondary'>Criar Vaga</button></a>}
+                                    </div>
+
                                 </div>
                                 <div className='container-fluid px-4'>
                                     <div className='row g-3'>
-                                        <TableVagas vagas={vagas} departamentos={departamentos} selectedDepartamento={selectedDepartamento} onVerDetalhes={handleVerDetalhesVaga} onApagar={handleApagarVaga} onEditar={handleEditarVaga}></TableVagas>
+                                        <TableVagas vagas={vagas} departamentos={departamentos} selectedDepartamento={selectedDepartamento} onVerDetalhes={handleVerDetalhesVaga} onApagar={handleApagarVaga} onEditar={handleEditarVaga} filtro={filtroTitulo}></TableVagas>
                                     </div>
                                 </div>
                             </div>
@@ -399,18 +386,26 @@ export default function Vagas() {
                                 onChange={(value) => { setTitulo_Vaga(value.target.value) }}
                             />
                             <TextField
-                                label="Descricao"
+                                label="Descrição"
                                 type="text"
+                                multiline
+                                minRows={3}
+                                maxRows={6}
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
-                                onChange={(value) => { setDescricao(value.target.value) }}
+                                onChange={(e) => setDescricao(e.target.value)}
+                                variant="outlined"
                             />
                             <TextField
                                 label="Requisitos"
+                                multiline
+                                minRows={3}
+                                maxRows={6}
                                 type="text"
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
                                 onChange={(value) => { setRequisitos(value.target.value) }}
+                                variant="outlined"
                             />
                             <TextField
                                 label="Número de Vagas"

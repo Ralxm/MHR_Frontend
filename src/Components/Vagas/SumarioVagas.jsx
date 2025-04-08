@@ -1,8 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { TableCell, TableRow, TableBody, Table, TableHead, Box, TableContainer, Chip } from "@mui/material";
 
-export default function SumarioVagas({ vagas, departamentos, candidaturas, tipo_user }) {
-    console.log(tipo_user)
+export default function SumarioVagas({ vagas, departamentos, candidaturas, tipo_user, onSetDepartamento }) {
     return (
         <TableContainer component={Box} sx={{ pl: 0 }}>
             <Table sx={{ minWidth: 300 }} aria-label="simple table" className="disable-edge-padding mt-4">
@@ -33,8 +32,8 @@ export default function SumarioVagas({ vagas, departamentos, candidaturas, tipo_
                             })
 
                             return (
-                                <>
-                                    <TableRow>
+                                <>         
+                                    <TableRow onClick={() => {onSetDepartamento(departamento)}} sx={{cursor: "pointer"}}>
                                         <TableCell align="left">{departamento.nome_departamento}</TableCell>
                                         <TableCell align="left">{quantVagas}</TableCell>
                                         {(tipo_user == 1 || tipo_user == 2) &&

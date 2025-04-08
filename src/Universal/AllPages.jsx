@@ -10,6 +10,8 @@ import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
 import Vagas from "../Components/Vagas/Vagas";
 import Vaga from '../Components/Vagas/Vaga'
+import CriarVaga from "../Components/Vagas/CriarVaga";
+import EditarVaga from "../Components/Vagas/EditarVaga";
 
 export default function MainPage(){
     return (
@@ -34,6 +36,10 @@ export default function MainPage(){
                 <Route path='/vagas' element={<Vagas></Vagas>}>
                 </Route>
                 <Route path='/vagas/:id' element={<Vaga></Vaga>}>
+                </Route>
+                <Route path='/vagas/criar' element={<CriarVaga></CriarVaga>}>
+                </Route>
+                <Route path='/vagas/editar/:id' element={<EditarVaga></EditarVaga>}>
                 </Route>
             </Routes>
         </div>

@@ -80,6 +80,7 @@ class HandleServices {
         return axios.post(url + "candidaturas/create", formData, { headers })
             .then(res => {
                 if (res.data.success) {
+                    console.log(res)
                     return res.data.data;
                 }
             }, reason => { throw new Error('Erro a criar a candidatura: ' + reason); });
@@ -121,13 +122,14 @@ class HandleServices {
             ...authHeader().headers,
             'Content-Type': 'application/json',
         };
+        console.log(formData)
 
         return axios.post(url + "comentarios/create", formData, { headers })
             .then(res => {
                 if (res.data.success) {
                     return res.data.data;
                 }
-            }, reason => { throw new Error('Erro a criar a candidatura: ' + reason); });
+            }, reason => { throw new Error('Erro a criar o comentario: ' + reason); });
     }
 
     listComentarios(id_candidatura){
@@ -138,6 +140,88 @@ class HandleServices {
                     return res.data.data;
                 }
             }, reason => { throw new Error('Erro a listar todas as vagas'); });
+    }
+
+    getCandidaturaUser(id_user, id_vaga) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "candidaturas/listUser/" + id_user, authHeader())
+            .then(res => {
+                const found = res.data.data.find(candidatura => candidatura.id_vaga == id_vaga);
+                if (found) {
+                    return found;
+                }
+                return null;
+            })
+            .catch(err => {
+                console.error('Erro a listar a candidatura feita pelo utilizador', err);
+                throw err;
+            });
+    }
+
+    atualizarCandidatura(formData){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'multipart/form-data'
+        };
+        console.log(formData)
+        return axios.post(url + "candidaturas/update/" + formData.get('id_candidatura'), formData, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => {
+                throw new Error('Erro a atualizar a despesa');
+            });
+    }
+
+    aceitarCandidatura(datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.post(url + "candidaturas/aceitar/" + datapost.id_candidatura, datapost, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => {
+                throw new Error('Erro a atualizar a despesa');
+            });
+    }
+
+    analisarCandidatura(id_candidatura){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.post(url + "candidaturas/analisar/" + id_candidatura, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => {
+                throw new Error('Erro a atualizar a despesa');
+            });
+    }
+
+    rejeitarCandidatura(datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.post(url + "candidaturas/rejeitar/" + datapost.id_candidatura, datapost, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => {
+                throw new Error('Erro a atualizar a despesa');
+            });
+    }
+
+    getDepartamento(id_departamento){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+
+        return axios.get(url + "departamento/get/" + id_departamento, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => {
+                throw new Error('Erro a ir buscar o departamento');
+            });
     }
 
     findResponsavel(id_responsavel) {
