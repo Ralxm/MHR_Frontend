@@ -958,7 +958,7 @@ export default function Vagas() {
                                         Comentários ({comentarios?.length || 0})
                                     </Typography>
 
-                                    <Box sx={{ mb: 4, maxHeight: '300px', overflowY: 'auto' }}>
+                                    <Box sx={{ mb: 1, maxHeight: '300px', overflowY: 'auto' }}>
                                         {comentarios ? (
                                             comentarios.map((comentario, index) => (
                                                 <Card key={index} variant="outlined" sx={{ p: 2, mb: 2 }}>
@@ -981,8 +981,9 @@ export default function Vagas() {
                                             </Typography>
                                         )}
                                     </Box>
+                                    <hr></hr>
 
-                                    <Box component="form" sx={{ mt: 2 }}>
+                                    <Box component="form" sx={{ mb: 2, mt: 1 }}>
                                         <Typography variant="subtitle1" gutterBottom>
                                             Adicionar Comentário
                                         </Typography>
@@ -1004,32 +1005,35 @@ export default function Vagas() {
                                             >
                                                 Enviar Comentário
                                             </Button>
-                                            <div className='d-flex justify-content-between'>
-                                                <button
-                                                    type="button"
-                                                    className='btn btn-success'
-                                                    onClick={() => { handleDecidirCandidaturas('Aceitar') }}
-                                                >
-                                                    Aceitar
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className='btn btn-warning mx-2'       
-                                                    onClick={() => { handleDecidirCandidaturas('Analisar') }}
-                                                >
-                                                    Analisar
-                                                </button>
-                                                <button
-                                                    type="button"
-                                                    className='btn btn-danger'
-                                                    onClick={() => { handleDecidirCandidaturas('Rejeitar') }}
-                                                >
-                                                    Rejeitar
-                                                </button>
-                                            </div>
+
                                         </div>
                                     </Box>
                                 </Box>
+                                <div className='modal-footer'>
+                                    <div className='d-flex justify-content-between'>
+                                        <button
+                                            type="button"
+                                            className='btn btn-success'
+                                            onClick={() => { handleDecidirCandidaturas('Aceitar') }}
+                                        >
+                                            Aceitar
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className='btn btn-warning mx-2'
+                                            onClick={() => { handleDecidirCandidaturas('Analisar') }}
+                                        >
+                                            Analisar
+                                        </button>
+                                        <button
+                                            type="button"
+                                            className='btn btn-danger'
+                                            onClick={() => { handleDecidirCandidaturas('Rejeitar') }}
+                                        >
+                                            Rejeitar
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                             :
                             <Typography variant="h6" color="textSecondary" sx={{ m: 'auto' }}>

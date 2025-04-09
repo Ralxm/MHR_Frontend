@@ -261,9 +261,9 @@ export default function Vagas() {
                 <div className="container-fluid">
                     <div className="row">
                         {/* Coluna da esquerda */}
-                        <div className="col-md-4" style={{ zIndex: 1000 }}>
-                            <div className='row'>
-                                <div className="items-container " style={{ height: '85vh', overflowY: 'auto', overflowX: 'hidden' }}>
+                        <div className="col-md-3" style={{ zIndex: 1000, position: 'sticky', top: 0 }}>
+                            <div className='row' style={{position: 'sticky', top: 10 }}>
+                                <div className="items-container " style={{ minHeight: '85vh' }}>
                                     <div className='d-flex justify-content-between align-items-center'>
                                         <span><strong>Departamentos</strong></span>
                                     </div>
@@ -281,8 +281,8 @@ export default function Vagas() {
                         </div>
 
                         {/* Coluna da direita */}
-                        <div className="col-md-8">
-                            <div className="items-container" style={{ height: '85vh', overflowY: 'auto' }}>
+                        <div className="col-md-9">
+                            <div className="items-container" style={{ minHeight: '85vh'}}>
                                 <div className='d-flex justify-content-between align-items-center mx-3 mb-3 mt-1'>
                                     <span>{selectedDepartamento ?
                                         <div style={{zIndex: 1001}}>

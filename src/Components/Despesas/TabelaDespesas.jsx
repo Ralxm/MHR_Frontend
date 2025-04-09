@@ -59,7 +59,7 @@ export default function BasicTable({ data, onVerDetalhes, tipo, onApagar, action
                                 key={row.name}
                             >
                                 <TableCell align="left">{row._data}</TableCell>
-                                <TableCell align="left">{row.valor}</TableCell>
+                                <TableCell align="left">{row.valor} €</TableCell>
                                 <TableCell align="left">
                                     {row.anexo && (
                                         <Dropdown>
@@ -114,7 +114,7 @@ export default function BasicTable({ data, onVerDetalhes, tipo, onApagar, action
                                 key={row.name}
                             >
                                 <TableCell align="left">{row._data}</TableCell>
-                                <TableCell align="left">{row.valor}</TableCell>
+                                <TableCell align="left">{row.valor} €</TableCell>
                                 <TableCell align="left">
                                     {row.anexo && (
                                         <Dropdown>
@@ -165,7 +165,7 @@ export default function BasicTable({ data, onVerDetalhes, tipo, onApagar, action
                             key={row.name}
                         >
                             <TableCell align="left">{row._data}</TableCell>
-                            <TableCell align="left">{row.valor}</TableCell>
+                            <TableCell align="left">{row.valor} €</TableCell>
                             <TableCell align="left">
                                 {row.anexo && (
                                     <Dropdown>

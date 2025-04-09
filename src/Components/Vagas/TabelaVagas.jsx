@@ -50,7 +50,7 @@ export default function BasicTable({ vagas, departamentos, selectedDepartamento,
           }
         })
         return (
-          <div className="col-md-4 mb-4" key={vaga.id_vaga} style={{zIndex: 1001}}>
+          <div className="col-md-3" key={vaga.id_vaga} style={{zIndex: 1001}}>
             <Card
               sx={{
                 height: '100%',
