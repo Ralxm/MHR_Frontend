@@ -25,22 +25,6 @@ export default function Calendario() {
 
     const [tipos_falta, setTipos_Falta] = useState([])
 
-    const [status, setStatus] = useState({
-        isCalendarioOpen: true,
-        isMarcarFaltasOpen: false,
-        isMarcarFeriasOpen: false,
-        isVerFaltasPessoaisOpen: false,
-        isVerFaltasUtilizadoresOpen: false,
-        isVerPedidosFeriasOpen: false,
-        isVerFeriasAprovadasOpen: false
-    })
-
-    {/* Variáveis para criar uma falta */ }
-    const [perfil, setPerfilFalta] = useState()
-    const [calendario, setCalendario] = useState()
-    const [tipo_falta, setTipo_Falta] = useState()
-    const [data_falta, setData_Falta] = useState()
-    const [comentario, setComentario] = useState('')
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -97,42 +81,8 @@ export default function Calendario() {
                 .catch(err => {
                     console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
                 })
-            handleServices.getCalendario(id_perfil)
-                .then(res => {
-                    setCalendario(res);
-                })
-                .catch(err => {
-                    console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
-                })
-
         }
     }, [id_perfil])
-
-    const handleStatusChange = (key) => {
-        setStatus(prevStatus => {
-            const newStatus = Object.fromEntries(
-                Object.keys(prevStatus).map(k => [k, false])
-            );
-            newStatus[key] = true;
-            return newStatus;
-        });
-    };
-
-    function carregarPerfis() {
-        setLoadingPerfis(true)
-        handleServices.listPerfis()
-            .then(res => {
-                setPerfis(res);
-            })
-            .catch(err => {
-                console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
-            })
-            .finally(() => {
-                setLoadingPerfis(false)
-            })
-    }
-
-
 
     return (
         <div id="root">
@@ -158,23 +108,22 @@ export default function Calendario() {
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
                     <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto' }}>
                         <div className='sidebar-items'>
-                            <a className="sidebar-item" onClick={() => handleStatusChange('isCalendarioOpen')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Calendário</a>
-                            <a className="sidebar-item" onClick={() => { handleStatusChange('isMarcarFaltasOpen'); carregarPerfis() }} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Marcar faltas</a>
-                            <a className="sidebar-item" onClick={() => handleStatusChange('isMarcarFeriasOpen')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Marcar faltas</a>
-                            <a className="sidebar-item" onClick={() => handleStatusChange('isVerFaltasPessoaisOpen')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Ver faltas pessoais</a>
-                            <a className="sidebar-item" onClick={() => handleStatusChange('isVerFaltasUtilizadoresOpen')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Ver faltas de utilizadores</a>
-                            <a className="sidebar-item" onClick={() => handleStatusChange('isVerPedidosFeriasOpen')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Ver pedidos de férias</a>
-                            <a className="sidebar-item" onClick={() => handleStatusChange('isVerFeriasAprovadasOpen')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Ver férias aprovadas</a>
+                            <a className="sidebar-item" onClick={() => navigate('/calendario')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Calendário</a>
+                            <a className="sidebar-item" onClick={() => navigate('/calendario/marcar_falta')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Marcar faltas</a>
+                            <a className="sidebar-item" onClick={() => navigate('/calendario/marcar_falta')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Marcar faltas</a>
+                            <a className="sidebar-item" onClick={() => navigate('/calendario/marcar_falta')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Ver faltas pessoais</a>
+                            <a className="sidebar-item" onClick={() => navigate('/calendario/marcar_falta')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Ver faltas de utilizadores</a>
+                            <a className="sidebar-item" onClick={() => navigate('/calendario/marcar_falta')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Ver pedidos de férias</a>
+                            <a className="sidebar-item" onClick={() => navigate('/calendario/marcar_falta')} style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>Ver férias aprovadas</a>
                         </div>
                     </div>
 
 
-                    {status.isCalendarioOpen && <CalendarioPagina></CalendarioPagina>}
-                    {status.isMarcarFaltasOpen && <MarcarFaltas isLoadingPerfis={isLoadingPerfis} perfis={perfis} tipos_falta={tipos_falta} calendario={calendario}></MarcarFaltas>}
-
-
-                    <div>
-
+                    <div className="col-md-10" style={{ minHeight: '85vh ' }}>
+                        <div className="form-container">
+                            <h3>Calendário</h3>
+                            <CalendarComponent />
+                        </div>
                     </div>
                 </div>
             </div>
@@ -267,152 +216,6 @@ export default function Calendario() {
             </div>
         );
     };
-
-    function CalendarioPagina() {
-        return (
-            <div className="col-md-10" style={{ minHeight: '85vh ' }}>
-                <div className="form-container">
-                    <h3>Calendário</h3>
-                    <CalendarComponent />
-                </div>
-            </div>
-        )
-    }
-}
-
-function MarcarFaltas({ isLoadingPerfis, perfis, tipos_falta }) {
-    const [perfil, setPerfilFalta] = useState();
-    const [tipo_falta, setTipo_Falta] = useState();
-    const [data_falta, setData_Falta] = useState();
-    const [comentario, setComentario] = useState('');
-    const [calendario, setCalendario] = useState()
-
-    return (
-        <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
-            <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Marcar faltas</h2>
-
-            <div className='row mb-4 justify-content-between'>
-                <div className='col-md-5 mb-3 mb-md-0'>
-                    <FormControl fullWidth>
-                        <InputLabel id="user-select-label">Utilizador</InputLabel>
-                        <Select
-                            labelId="user-select-label"
-                            label="Utilizador"
-                            value={perfil}
-                            onChange={(value) => {setPerfilFalta(value.target.value); carregarCalendario(value.target.value)}}
-                            variant="outlined"
-                        >
-                            {perfis.filter(perfil => perfil.nome).map((perfil) => (
-                                <MenuItem key={perfil.id_perfil} value={perfil.id_perfil}>
-                                    <div>
-                                        <div style={{ fontWeight: 500 }}>{perfil.nome}</div>
-                                        <div style={{ fontSize: '0.8rem', color: '#666' }}>{perfil.email}</div>
-                                    </div>
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </div>
-
-                <div className='col-md-5'>
-                    <FormControl fullWidth>
-                        <InputLabel id="absence-type-label">Tipo de falta</InputLabel>
-                        <Select
-                            labelId="absence-type-label"
-                            label="Tipo de falta"
-                            value={tipo_falta}
-                            onChange={(value) => setTipo_Falta(value.target.value)}
-                            variant="outlined"
-                        >
-                            {tipos_falta.map((tipo) => (
-                                <MenuItem key={tipo.id_tipofalta} value={tipo.id_tipofalta}>
-                                    <div>
-                                        <div style={{ fontWeight: 500 }}>{tipo.tipo}</div>
-                                        <div style={{ fontSize: '0.8rem', color: '#666' }}>{tipo.descricao}</div>
-                                    </div>
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </FormControl>
-                </div>
-            </div>
-
-            <div className='row mb-4'>
-                <div className='col-md-5'>
-                    <TextField
-                        label="Data"
-                        type="date"
-                        fullWidth
-                        variant="outlined"
-                        InputLabelProps={{ shrink: true }}
-                        value={data_falta}
-                        onChange={(value) => setData_Falta(value.target.value)}
-                    />
-                </div>
-            </div>
-
-            <div className='row'>
-                <div className='col-md-12'>
-                    <TextField
-                        key="comments-field"
-                        label="Comentários"
-                        multiline
-                        rows={4}
-                        fullWidth
-                        variant="outlined"
-                        value={comentario ?? ''}
-                        onChange={(e) => { setComentario(e.target.value); }}
-                        InputLabelProps={{ shrink: true }}
-                        inputProps={{ maxLength: 1000 }}
-                        helperText={`${comentario?.length || 0}/1000 caracteres`}
-                    />
-                </div>
-            </div>
-
-            <div className='row mt-4'>
-                <div className='col-md-3'>
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        onClick={(perfil, id_tipofalta, data_falta, comentarios, calendario) => handleCriarFalta(perfil, id_tipofalta, data_falta, comentarios, calendario)}
-                    >
-                        Submeter
-                    </Button>
-                </div>
-            </div>
-        </div>
-    );
-
-    function carregarCalendario(perfil) {
-        handleServices.getCalendario(perfil.id_perfil)
-            .then(res => {
-                setCalendario(res)
-            })
-            .catch(err => {
-                console.log(err)
-            })
-    }
-}
-
-function handleCriarFalta(perfil, id_tipofalta, data_falta, comentarios, calendario) {
-    const datapost = {
-        perfil: perfil.id_perfil,
-        id_tipofalta: id_tipofalta,
-        data_falta: data_falta,
-        comentarios: comentarios,
-        calendario: calendario,
-    }
-
-    console.log(datapost)
-
-    /*handleServices.createFalta(datapost)
-        .then(res => {
-            alert(res)
-        })
-        .catch(err => {
-            console.log(err)
-        })*/
 }
 
 
