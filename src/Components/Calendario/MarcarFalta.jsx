@@ -49,6 +49,8 @@ export default function MarcarFalta() {
         }
 
         document.title = "Calendário";
+
+        carregarPerfis();
     }, []);
 
 
@@ -113,17 +115,33 @@ export default function MarcarFalta() {
     }
 
     function carregarCalendario(perfil) {
-        handleServices.getCalendario(perfil.id_perfil)
+        handleServices.getCalendario(perfil)
             .then(res => {
-                setCalendario(res)
+                setCalendario(res[0])
             })
             .catch(err => {
                 console.log(err)
             })
     }
 
-    function handleCriarFalta(){
-        
+    function handleCriarFalta(event){
+        event.preventDefault();
+
+        const datapost = {
+            id_tipofalta: tipo_falta,
+            id_perfil: perfil,
+            id_calendario: calendario.id_calendario,
+            data_falta: data_falta,
+            comentarios: comentario
+        }
+
+        handleServices.createFalta(datapost)
+        .then(res => {
+            alert(res)
+        })
+        .catch(err => {
+            console.log(err)
+        })
     }
 
     return (
@@ -171,7 +189,6 @@ export default function MarcarFalta() {
                                     <Select
                                         labelId="user-select-label"
                                         label="Utilizador"
-                                        value={perfil}
                                         onChange={(value) => { setPerfilFalta(value.target.value); carregarCalendario(value.target.value) }}
                                         variant="outlined"
                                     >
@@ -193,7 +210,6 @@ export default function MarcarFalta() {
                                     <Select
                                         labelId="absence-type-label"
                                         label="Tipo de falta"
-                                        value={tipo_falta}
                                         onChange={(value) => setTipo_Falta(value.target.value)}
                                         variant="outlined"
                                     >
@@ -248,7 +264,7 @@ export default function MarcarFalta() {
                                     variant="contained"
                                     color="primary"
                                     fullWidth
-                                    onClick={(perfil, id_tipofalta, data_falta, comentarios, calendario) => handleCriarFalta(perfil, id_tipofalta, data_falta, comentarios, calendario)}
+                                    onClick={handleCriarFalta}
                                 >
                                     Submeter
                                 </Button>

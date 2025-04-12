@@ -136,7 +136,7 @@ const DoughnutPieChart = ({ vagas, departamentos, candidaturas, onSetDepartament
         <ReactEchart
             echarts={echarts}
             option={getOptions}
-            style={{ width: '45%', height: '270px' }}
+            style={{ width: '48%', height: '270px' }}
             onEvents={{
                 click: onChartClick
             }}

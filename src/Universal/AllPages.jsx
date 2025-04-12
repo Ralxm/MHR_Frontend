@@ -7,6 +7,7 @@ import Recuperar from "../Components/Login/RecuperarPass";
 import Despesas from "../Components/Despesas/Despesas";
 import Calendario from "../Components/Calendario/Calendario";
 import MarcarFalta from "../Components/Calendario/MarcarFalta";
+import FaltasUtilizadores from "../Components/Calendario/FaltasUtilizadores";
 import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
 import Vagas from "../Components/Vagas/Vagas";
@@ -31,6 +32,8 @@ export default function MainPage(){
                 <Route path='/calendario' element={<Calendario></Calendario>}>
                 </Route>
                 <Route path='/calendario/marcar_falta' element={<MarcarFalta></MarcarFalta>}>
+                </Route>
+                <Route path='/calendario/faltas_utilizadores' element={<FaltasUtilizadores></FaltasUtilizadores>}>
                 </Route>
                 <Route path='/projetos' element={<Projetos></Projetos>}>
                 </Route>
