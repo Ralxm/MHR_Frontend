@@ -8,7 +8,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab, FormControl, InputLabel, Select, MenuItem, Card, CardContent } from '@mui/material';
+import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
 import SidebarItems from './SidebarItems';
 
@@ -56,12 +56,13 @@ export default function FaltasUtilizadores() {
     }, [id_user])
 
     function carregarFaltas() {
-        handleServices.listFaltas()
+        handleServices.carregarFaltas()
             .then(res => {
+                console.log(res)
                 setFaltas(res);
             })
             .catch(err => {
-                console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+                console.log("Não foi possivel encontrar as faltas: " + err)
             })
     }
 
@@ -104,72 +105,32 @@ export default function FaltasUtilizadores() {
     );
 
     function ListFaltas() {
-        return faltas.map((falta) => {
-            return (
-                <div className='col-md-3 mb-3'>
-                    <Card
-                        sx={{
-                            height: '100%',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            transition: 'transform 0.2s, box-shadow 0.2s',
-                            '&:hover': {
-                                transform: 'translateY(-4px)',
-                                boxShadow: '0 6px 15px rgba(0,0,0,0.1)'
-                            },
-                            backgroundColor: "white"
-                        }}
-                    >
-                        <CardContent sx={{
-                            flexGrow: 1,
-                            display: 'flex',
-                            flexDirection: 'column',
-                            height: '100%'
-                        }}>
-                            <Typography
-                                variant="h6"
-                                component="h3"
-                                sx={{
-                                    fontWeight: 600,
-                                    mb: 1,
-                                    minHeight: '64px'
-                                }}
-                            >
-                                {falta.id_falta} - {falta.id_perfil}
-                            </Typography>
+        return (
+            <TableContainer component={Box} sx={{ pl: 0 }}>
+                <Table sx={{ minWidth: 750 }} aria-label="simple table" className="disable-edge-padding">
+                    <TableHead>
+                        <TableRow>
+                            <TableCell align="left">Nome</TableCell>
+                            <TableCell align="left">Data</TableCell>
+                            <TableCell align="left">Anexo</TableCell>
+                            <TableCell align="left">Estado</TableCell>
+                            <TableCell align="right"></TableCell>
+                        </TableRow>
+                    </TableHead>
+                    <TableBody>
+                        {faltas.map((falta) => (
+                            <TableRow key={falta.id_falta} >
+                                <TableCell align="left">{falta.perfil.nome}</TableCell>
+                                <TableCell align="left">{falta.data_falta}</TableCell>
+                                <TableCell align="left">{falta.anexo}</TableCell>
+                                <TableCell align="left"><Chip label={falta.estado} size='10px'></Chip></TableCell>
+                                <TableCell align="right"><button className='btn btn-secondary'>Ver detalhes</button></TableCell>
 
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                sx={{
-                                    mb: 2,
-                                    display: '-webkit-box',
-                                    WebkitLineClamp: 3,
-                                    WebkitBoxOrient: 'vertical',
-                                    overflow: 'hidden',
-                                    textOverflow: 'ellipsis'
-                                }}
-                            >
-                                {falta.comentarios}
-                            </Typography>
-
-                            <Box sx={{ mt: 'auto' }}>
-                                <Box sx={{ textAlign: 'center' }}>
-                                    <Button
-                                        variant="outlined"
-                                        size="small"
-                                        endIcon={<ArrowForward />}
-                                        fullWidth
-                                        sx={{ mb: 1 }}
-                                    >
-                                        Ver detalhes
-                                    </Button>
-                                </Box>
-                            </Box>
-                        </CardContent>
-                    </Card>
-                </div>
-            )
-        })
+                            </TableRow>
+                        ))}
+                    </TableBody>
+                </Table>
+            </TableContainer>
+        )
     }
 }
