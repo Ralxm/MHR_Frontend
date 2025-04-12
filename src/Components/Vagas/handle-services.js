@@ -122,7 +122,6 @@ class HandleServices {
             ...authHeader().headers,
             'Content-Type': 'application/json',
         };
-        console.log(formData)
 
         return axios.post(url + "comentarios/create", formData, { headers })
             .then(res => {

@@ -393,7 +393,7 @@ export default function Vagas() {
                                 maxRows={6}
                                 InputLabelProps={{ shrink: true }}
                                 fullWidth
-                                onChange={(e) => setDescricao(e.target.value)}
+                                onChange={(value) => setDescricao(value.target.value)}
                                 variant="outlined"
                             />
                             <TextField

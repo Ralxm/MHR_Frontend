@@ -21,3 +21,16 @@
 .shadow-rejeitadas {
     box-shadow: 0 0 5px red;
 }
+
+.sidebar-item {
+    cursor: pointer;
+    transition: background-color 0.5s;
+}
+
+.sidebar-item:hover {
+    background-color: rgb(182, 182, 182)
+}
+
+.sidebar-item:active {
+    background-color: rgb(141, 141, 141)
+}
