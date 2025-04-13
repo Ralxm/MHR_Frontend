@@ -654,8 +654,8 @@ export default function Vagas() {
                                                         <CandidaturaCard
                                                             key={candidaturaUser.id_candidatura}
                                                             candidatura={candidaturaUser}
-                                                            handleVerCandidaturas={handleVerCandidaturas}
-                                                            setSelectedCandidatura={setSelectedCandidatura}
+                                                            handleVerCandidaturas={setSelectedCandidaturaUser}
+                                                            setSelectedCandidatura={setSelectedCandidaturaUser}
                                                             carregarComentarios={carregarComentarios}
                                                         />
                                                     }
@@ -1186,7 +1186,7 @@ export default function Vagas() {
                         transform: 'translate(-50%, -50%)',
                         width: { xs: '90%', sm: '80%', md: '70%' },
                         maxWidth: '800px',
-                        height: '80vh',
+                        minHeight: '80vh',
                         borderRadius: 4,
                         p: 0,
                         display: 'flex',
@@ -1407,7 +1407,7 @@ export default function Vagas() {
                             </Button>
                             <div>
                                 {selectedCandidaturaUser && selectedCandidaturaUser.status.includes("Pendente") &&
-                                    <button className='btn btn-danger' onClick={() => { handleDecidirCandidaturas('Rejeitar') }}>Apagar</button>
+                                    <button className='btn btn-danger' onClick={() => {  }}>Apagar candidatura</button>
                                 }
                                 <button className='btn btn-primary mx-1' onClick={handleSubmit}>Guardar</button>
                             </div>

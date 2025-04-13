@@ -85,6 +85,16 @@ export default function FaltasPessoais() {
         }
     };
 
+    function convertDate(d) {
+        const date = new Date(d);
+        const day = String(date.getDate()).padStart(2, '0');
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const year = date.getFullYear();
+        const formattedDate = `${day}-${month}-${year}`;
+
+        return formattedDate
+    }
+
     return (
         <div id="root">
             <div
@@ -113,7 +123,7 @@ export default function FaltasPessoais() {
 
 
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
-                        <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Ver faltas de utilizadores</h2>
+                        <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Faltas</h2>
                         <div className='row'>
                             <ListFaltas></ListFaltas>
                         </div>
@@ -168,7 +178,7 @@ export default function FaltasPessoais() {
                     <TableBody>
                         {faltas.map((falta) => (
                             <TableRow key={falta.id_falta} >
-                                <TableCell align="left">{falta.data_falta}</TableCell>
+                                <TableCell align="left">{convertDate(falta.data_falta)}</TableCell>
                                 <TableCell align="left">{falta.justificacao && <a href={falta.justificacao} target="_blank"><button className='btn btn-outline-primary'>Abrir</button></a>}</TableCell>
                                 <TableCell align="left"><Chip label={falta.estado} size='10px' color={getShadowClass(falta.estado)}></Chip></TableCell>
                                 <TableCell align="right"><button className='btn btn-secondary' onClick={() => { setSelectedFalta(falta) }}>{falta.estado == "Pendente" ? "Justificar" : "Ver detalhes"}</button></TableCell>

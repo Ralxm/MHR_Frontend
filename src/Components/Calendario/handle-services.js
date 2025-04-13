@@ -104,6 +104,31 @@ class HandleServices {
             });
     }
 
+    getFeriasUser(id_perfil){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "ferias/listUser/" + id_perfil, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar todas as faltas'); });
+    }
+
+    createFerias(formData) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json',
+        };
+
+        return axios.post(url + "ferias/create", formData, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a criar o comentario: ' + reason); });
+    }
+
     find_perfil(id_utilizador) {
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.get(url + "perfis/getUtilizador/" + id_utilizador, authHeader())

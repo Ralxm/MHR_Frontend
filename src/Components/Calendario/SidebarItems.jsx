@@ -25,14 +25,12 @@ export default function SidebarItems({ tipo_user }) {
                     Marcar faltas
                 </a>
             }
-            {(tipo_user == 1 || tipo_user == 2) &&
-                <a href="/calendario/marcar_ferias"
-                    className="sidebar-item"
-                    onClick={handleNavigation('/calendario/marcar_ferias')}
-                    style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
-                    Marcar férias
-                </a>
-            }
+            <a href="/calendario/marcar_ferias"
+                className="sidebar-item"
+                onClick={handleNavigation('/calendario/marcar_ferias')}
+                style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
+                Marcar férias
+            </a>
             <a href="/calendario/faltas_pessoais"
                 className="sidebar-item"
                 onClick={handleNavigation('/calendario/faltas_pessoais')}
@@ -49,7 +47,7 @@ export default function SidebarItems({ tipo_user }) {
             }
             <a href="/calendario/ferias_pessoais"
                 className="sidebar-item"
-                onClick={handleNavigation('/calendario/faltas_pessoais')}
+                onClick={handleNavigation('/calendario/ferias_pessoais')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                 Ver férias pessoais
             </a>

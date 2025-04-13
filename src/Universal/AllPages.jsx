@@ -9,6 +9,7 @@ import Despesas from "../Components/Despesas/Despesas";
 
 import Calendario from "../Components/Calendario/Calendario";
 import MarcarFalta from "../Components/Calendario/MarcarFalta";
+import MarcarFerias from "../Components/Calendario/MarcarFerias";
 import FaltasUtilizadores from "../Components/Calendario/FaltasUtilizadores";
 import FaltasPessoais from "../Components/Calendario/FaltasPessoais";
 
@@ -38,6 +39,8 @@ export default function MainPage(){
                 <Route path='/calendario' element={<Calendario></Calendario>}>
                 </Route>
                 <Route path='/calendario/marcar_falta' element={<MarcarFalta></MarcarFalta>}>
+                </Route>
+                <Route path='/calendario/marcar_ferias' element={<MarcarFerias></MarcarFerias>}>
                 </Route>
                 <Route path='/calendario/faltas_utilizadores' element={<FaltasUtilizadores></FaltasUtilizadores>}>
                 </Route>
