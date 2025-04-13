@@ -108,7 +108,7 @@ export default function Calendario() {
                 <NavBar />
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
                     <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto' }}>
-                        <SidebarItems></SidebarItems>
+                        <SidebarItems tipo_user={tipo_user}></SidebarItems>
                     </div>
 
 

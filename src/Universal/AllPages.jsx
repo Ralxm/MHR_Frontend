@@ -4,16 +4,22 @@ import React from 'react'
 import Login from '../Components/Login/Login'
 import Registar from "../Components/Registar/Registar";
 import Recuperar from "../Components/Login/RecuperarPass";
+
 import Despesas from "../Components/Despesas/Despesas";
+
 import Calendario from "../Components/Calendario/Calendario";
 import MarcarFalta from "../Components/Calendario/MarcarFalta";
 import FaltasUtilizadores from "../Components/Calendario/FaltasUtilizadores";
+import FaltasPessoais from "../Components/Calendario/FaltasPessoais";
+
 import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
+
 import Vagas from "../Components/Vagas/Vagas";
 import Vaga from '../Components/Vagas/Vaga'
 import CriarVaga from "../Components/Vagas/CriarVaga";
 import EditarVaga from "../Components/Vagas/EditarVaga";
+
 
 export default function MainPage(){
     return (
@@ -34,6 +40,8 @@ export default function MainPage(){
                 <Route path='/calendario/marcar_falta' element={<MarcarFalta></MarcarFalta>}>
                 </Route>
                 <Route path='/calendario/faltas_utilizadores' element={<FaltasUtilizadores></FaltasUtilizadores>}>
+                </Route>
+                <Route path='/calendario/faltas_pessoais' element={<FaltasPessoais></FaltasPessoais>}>
                 </Route>
                 <Route path='/projetos' element={<Projetos></Projetos>}>
                 </Route>

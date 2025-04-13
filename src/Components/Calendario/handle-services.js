@@ -77,6 +77,33 @@ class HandleServices {
             }, reason => { throw new Error('Erro a listar todas as faltas'); });
     }
 
+    carregarFaltasPessoais(id_perfil){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "faltas/listUser/" + id_perfil, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar todas as faltas'); });
+    }
+
+    atualizarFalta(formData){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'multipart/form-data'
+        };
+        console.log(formData)
+        return axios.post(url + "faltas/update/" + formData.get('id_falta'), formData, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => {
+                throw new Error('Erro a atualizar a falta');
+            });
+    }
+
     find_perfil(id_utilizador) {
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.get(url + "perfis/getUtilizador/" + id_utilizador, authHeader())
