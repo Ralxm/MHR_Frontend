@@ -12,6 +12,7 @@ import MarcarFalta from "../Components/Calendario/MarcarFalta";
 import MarcarFerias from "../Components/Calendario/MarcarFerias";
 import FaltasUtilizadores from "../Components/Calendario/FaltasUtilizadores";
 import FaltasPessoais from "../Components/Calendario/FaltasPessoais";
+import FeriasPessoais from "../Components/Calendario/FeriasPessoais";
 
 import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
@@ -34,8 +35,10 @@ export default function MainPage(){
                 </Route>
                 <Route path='/recuperar' element={<Recuperar></Recuperar>}>
                 </Route>
+
                 <Route path='/despesas' element={<Despesas></Despesas>}>
                 </Route>
+
                 <Route path='/calendario' element={<Calendario></Calendario>}>
                 </Route>
                 <Route path='/calendario/marcar_falta' element={<MarcarFalta></MarcarFalta>}>
@@ -46,10 +49,14 @@ export default function MainPage(){
                 </Route>
                 <Route path='/calendario/faltas_pessoais' element={<FaltasPessoais></FaltasPessoais>}>
                 </Route>
+                <Route path='/calendario/ferias_pessoais' element={<FeriasPessoais></FeriasPessoais>}>
+                </Route>
+
                 <Route path='/projetos' element={<Projetos></Projetos>}>
                 </Route>
                 <Route path='/projeto/:id' element={<Projeto></Projeto>}>
                 </Route>
+
                 <Route path='/vagas' element={<Vagas></Vagas>}>
                 </Route>
                 <Route path='/vagas/:id' element={<Vaga></Vaga>}>

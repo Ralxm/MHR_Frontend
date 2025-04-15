@@ -14,18 +14,14 @@ import SidebarItems from './SidebarItems';
 export default function Calendario() {
     const navigate = useNavigate();
 
-    const [isLoadingPerfis, setLoadingPerfis] = useState(false)
+    const [isLoadingFaltasFerias, setLoadingFaltasFerias] = useState(false)
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
     const [id_perfil, setPerfil] = useState()
 
-    const [perfis, setPerfis] = useState([])
     const [faltas, setFaltas] = useState([])
     const [ferias, setFerias] = useState([])
-
-    const [tipos_falta, setTipos_Falta] = useState([])
-
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -60,30 +56,36 @@ export default function Calendario() {
     }, [id_user])
 
     useEffect(() => {
-        if (id_perfil) {
-            handleServices.listFerias(id_perfil)
-                .then(res => {
-                    setFerias(res);
-                })
-                .catch(err => {
-                    console.log("Não foi possivel encontrar as férias do utilizador: " + err)
-                })
-            handleServices.listFaltas(id_perfil)
-                .then(res => {
-                    setFaltas(res);
-                })
-                .catch(err => {
-                    console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
-                })
-            handleServices.listTipoFaltas()
-                .then(res => {
-                    setTipos_Falta(res);
-                })
-                .catch(err => {
-                    console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
-                })
+        try {
+            if (id_perfil) {
+                setLoadingFaltasFerias(true)
+                handleServices.listFerias(id_perfil)
+                    .then(res => {
+                        setFerias(res);
+                    })
+                    .catch(err => {
+                        console.log("Não foi possivel encontrar as férias do utilizador: " + err)
+                    })
+                handleServices.listFaltas(id_perfil)
+                    .then(res => {
+                        setFaltas(res);
+                    })
+                    .catch(err => {
+                        console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+                    })
+            }
+        }
+        catch {
+
+        }
+        finally {
+            setLoadingFaltasFerias(false)
         }
     }, [id_perfil])
+
+    if (isLoadingFaltasFerias) {
+        return (<div>A carregar as faltas e férias</div>)
+    }
 
     return (
         <div id="root">
@@ -115,7 +117,7 @@ export default function Calendario() {
                     <div className="m-4 p-4 rounded" style={{ flex: 1, minHeight: '85svh', background: "white" }}>
                         <div className="form-container">
                             <h3>Calendário</h3>
-                            <CalendarComponent />
+                            {!isLoadingFaltasFerias && <CalendarComponent faltas={faltas} ferias={ferias} />}
                         </div>
                     </div>
                 </div>
@@ -123,93 +125,97 @@ export default function Calendario() {
         </div>
     );
 
-    function transformFaltasAndFeriasToEvents(faltas, ferias) {
-        const eventos = [];
+    function CalendarComponent({ faltas, ferias }) {
+        if (faltas && ferias) {
+            moment.locale("pt")
+            const localizer = momentLocalizer(moment);
+            const events = transformFaltasAndFeriasToEvents(faltas, ferias);
+            console.log(events)
 
-        const faltasEvents = faltas.map((falta) => ({
-            title: `Falta: ${falta.motivo}`,
-            start: new Date(moment(falta.data_falta, "DD-MM-YYYY").toDate()),
-            end: new Date(moment(falta.data_falta, "DD-MM-YYYY").toDate()),
-            allDay: true,
-            resource: falta,
-        }));
+            const eventPropGetter = (event) => {
+                let backgroundColor = '';
+                switch (event.resource.estado) {
+                    case "Justificada":
+                        backgroundColor = '#28a745';
+                        break;
+                    case "Por Justificar":
+                        backgroundColor = '#ffc107';
+                        break;
+                    case "Rejeitada":
+                        backgroundColor = '#dc3545';
+                        break;
+                    case "Em análise":
+                        backgroundColor = 'orange';
+                        break;
+                    case "Aprovada":
+                        backgroundColor = '#28a745';
+                        break;
+                    default:
+                        backgroundColor = '#6c757d';
+                }
 
-        const feriasEvents = ferias.map((feria) => ({
-            title: 'Férias',
-            start: new Date(moment(feria.data_inicio, "DD-MM-YYYY").toDate()),
-            end: new Date(moment(feria.data_fim, "DD-MM-YYYY").toDate() + 1),
-            allDay: true,
-            resource: feria,
-        }));
-
-        eventos.push(...faltasEvents, ...feriasEvents);
-
-        return eventos;
-    };
-
-    function CalendarComponent() {
-        moment.locale("pt")
-        const localizer = momentLocalizer(moment);
-        const events = transformFaltasAndFeriasToEvents(faltas, ferias);
-
-        const eventPropGetter = (event) => {
-            let backgroundColor = '';
-            switch (event.resource.estado) {
-                case "Justificada":
-                    backgroundColor = '#28a745';
-                    break;
-                case "Por Justificar":
-                    backgroundColor = '#ffc107';
-                    break;
-                case "Injustificada":
-                    backgroundColor = '#dc3545';
-                    break;
-                case "Em Análise":
-                    backgroundColor = 'orange';
-                    break;
-                case "Aprovadas":
-                    backgroundColor = '#28a745';
-                    break;
-                default:
-                    backgroundColor = '#6c757d';
-            }
-
-            return {
-                style: {
-                    backgroundColor,
-                    color: '#fff',
-                    borderRadius: '4px',
-                    border: 'none',
-                },
+                return {
+                    style: {
+                        backgroundColor,
+                        color: '#fff',
+                        borderRadius: '4px',
+                        border: 'none',
+                    },
+                };
             };
-        };
 
-        return (
-            <div style={{ minHeight: '70vh' }}>
-                <Calendar
-                    localizer={localizer}
-                    events={events}
-                    startAccessor="start"
-                    endAccessor="end"
-                    style={{ minHeight: '70vh' }}
-                    eventPropGetter={eventPropGetter}
-                    messages={{
-                        today: 'Hoje',
-                        previous: 'Anterior',
-                        next: 'Próximo',
-                        month: 'Mês',
-                        week: 'Semana',
-                        day: 'Dia',
-                        agenda: 'Agenda',
-                        date: 'Data',
-                        time: 'Hora',
-                        event: 'Evento',
-                    }}
-                />
-            </div>
-        );
+            return (
+                <div style={{ minHeight: '70vh' }}>
+                    <Calendar
+                        localizer={localizer}
+                        events={events}
+                        startAccessor="start"
+                        endAccessor="end"
+                        style={{ minHeight: '70vh' }}
+                        eventPropGetter={eventPropGetter}
+                        messages={{
+                            today: 'Hoje',
+                            previous: 'Anterior',
+                            next: 'Próximo',
+                            month: 'Mês',
+                            week: 'Semana',
+                            day: 'Dia',
+                            agenda: 'Agenda',
+                            date: 'Data',
+                            time: 'Hora',
+                            event: 'Evento',
+                        }}
+                    />
+                </div>
+            );
+        }
+
     };
 }
+
+function transformFaltasAndFeriasToEvents(faltas, ferias) {
+    const eventos = [];
+
+    const faltasEvents = faltas.map((falta) => ({
+        title: falta.motivo ? `Falta: ${falta.motivo}` : "Falta",
+        start: new Date(moment(falta.data_falta, "YYYY-MM-DD").toDate()),
+        end: new Date(moment(falta.data_falta, "YYYY-MM-DD").toDate()),
+        allDay: true,
+        resource: falta,
+    }));
+
+    const feriasEvents = ferias.map((feria) => ({
+        title: 'Férias',
+        start: new Date(moment(feria.data_inicio, "YYYY-MM-DD").toDate()),
+        end: new Date(moment(feria.data_conclusao).toDate() + 1),
+        allDay: true,
+        resource: feria,
+    }));
+
+    eventos.push(...faltasEvents, ...feriasEvents);
+
+    return eventos;
+};
 
 
 

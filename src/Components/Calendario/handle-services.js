@@ -129,6 +129,17 @@ class HandleServices {
             }, reason => { throw new Error('Erro a criar o comentario: ' + reason); });
     }
 
+    apagarFeria(id_solicitacao){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+
+        return axios.put(url + "ferias/delete/" + id_solicitacao, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a criar o comentario: ' + reason); });
+    }
+
     find_perfil(id_utilizador) {
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.get(url + "perfis/getUtilizador/" + id_utilizador, authHeader())

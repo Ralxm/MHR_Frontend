@@ -14,6 +14,8 @@ import SidebarItems from './SidebarItems';
 export default function MarcarFerias() {
     const navigate = useNavigate();
 
+    const [isLoading, setIsLoading] = useState(true)
+
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
     const [id_perfil, setPerfil] = useState()
@@ -84,11 +86,11 @@ export default function MarcarFerias() {
         if (data_conclusao && data_inicio) {
             const startDate = new Date(data_inicio);
             const endDate = new Date(data_conclusao);
-            
+
             const calculateBusinessDays = (start, end) => {
                 let count = 0;
                 const current = new Date(start);
-                
+
                 while (current <= end) {
                     const dayOfWeek = current.getDay();
                     if (dayOfWeek !== 0 && dayOfWeek !== 6) {
@@ -98,28 +100,52 @@ export default function MarcarFerias() {
                 }
                 return count;
             };
-            
+
             const businessDays = calculateBusinessDays(startDate, endDate);
             setDuracao(businessDays);
         }
-    }, data_conclusao, data_inicio)
+    }, [data_conclusao])
+
+    useEffect(() => {
+        if (data_conclusao && data_inicio) {
+            const startDate = new Date(data_inicio);
+            const endDate = new Date(data_conclusao);
+
+            const calculateBusinessDays = (start, end) => {
+                let count = 0;
+                const current = new Date(start);
+
+                while (current <= end) {
+                    const dayOfWeek = current.getDay();
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                        count++;
+                    }
+                    current.setDate(current.getDate() + 1);
+                }
+                return count;
+            };
+
+            const businessDays = calculateBusinessDays(startDate, endDate);
+            setDuracao(businessDays);
+        }
+    }, [data_inicio])
 
     useEffect(() => {
         if (calendario && ferias) {
             const anoAtual = new Date().getFullYear();
             let totalDuracao = 0;
     
-            ferias.map((feria) => {
+            ferias.forEach((feria) => {
                 if (feria.estado === "Aprovada") {
                     const ano = new Date(feria.data_inicio).getFullYear();
-                    
                     if (ano === anoAtual) {
                         totalDuracao += feria.duracao;
                     }
                 }
             });
     
-            setDias_Restantes_Ferias(calendario.dias_ferias_ano_atual - totalDuracao)
+            setDias_Restantes_Ferias(calendario.dias_ferias_ano_atual - totalDuracao);
+            setIsLoading(false);
         }
     }, [ferias]);
 
@@ -135,18 +161,23 @@ export default function MarcarFerias() {
             duracao: duracao,
         }
 
-        if(duracao <= dias_restantes_ferias){
-            handleServices.createFerias(datapost)
+        if (new Date(data_inicio) > new Date(data_conclusao)) {
+            alert("O dia final não pode ser antes do dia de ínicio!!!")
+            return;
+        }
+        else if (duracao >= dias_restantes_ferias) {
+            alert("Não tem dias de férias suficientes");
+            return;
+        }
+
+        handleServices.createFerias(datapost)
             .then(res => {
                 alert(res)
             })
             .catch(err => {
                 console.log(err)
             })
-        }
-        else{
-            alert("Não tem dias de férias suficientes")
-        }
+
     }
 
     return (
@@ -180,7 +211,7 @@ export default function MarcarFerias() {
                         <div className='d-flex justify-content-between align-items-center'>
                             <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Marcar férias</h2>
                             <div className='mb-3' style={{ backgroundColor: '#e9f7fe', padding: '10px' }}>
-                                <h3><strong>Dias de férias restantes: {dias_restantes_ferias}</strong></h3>
+                                <h3><strong>Dias de férias restantes: {isLoading ? "A calcular" : dias_restantes_ferias}</strong></h3>
                             </div>
 
                         </div>
