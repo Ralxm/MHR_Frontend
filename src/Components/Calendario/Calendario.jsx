@@ -13,6 +13,7 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import SidebarItems from './SidebarItems';
 import FaltasPieChart from './FaltasPieChart';
 import FeriasPieChart from './FeriasPieChart';
+import FileDropZone from '../../Universal/FileDropZoneSingle';
 
 export default function Calendario() {
     const navigate = useNavigate();
@@ -35,7 +36,7 @@ export default function Calendario() {
     const [selectedFalta, setSelectedFalta] = useState(null)
     const [selectedFeria, setSelectedFeria] = useState(null)
     const [selectedFeriaApagar, setSelectedFeriaApagar] = useState(null)
-    
+
     const handleCloseVerDetalhesFeria = () => {
         setSelectedFeria(null)
     }
@@ -44,6 +45,9 @@ export default function Calendario() {
         setSelectedFeriaApagar(null)
     }
 
+    const handleCloseVerDetalhesFalta = () => {
+        setSelectedFalta(null)
+    }
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -128,17 +132,17 @@ export default function Calendario() {
         return formattedDate
     }
 
-    function handleApagarFeria(event){
-            event.preventDefault();
-            handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
-                .then(res => {
-                    alert("Pedido de ferias apagado com sucesso")
-                    navigate(0)
-                })
-                .catch(err => {
-                    console.log("Erro a apagar a despesa: " + err);
-                });
-        }
+    function handleApagarFeria(event) {
+        event.preventDefault();
+        handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
+            .then(res => {
+                alert("Pedido de ferias apagado com sucesso")
+                navigate(0)
+            })
+            .catch(err => {
+                console.log("Erro a apagar a despesa: " + err);
+            });
+    }
 
     return (
         <div id="root">
@@ -357,6 +361,36 @@ export default function Calendario() {
                 </div>
             </div>
 
+            {/* Modal para ver os detalhes de uma falta */}
+            <Modal
+                open={selectedFalta}
+                onClose={handleCloseVerDetalhesFalta}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 500 },
+                        height: { xs: 500, sm: 850 },
+                        borderRadius: 4,
+                        p: 4,
+                        overflowY: 'scroll'
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6">
+                        Detalhes da Falta
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        {selectedFalta && <DetalhesFalta falta={selectedFalta} />}
+                    </Typography>
+                    <Button onClick={handleCloseVerDetalhesFalta} className='col-md-12'>Fechar</Button>
+                </Paper>
+            </Modal>
+
             {/* Modal para ver os detalhes de uma feria */}
             <Modal
                 open={selectedFeria}
@@ -371,7 +405,7 @@ export default function Calendario() {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: { xs: 300, sm: 500 },
-                        height: { xs: 500, sm: 770 },
+                        minHeight: { xs: 500, sm: 500 },
                         borderRadius: 4,
                         p: 4,
                         overflowY: 'scroll'
@@ -494,8 +528,167 @@ export default function Calendario() {
                 </div>
             );
         }
-
     };
+
+    function DetalhesFalta({ falta }) {
+        const [newFile, setNewFile] = useState([]);
+
+        const convertDateToInputFormat = (date) => {
+            const datePart = date.split('T')[0];
+            return datePart;
+        };
+
+        const [formData, setFormData] = useState({
+            ...falta,
+            data_falta: convertDateToInputFormat(falta.data_falta),
+        });
+
+        console.log(formData)
+
+        const handleChange = (e) => {
+            const { name, value } = e.target;
+            setFormData((prevData) => ({
+                ...prevData,
+                [name]: value,
+            }));
+        };
+
+        const handleSubmit = async (e) => {
+            e.preventDefault();
+
+            const formDataToSend = new FormData();
+
+            formDataToSend.append('id_falta', formData.id_falta);
+            formDataToSend.append('id_calendario', formData.id_calendario);
+            formDataToSend.append('id_perfil', formData.id_perfil);
+            formDataToSend.append('id_tipofalta', formData.id_tipofalta);
+
+            formDataToSend.append('comentarios', formData.comentarios);
+            formDataToSend.append('motivo', formData.motivo);
+            formDataToSend.append('validador', formData.validador);
+            formDataToSend.append('data_falta', formData.data_falta);
+            formDataToSend.append('estado', "Em análise");
+
+            if (newFile) {
+                formDataToSend.append('justificacao', newFile)
+            }
+
+            handleServices.atualizarFalta(formDataToSend)
+                .then(res => {
+                    alert("Despesa atualizada com sucesso")
+                    navigate(0);
+                })
+                .catch(err => {
+                    console.log(err);
+                })
+        };
+
+
+        return (
+            <form onSubmit={handleSubmit}>
+                <div className='mb-3'>
+                    <label><strong>Nome:</strong>&nbsp;<span>{falta.perfil.nome}</span></label>
+                </div>
+
+                <div className="mb-3">
+                    <div className='d-flex justify-content-between align-items-center my-2'>
+                        <label className="form-label"><strong>Anexo:</strong></label>
+                        {falta.justificacao && (
+                            <a href={falta.justificacao} target="_blank" rel="noopener noreferrer">
+                                <button type="button" className='btn btn-outline-info btn-sm'>Abrir</button>
+                            </a>
+                        )}
+                    </div>
+
+                    <FileDropZone
+                        onDrop={(files) => {
+                            if (files && files.length > 0) {
+                                setNewFile(files[0]);
+                            }
+                        }}
+                        accept={{
+                            'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+                            'application/pdf': ['.pdf'],
+                        }}
+                        maxSize={5 * 1024 * 1024}
+                        multiple={true}
+                        disabled={falta.estado == "Aprovada" || falta.estado == "Rejeitada"}
+                    />
+                </div>
+                <div className="mb-4">
+                    <TextField
+                        label="Motivo"
+                        type="text"
+                        name="motivo"
+                        rows={6}
+                        multiline
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={formData.motivo}
+                        onChange={handleChange}
+                        disabled={falta.estado == "Aprovada" || falta.estado == "Rejeitada"}
+                    />
+                </div>
+
+                <label><strong>Informações:</strong></label>
+                <div className="my-3">
+                    <TextField
+                        label="Data"
+                        type="date"
+                        name="data"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={formData.data_falta}
+                        onChange={handleChange}
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <TextField
+                        label="Validador"
+                        type="text"
+                        name="validador"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={formData.validador ? formData.validadorPerfil.nome : "Sem validador"}
+                        onChange={handleChange}
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <TextField
+                        label="Estado"
+                        type="text"
+                        name="estado"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={formData.estado}
+                        onChange={handleChange}
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <TextField
+                        label="Comentários"
+                        type="text"
+                        name="comentarios"
+                        rows={6}
+                        multiline
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={formData.comentarios}
+                        onChange={handleChange}
+                        disabled
+                    />
+                </div>
+
+
+                <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1">
+                    Justificar
+                </button>
+            </form>
+        );
+    }
 
     function DetalhesFeria({ feria }) {
         console.log(feria)
@@ -553,78 +746,136 @@ export default function Calendario() {
                 </div>
 
                 <div className="my-3">
-                    <TextField
-                        label="Data do pedido"
-                        type="date"
-                        name="data_pedido"
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={formData.data_pedido}
-                        onChange={handleChange}
-                        disabled
-                    />
+                    {(formData.estado == "Aprovada" || formData.estado == "Rejeitada") ?
+                        <>
+                            <label><strong>Data do pedido:</strong></label>
+                            <Typography>
+                                {formData.data_pedido}
+                            </Typography>
+                        </>
+                        :
+                        <TextField
+                            label="Data do pedido"
+                            type="date"
+                            name="data_pedido"
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={formData.data_pedido}
+                            onChange={handleChange}
+                            disabled
+                        />
+                    }
                 </div>
                 <div className="my-3">
-                    <TextField
-                        label="Data de início"
-                        type="date"
-                        name="data_inicio"
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={formData.data_inicio}
-                        onChange={handleChange}
-                        disabled={formData.estado == "Aprovada" || formData.estado == "Rejeitada"}
-                    />
+                    {(formData.estado == "Aprovada" || formData.estado == "Rejeitada") ?
+                        <>
+                            <label><strong>Data de ínicio:</strong></label>
+                            <Typography>
+                                {formData.data_inicio}
+                            </Typography>
+
+                        </>
+                        :
+                        <TextField
+                            label="Data de início"
+                            type="date"
+                            name="data_inicio"
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={formData.data_inicio}
+                            onChange={handleChange}
+                            disabled={formData.estado == "Aprovada" || formData.estado == "Rejeitada"}
+                        />
+                    }
                 </div>
                 <div className="my-3">
-                    <TextField
-                        label="Data de fim"
-                        type="date"
-                        name="data_conclusao"
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={formData.data_conclusao}
-                        onChange={handleChange}
-                        disabled={formData.estado == "Aprovada" || formData.estado == "Rejeitada"}
-                    />
+                    {(formData.estado == "Aprovada" || formData.estado == "Rejeitada") ?
+                        <>
+                            <label><strong>Data de fim</strong></label>
+                            <Typography>
+                                {formData.data_conclusao}
+                            </Typography>
+                        </>
+                        :
+                        <TextField
+                            label="Data de fim"
+                            type="date"
+                            name="data_conclusao"
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={formData.data_conclusao}
+                            onChange={handleChange}
+                            disabled={formData.estado == "Aprovada" || formData.estado == "Rejeitada"}
+                        />
+                    }
                 </div>
                 <div className="mb-3">
-                    <TextField
-                        label="Validador"
-                        type="text"
-                        name="validador"
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={formData.validador}
-                        onChange={handleChange}
-                        disabled
-                    />
+                    {(formData.estado == "Aprovada" || formData.estado == "Rejeitada") ?
+                        <>
+                            <label><strong>Validador:</strong></label>
+                            <Typography>
+                                {formData.validador}
+                            </Typography>
+
+                        </>
+                        :
+                        <TextField
+                            label="Validador"
+                            type="text"
+                            name="validador"
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={formData.validador}
+                            onChange={handleChange}
+                            disabled
+                        />
+                    }
                 </div>
                 <div className="mb-3">
-                    <TextField
-                        label="Estado"
-                        type="text"
-                        name="estado"
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={formData.estado}
-                        onChange={handleChange}
-                        disabled
-                    />
+                    {(formData.estado == "Aprovada" || formData.estado == "Rejeitada") ?
+                        <>
+                            <label><strong>Estado:</strong></label>
+                            <Typography>
+                                {formData.estado}
+                            </Typography>
+
+                        </>
+                        :
+                        <TextField
+                            label="Estado"
+                            type="text"
+                            name="estado"
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={formData.estado}
+                            onChange={handleChange}
+                            disabled
+                        />
+                    }
                 </div>
                 <div className="mb-3">
-                    <TextField
-                        label="Comentários"
-                        type="text"
-                        name="comentarios"
-                        rows={6}
-                        multiline
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={formData.comentarios}
-                        onChange={handleChange}
-                        disabled
-                    />
+                    {(formData.estado == "Aprovada" || formData.estado == "Rejeitada") ?
+                        <>
+                            <label><strong>Comentários:</strong></label>
+                            <Typography>
+                                {formData.comentarios ? formData.comentarios : "Sem comentário"}
+                            </Typography>
+
+                        </>
+                        :
+                        <TextField
+                            label="Comentários"
+                            type="text"
+                            name="comentarios"
+                            rows={6}
+                            multiline
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={formData.comentarios}
+                            onChange={handleChange}
+                            disabled
+                        />
+                    }
                 </div>
 
 
