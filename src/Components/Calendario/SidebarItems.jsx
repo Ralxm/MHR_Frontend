@@ -44,7 +44,7 @@ export default function SidebarItems({ tipo_user }) {
 
     useEffect(() => {
         faltas.map((falta) => {
-            if (falta.estado == "Pendente") {
+            if (falta.estado == "Em análise") {
                 setFaltas_Por_Justificar(faltas_por_justificar + 1);
             }
         })
@@ -73,7 +73,7 @@ export default function SidebarItems({ tipo_user }) {
                 className="sidebar-item d-flex justify-content-between align-items-center"
                 onClick={handleNavigation('/calendario/faltas_pessoais')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
-                <span>Ver faltas pessoais</span>
+                <span>Ver faltas</span>
                 <span>
                     {faltas_por_justificar > 0 && (
                         <span className="notification-badge">
@@ -86,7 +86,7 @@ export default function SidebarItems({ tipo_user }) {
                 className="sidebar-item"
                 onClick={handleNavigation('/calendario/ferias_pessoais')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
-                Ver férias pessoais
+                Ver férias 
             </a>
 
 
@@ -95,6 +95,13 @@ export default function SidebarItems({ tipo_user }) {
                     <div className="mt-4">
                         <span><strong>Gestão</strong></span>
                     </div>
+
+                    <a href="/calendario/ferias_aprovadas"
+                        className="sidebar-item"
+                        onClick={handleNavigation('/calendario/ferias_aprovadas')}
+                        style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
+                        Mapa de férias
+                    </a>  
 
                     <a href="/calendario/marcar_falta"
                         className="sidebar-item"
@@ -115,16 +122,7 @@ export default function SidebarItems({ tipo_user }) {
                         onClick={handleNavigation('/calendario/pedidos_ferias')}
                         style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                         Ver pedidos de férias
-                    </a>
-
-                    <a href="/calendario/ferias_aprovadas"
-                        className="sidebar-item"
-                        onClick={handleNavigation('/calendario/ferias_aprovadas')}
-                        style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
-                        Ver férias aprovadas
-                    </a>
-
-                    
+                    </a>    
                 </>
             }
         </div>

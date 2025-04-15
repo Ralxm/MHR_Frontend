@@ -211,7 +211,7 @@ export default function MarcarFerias() {
                         <div className='d-flex justify-content-between align-items-center'>
                             <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Marcar férias</h2>
                             <div className='mb-3' style={{ backgroundColor: '#e9f7fe', padding: '10px' }}>
-                                <h3><strong>Dias de férias restantes: {isLoading ? "A calcular" : dias_restantes_ferias}</strong></h3>
+                                <h3><strong>Saldo de férias: {isLoading ? "A calcular" : dias_restantes_ferias}</strong></h3>
                             </div>
 
                         </div>

@@ -133,7 +133,8 @@ export default function MarcarFalta() {
             id_perfil: perfil,
             id_calendario: calendario.id_calendario,
             data_falta: data_falta,
-            comentarios: comentario
+            comentarios: comentario,
+            estado: "Em análise"
         }
 
         handleServices.createFalta(datapost)

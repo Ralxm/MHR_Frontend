@@ -8,7 +8,7 @@ import ReactEchart from 'echarts-for-react';
 
 echarts.use([TooltipComponent, PieChart, CanvasRenderer]);
 
-const FaltasPieChart = ({ faltas }) => {
+const FeriasPieChart = ({ ferias }) => {
     const { palette } = useTheme();
 
     const data = useMemo(() => {
@@ -19,7 +19,7 @@ const FaltasPieChart = ({ faltas }) => {
             'Em análise': 0
         };
 
-        faltas.forEach(falta => {
+        ferias.forEach(falta => {
             counts[falta.estado] = (counts[falta.estado] || 0) + 1;
         });
 
@@ -29,14 +29,14 @@ const FaltasPieChart = ({ faltas }) => {
             { value: counts['Pendente'], name: 'Pendente' },
             { value: counts['Em análise'], name: 'Em análise' }
         ].filter(item => item.value > 0);
-    }, [faltas]);
+    }, [ferias]);
 
     const colors = useMemo(() => {
         const colorMap = {
             'Aprovada': palette.success.main,
             'Rejeitada': palette.error.main,
             'Pendente': 'gray',
-            'Em análise': palette.warning.main
+            'Em análise': palette.info.main
         };
         return data.map(item => colorMap[item.name]);
     }, [data, palette]);
@@ -51,7 +51,7 @@ const FaltasPieChart = ({ faltas }) => {
             tooltip: {
                 trigger: 'item',
                 formatter: (params) => {
-                    return `<strong>${params.name}:</strong> ${params.value} falta(s) (${params.percent}%)`;
+                    return `<strong>${params.name}:</strong> ${params.value} feria(s) (${params.percent}%)`;
                 },
             },
             legend: {
@@ -77,7 +77,7 @@ const FaltasPieChart = ({ faltas }) => {
                     label: {
                         show: true,
                         position: 'center',
-                        formatter: `{x|${total}}\n{y|Faltas}`,
+                        formatter: `{x|${total}}\n{y|Ferias}`,
                         rich: {
                             x: {
                                 fontSize: 24,
@@ -109,4 +109,4 @@ const FaltasPieChart = ({ faltas }) => {
     );
 };
 
-export default FaltasPieChart;
+export default FeriasPieChart;

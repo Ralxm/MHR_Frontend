@@ -64,7 +64,7 @@ export default function FaltasUtilizadores() {
     const getShadowClass = (estado) => {
         switch (estado) {
             case "Aprovada":
-                return "primary";
+                return "success";
             case "Em análise":
                 return "warning";
             case "Rejeitada":
@@ -223,10 +223,9 @@ export default function FaltasUtilizadores() {
 
             formDataToSend.append('comentarios', formData.comentarios);
             formDataToSend.append('motivo', formData.motivo);
-            formDataToSend.append('validador', formData.validador);
+            formDataToSend.append('validador', id_perfil);
             formDataToSend.append('data_falta', formData.data_falta);
             formDataToSend.append('estado', formData.estado);
-
 
             handleServices.atualizarFalta(formDataToSend)
                 .then(res => {
@@ -280,7 +279,7 @@ export default function FaltasUtilizadores() {
                         name="validador"
                         InputLabelProps={{ shrink: true }}
                         fullWidth
-                        value={formData.validador ? formData.validador : "Sem validador"}
+                        value={formData.validador ? formData.validadorPerfil.nome : "Sem validador"}
                         onChange={handleChange}
                         disabled
                     />

@@ -100,7 +100,7 @@ export default function FeriasPessoais() {
         return formattedDate
     }
 
-    function handleApagarDespesa(event){
+    function handleApagarFeria(event){
         event.preventDefault();
         handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
             .then(res => {
@@ -148,7 +148,7 @@ export default function FeriasPessoais() {
                 </div>
             </div>
 
-            {/* Modal para ver os detalhes de uma falta */}
+            {/* Modal para ver os detalhes de uma feria */}
             <Modal
                 open={selectedFeria}
                 onClose={handleCloseVerDetalhes}
@@ -210,7 +210,7 @@ export default function FeriasPessoais() {
                         <Button
                             variant="contained"
                             color="error"
-                            onClick={(event) => { handleApagarDespesa(event); handleCloseApagar() }}
+                            onClick={(event) => { handleApagarFeria(event); handleCloseApagar() }}
                             sx={{ width: '50%' }}
                         >
                             Apagar
