@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import NavBar from "../../Universal/NavBar";
 import './Calendario.css';
 import '../../index.css'
@@ -8,7 +8,7 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Tab, Stack } from '@mui/material';
+import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Tab, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import SidebarItems from './SidebarItems';
 import FaltasPieChart from './FaltasPieChart';
@@ -26,6 +26,8 @@ export default function Calendario() {
 
     const [tab, setTab] = useState('1')
 
+    const [isLoading, setIsLoading] = useState(true)
+
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
     const [id_perfil, setPerfil] = useState()
@@ -33,9 +35,27 @@ export default function Calendario() {
     const [faltas, setFaltas] = useState([])
     const [ferias, setFerias] = useState([])
 
+    const [calendario, setCalendario] = useState()
+    const [dias_restantes_ferias, setDias_Restantes_Ferias] = useState();
+
+    const [tipos_falta, setTipos_Falta] = useState([])
+
     const [selectedFalta, setSelectedFalta] = useState(null)
     const [selectedFeria, setSelectedFeria] = useState(null)
     const [selectedFeriaApagar, setSelectedFeriaApagar] = useState(null)
+
+    const [isCriarFaltaModalOpen, setIsCriarFaltaModalOpen] = useState(false)
+    const [isCriarFeriaModalOpen, setIsCriarFeriaModalOpen] = useState(false)
+
+    {/* Criação de uma féria */ }
+    const [data_inicio, setData_Inicio] = useState();
+    const [data_conclusao, setData_Conclusao] = useState();
+    const [duracao, setDuracao] = useState(0);
+
+    {/* Criação de uma falta */ }
+    const [tipo_falta, setTipo_Falta] = useState()
+    const [data_falta, setData_Falta] = useState()
+    const [motivo, setMotivo] = useState('')
 
     const handleCloseVerDetalhesFeria = () => {
         setSelectedFeria(null)
@@ -47,6 +67,14 @@ export default function Calendario() {
 
     const handleCloseVerDetalhesFalta = () => {
         setSelectedFalta(null)
+    }
+
+    const handleCloseCriarFalta = () => {
+        setIsCriarFaltaModalOpen(false)
+    }
+
+    const handleCloseCriarFeria = () => {
+        setIsCriarFeriaModalOpen(false)
     }
 
     useEffect(() => {
@@ -85,6 +113,13 @@ export default function Calendario() {
         try {
             if (id_perfil) {
                 setLoadingFaltasFerias(true)
+                handleServices.getCalendario(id_perfil)
+                    .then(res => {
+                        setCalendario(res[0]);
+                    })
+                    .catch(err => {
+                        console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+                    })
                 handleServices.listFerias(id_perfil)
                     .then(res => {
                         setFerias(res);
@@ -99,6 +134,13 @@ export default function Calendario() {
                     .catch(err => {
                         console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
                     })
+                handleServices.listTipoFaltas()
+                    .then(res => {
+                        setTipos_Falta(res);
+                    })
+                    .catch(err => {
+                        console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+                    })
             }
         }
         catch {
@@ -108,6 +150,73 @@ export default function Calendario() {
             setLoadingFaltasFerias(false)
         }
     }, [id_perfil])
+
+    useEffect(() => {
+        if (data_conclusao && data_inicio) {
+            const startDate = new Date(data_inicio);
+            const endDate = new Date(data_conclusao);
+
+            const calculateBusinessDays = (start, end) => {
+                let count = 0;
+                const current = new Date(start);
+
+                while (current <= end) {
+                    const dayOfWeek = current.getDay();
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                        count++;
+                    }
+                    current.setDate(current.getDate() + 1);
+                }
+                return count;
+            };
+
+            const businessDays = calculateBusinessDays(startDate, endDate);
+            setDuracao(businessDays);
+        }
+    }, [data_conclusao])
+
+    useEffect(() => {
+        if (data_conclusao && data_inicio) {
+            const startDate = new Date(data_inicio);
+            const endDate = new Date(data_conclusao);
+
+            const calculateBusinessDays = (start, end) => {
+                let count = 0;
+                const current = new Date(start);
+
+                while (current <= end) {
+                    const dayOfWeek = current.getDay();
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                        count++;
+                    }
+                    current.setDate(current.getDate() + 1);
+                }
+                return count;
+            };
+
+            const businessDays = calculateBusinessDays(startDate, endDate);
+            setDuracao(businessDays);
+        }
+    }, [data_inicio])
+
+    useEffect(() => {
+        if (calendario && ferias) {
+            const anoAtual = new Date().getFullYear();
+            let totalDuracao = 0;
+
+            ferias.forEach((feria) => {
+                if (feria.estado === "Aprovada") {
+                    const ano = new Date(feria.data_inicio).getFullYear();
+                    if (ano === anoAtual) {
+                        totalDuracao += feria.duracao;
+                    }
+                }
+            });
+
+            setDias_Restantes_Ferias(calendario.dias_ferias_ano_atual - totalDuracao);
+            setIsLoading(false);
+        }
+    }, [ferias]);
 
     const getShadowClass = (estado) => {
         switch (estado) {
@@ -143,6 +252,40 @@ export default function Calendario() {
                 console.log("Erro a apagar a despesa: " + err);
             });
     }
+
+    function handleCriarFerias(event) {
+        event.preventDefault();
+
+        const datapost = {
+            id_perfil: id_perfil,
+            id_calendario: calendario.id_calendario,
+            data_inicio: data_inicio,
+            data_conclusao: data_conclusao,
+            duracao: duracao,
+        }
+
+        console.log(datapost)
+
+        if (new Date(data_inicio) > new Date(data_conclusao)) {
+            alert("O dia final não pode ser antes do dia de ínicio!!!")
+            return;
+        }
+        else if (duracao >= dias_restantes_ferias) {
+            alert("Não tem dias de férias suficientes");
+            return;
+        }
+
+        handleServices.createFerias(datapost)
+            .then(res => {
+                alert(res)
+                navigate(0)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
+
 
     return (
         <div id="root">
@@ -183,7 +326,7 @@ export default function Calendario() {
                                         <div className='row'>
                                             <div className='col d-flex justify-content-between align-items-center'>
                                                 <span><strong>Faltas</strong></span>
-                                                <button className='btn btn-primary'>Criar Falta</button>
+                                                <button className='btn btn-primary' onClick={() => setIsCriarFaltaModalOpen(true)}>Criar Falta</button>
                                             </div>
                                         </div>
                                         {/* DIV COM O CARD DAS FALTAS */}
@@ -225,10 +368,10 @@ export default function Calendario() {
 
                                 </div>
                                 <div className="col-md-6">
-                                    <div className='items-container' style={{ minHeight: '40svh' }}>
+                                    <div className='items-container' style={{ height: '40svh' }}>
                                         <div className='d-flex justify-content-between align-items-center'>
                                             <span><strong>Férias</strong></span>
-                                            <button className='btn btn-primary'>Marcar Férias</button>
+                                            <button className='btn btn-primary' onClick={() => setIsCriarFeriaModalOpen(true)}>Marcar Férias</button>
                                         </div>
                                         {/* DIV COM O CARD DAS FERIAS */}
                                         <div className='row mt-3'>
@@ -248,18 +391,22 @@ export default function Calendario() {
                                                             </TableRow>
                                                         </TableHead>
                                                         <TableBody>
-                                                            {ferias.map((feria) => (
-                                                                <TableRow key={feria.id_falta} >
-                                                                    <TableCell align="left">{convertDate(feria.data_inicio)}</TableCell>
-                                                                    <TableCell align="left">{convertDate(feria.data_conclusao)}</TableCell>
-                                                                    <TableCell align="left">{feria.duracao} {feria.duracao > 1 ? "dias" : "dia"} </TableCell>
-                                                                    <TableCell align="left"><Chip label={feria.estado} size='10px' color={getShadowClass(feria.estado)}></Chip></TableCell>
-                                                                    <TableCell align="right">
-                                                                        {feria.estado == "Pendente" && <button className='btn btn-outline-danger mx-2' onClick={() => { setSelectedFeriaApagar(feria) }}>Apagar</button>}
-                                                                        <button className='btn btn-secondary' onClick={() => { setSelectedFeria(feria) }}>Ver detalhes</button>
-                                                                    </TableCell>
-                                                                </TableRow>
-                                                            ))}
+                                                            {ferias.map((feria) => {
+                                                                if (feria.estado == "Aprovada") {
+                                                                    return (
+                                                                        <TableRow key={feria.id_falta} >
+                                                                            <TableCell align="left">{convertDate(feria.data_inicio)}</TableCell>
+                                                                            <TableCell align="left">{convertDate(feria.data_conclusao)}</TableCell>
+                                                                            <TableCell align="left">{feria.duracao} {feria.duracao > 1 ? "dias" : "dia"} </TableCell>
+                                                                            <TableCell align="left"><Chip label={feria.estado} size='10px' color={getShadowClass(feria.estado)}></Chip></TableCell>
+                                                                            <TableCell align="right">
+                                                                                {feria.estado == "Pendente" && <button className='btn btn-outline-danger mx-2' onClick={() => { setSelectedFeriaApagar(feria) }}>Apagar</button>}
+                                                                                <button className='btn btn-secondary' onClick={() => { setSelectedFeria(feria) }}>Ver detalhes</button>
+                                                                            </TableCell>
+                                                                        </TableRow>
+                                                                    )
+                                                                }
+                                                            })}
                                                         </TableBody>
                                                     </Table>
                                                 </TableContainer>
@@ -281,7 +428,7 @@ export default function Calendario() {
                                                         <TabList onChange={handleChangeTab} aria-label="lab API tabs example" style={{ flexGrow: 1 }}>
                                                             <Tab label="Calendário" value="1" sx={{ textTransform: 'none' }} />
                                                             <Tab label="Faltas" value="2" sx={{ textTransform: 'none' }} />
-                                                            <Tab label="Despesas" value="3" sx={{ textTransform: 'none' }} />
+                                                            <Tab label="Ferias" value="3" sx={{ textTransform: 'none' }} />
                                                         </TabList>
                                                     </div>
                                                 </Box>
@@ -335,18 +482,20 @@ export default function Calendario() {
                                                                 </TableRow>
                                                             </TableHead>
                                                             <TableBody>
-                                                                {ferias.map((feria) => (
-                                                                    <TableRow key={feria.id_falta} >
-                                                                        <TableCell align="left">{convertDate(feria.data_inicio)}</TableCell>
-                                                                        <TableCell align="left">{convertDate(feria.data_conclusao)}</TableCell>
-                                                                        <TableCell align="left">{feria.duracao} {feria.duracao > 1 ? "dias" : "dia"} </TableCell>
-                                                                        <TableCell align="left"><Chip label={feria.estado} size='10px' color={getShadowClass(feria.estado)}></Chip></TableCell>
-                                                                        <TableCell align="right">
-                                                                            {feria.estado == "Pendente" && <button className='btn btn-outline-danger mx-2' onClick={() => { setSelectedFeriaApagar(feria) }}>Apagar</button>}
-                                                                            <button className='btn btn-secondary' onClick={() => { setSelectedFeria(feria) }}>Ver detalhes</button>
-                                                                        </TableCell>
-                                                                    </TableRow>
-                                                                ))}
+                                                                {ferias.map((feria) => {
+                                                                    return (
+                                                                        <TableRow key={feria.id_falta} >
+                                                                            <TableCell align="left">{convertDate(feria.data_inicio)}</TableCell>
+                                                                            <TableCell align="left">{convertDate(feria.data_conclusao)}</TableCell>
+                                                                            <TableCell align="left">{feria.duracao} {feria.duracao > 1 ? "dias" : "dia"} </TableCell>
+                                                                            <TableCell align="left"><Chip label={feria.estado} size='10px' color={getShadowClass(feria.estado)}></Chip></TableCell>
+                                                                            <TableCell align="right">
+                                                                                {feria.estado == "Pendente" && <button className='btn btn-outline-danger mx-2' onClick={() => { setSelectedFeriaApagar(feria) }}>Apagar</button>}
+                                                                                <button className='btn btn-secondary' onClick={() => { setSelectedFeria(feria) }}>Ver detalhes</button>
+                                                                            </TableCell>
+                                                                        </TableRow>
+                                                                    )
+                                                                })}
                                                             </TableBody>
                                                         </Table>
                                                     </TableContainer>
@@ -412,7 +561,7 @@ export default function Calendario() {
                     }}
                 >
                     <Typography id="modal-modal-title" variant="h6">
-                        Detalhes da Falta
+                        Detalhes do pedido de férias
                     </Typography>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
                         {selectedFeria && <DetalhesFeria feria={selectedFeria} />}
@@ -461,6 +610,66 @@ export default function Calendario() {
                     </Stack>
                 </Paper>
             </Modal>
+
+            {/* Modal para criar uma feria */}
+            <Modal
+                open={isCriarFeriaModalOpen}
+                onClose={handleCloseCriarFeria}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 500 },
+                        height: { xs: 500, sm: 500 },
+                        borderRadius: 4,
+                        p: 4,
+                        overflowY: 'scroll'
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6">
+                        Marcar férias
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        <CriarFeria data_inicio={data_inicio} data_conclusao={data_conclusao} duracao={duracao} />
+                    </Typography>
+                    <Button onClick={handleCloseCriarFeria} className='col-md-12'>Fechar</Button>
+                </Paper>
+            </Modal>
+
+            {/* Modal para criar uma falta */}
+            <Modal
+                open={isCriarFaltaModalOpen}
+                onClose={handleCloseCriarFalta}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 500 },
+                        height: { xs: 500, sm: 600 },
+                        borderRadius: 4,
+                        p: 4,
+                        overflowY: 'scroll'
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6">
+                        Marcar falta
+                    </Typography>
+                    <Typography id="modal-modal-description" sx={{ mt: 2 }}>
+                        <CriarFalta tipo_falta={tipo_falta} data_falta={data_falta} motivo={motivo} />
+                    </Typography>
+                    <Button onClick={handleCloseCriarFalta} className='col-md-12'>Fechar</Button>
+                </Paper>
+            </Modal>
         </div>
     );
 
@@ -469,7 +678,6 @@ export default function Calendario() {
             moment.locale("pt")
             const localizer = momentLocalizer(moment);
             const events = transformFaltasAndFeriasToEvents(faltas, ferias);
-            console.log(events)
 
             const eventPropGetter = (event) => {
                 let backgroundColor = '';
@@ -542,8 +750,6 @@ export default function Calendario() {
             ...falta,
             data_falta: convertDateToInputFormat(falta.data_falta),
         });
-
-        console.log(formData)
 
         const handleChange = (e) => {
             const { name, value } = e.target;
@@ -632,6 +838,27 @@ export default function Calendario() {
 
                 <label><strong>Informações:</strong></label>
                 <div className="my-3">
+                    <FormControl fullWidth disabled={formData.estado == "Aprovada" || formData.estado == "Rejeitada"}>
+                        <InputLabel id="absence-type-label">Tipo de falta</InputLabel>
+                        <Select
+                            labelId="absence-type-label"
+                            label="Tipo de falta"
+                            value={formData.id_tipofalta}
+                            onChange={(value) => setFormData({ ...formData, id_tipofalta: value.target.value })}
+                            variant="outlined"
+                        >
+                            {tipos_falta.map((tipo) => (
+                                <MenuItem key={tipo.id_tipofalta} value={tipo.id_tipofalta}>
+                                    <div>
+                                        <div style={{ fontWeight: 500 }}>{tipo.tipo}</div>
+                                        <div style={{ fontSize: '0.8rem', color: '#666' }}>{tipo.descricao}</div>
+                                    </div>
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </div>
+                <div className="my-3">
                     <TextField
                         label="Data"
                         type="date"
@@ -691,7 +918,6 @@ export default function Calendario() {
     }
 
     function DetalhesFeria({ feria }) {
-        console.log(feria)
         const convertDateToInputFormat = (date) => {
             const datePart = date.split('T')[0];
             return datePart;
@@ -704,6 +930,60 @@ export default function Calendario() {
             data_pedido: convertDateToInputFormat(feria.data_pedido),
         });
 
+        useEffect(() => {
+            if (formData.data_conclusao && formData.data_inicio) {
+                const startDate = new Date(formData.data_inicio);
+                const endDate = new Date(formData.data_conclusao);
+
+                const calculateBusinessDays = (start, end) => {
+                    let count = 0;
+                    const current = new Date(start);
+
+                    while (current <= end) {
+                        const dayOfWeek = current.getDay();
+                        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                            count++;
+                        }
+                        current.setDate(current.getDate() + 1);
+                    }
+                    return count;
+                };
+
+                const businessDays = calculateBusinessDays(startDate, endDate);
+                setFormData(prevFormData => ({
+                    ...prevFormData,
+                    duracao: businessDays
+                }));
+            }
+        }, [formData.data_conclusao])
+
+        useEffect(() => {
+            if (formData.data_conclusao && formData.data_inicio) {
+                const startDate = new Date(formData.data_inicio);
+                const endDate = new Date(formData.data_conclusao);
+
+                const calculateBusinessDays = (start, end) => {
+                    let count = 0;
+                    const current = new Date(start);
+
+                    while (current <= end) {
+                        const dayOfWeek = current.getDay();
+                        if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                            count++;
+                        }
+                        current.setDate(current.getDate() + 1);
+                    }
+                    return count;
+                };
+
+                const businessDays = calculateBusinessDays(startDate, endDate);
+                setFormData(prevFormData => ({
+                    ...prevFormData,
+                    duracao: businessDays
+                }));
+            }
+        }, [formData.data_inicio])
+
         const handleChange = (e) => {
             const { name, value } = e.target;
             setFormData((prevData) => ({
@@ -715,20 +995,17 @@ export default function Calendario() {
         const handleSubmit = async (e) => {
             e.preventDefault();
 
-            const formDataToSend = new FormData();
+            const datapost = {
+                id_solicitacao: formData.id_solicitacao,
+                data_inicio: formData.data_inicio,
+                data_conclusao: formData.data_conclusao,
+                duracao: formData.duracao,
+                estado: formData.estado,
+                validador: formData.validador,
+                comentarios: formData.comentarios
+            }
 
-            formDataToSend.append('id_falta', formData.id_falta);
-            formDataToSend.append('id_calendario', formData.id_calendario);
-            formDataToSend.append('id_perfil', formData.id_perfil);
-            formDataToSend.append('id_tipofalta', formData.id_tipofalta);
-
-            formDataToSend.append('comentarios', formData.comentarios);
-            formDataToSend.append('motivo', formData.motivo);
-            formDataToSend.append('validador', formData.validador);
-            formDataToSend.append('data_falta', formData.data_falta);
-            formDataToSend.append('estado', "Em análise");
-
-            handleServices.atualizarFalta(formDataToSend)
+            handleServices.atualizarFeria(datapost)
                 .then(res => {
                     alert(res)
                     navigate(0);
@@ -825,7 +1102,7 @@ export default function Calendario() {
                             name="validador"
                             InputLabelProps={{ shrink: true }}
                             fullWidth
-                            value={formData.validador}
+                            value={formData.validador ? formData.validadorPerfil.nome : "Sem validador"}
                             onChange={handleChange}
                             disabled
                         />
@@ -878,12 +1155,157 @@ export default function Calendario() {
                     }
                 </div>
 
-
-                <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1">
-                    Guardar
-                </button>
+                {(formData.estado == "Aprovada" || formData.estado == "Rejeitada") ?
+                    <></>
+                    :
+                    <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1">
+                        Guardar
+                    </button>
+                }
             </form>
         );
+    }
+
+    function CriarFalta({ tipo_falta, data_falta, motivo }) {
+        const [_motivo, set_Motivo] = useState(motivo);
+        const [newFile, setNewFile] = useState()
+
+        function handleCriarFalta(event) {
+            event.preventDefault()
+
+            const formData = new FormData()
+
+            console.log(formData)
+
+            formData.append('id_calendario', calendario.id_calendario);
+            formData.append('id_perfil', id_perfil);
+            formData.append('id_tipofalta', tipo_falta);
+
+            formData.append('motivo', _motivo);
+            formData.append('data_falta', data_falta);
+            formData.append('estado', "Em análise");
+
+            if (newFile) {
+                formData.append('justificacao', newFile)
+            }
+
+            handleServices.createFalta(formData)
+                .then(res => {
+                    alert(res)
+                    navigate(0)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+
+        return (
+            <div>
+                <form>
+                    <Stack spacing={2} className='mt-3'>
+                        <FormControl fullWidth>
+                            <InputLabel id="absence-type-label">Tipo de falta</InputLabel>
+                            <Select
+                                labelId="absence-type-label"
+                                label="Tipo de falta"
+                                value={tipo_falta}
+                                onChange={(value) => setTipo_Falta(value.target.value)}
+                                variant="outlined"
+                            >
+                                {tipos_falta.map((tipo) => (
+                                    <MenuItem key={tipo.id_tipofalta} value={tipo.id_tipofalta}>
+                                        <div>
+                                            <div style={{ fontWeight: 500 }}>{tipo.tipo}</div>
+                                            <div style={{ fontSize: '0.8rem', color: '#666' }}>{tipo.descricao}</div>
+                                        </div>
+                                    </MenuItem>
+                                ))}
+                            </Select>
+                        </FormControl>
+
+                        <TextField
+                            label="Data da falta"
+                            type="date"
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={data_falta}
+                            onChange={(value) => { setData_Falta(value.target.value) }}
+                        />
+                        <TextField
+                            label="Motivo"
+                            type="text"
+                            rows={6}
+                            multiline
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={_motivo}
+                            onChange={(value) => { set_Motivo(value.target.value) }}
+                        />
+
+                        <FileDropZone
+                            onDrop={(files) => {
+                                if (files && files.length > 0) {
+                                    setNewFile(files[0]);
+                                }
+                            }}
+                            accept={{
+                                'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+                                'application/pdf': ['.pdf'],
+                            }}
+                            maxSize={5 * 1024 * 1024}
+                            multiple={true}
+                        />
+
+                        <Button variant="contained" color="primary" onClick={handleCriarFalta}>
+                            Criar
+                        </Button>
+                    </Stack>
+                </form>
+            </div>
+        )
+    }
+
+    function CriarFeria({ data_inicio, data_conclusao, duracao }) {
+        return (
+            <div>
+                <div className='d-flex justify-content-center align-items-center'>
+                    <div className='mb-3' style={{ backgroundColor: '#e9f7fe', padding: '10px' }}>
+                        <h3><strong>Saldo de férias: {isLoading ? "A calcular" : dias_restantes_ferias}</strong></h3>
+                    </div>
+
+                </div>
+
+                <form>
+                    <Stack spacing={2} className='mt-3'>
+                        <TextField
+                            label="Data de ínicio"
+                            type="date"
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={data_inicio}
+                            onChange={(value) => { setData_Inicio(value.target.value) }}
+                        />
+                        <TextField
+                            label="Data de fim"
+                            type="date"
+                            InputLabelProps={{ shrink: true }}
+                            fullWidth
+                            value={data_conclusao}
+                            onChange={(value) => { setData_Conclusao(value.target.value) }}
+                        />
+
+                        <Typography variant='h6' className='my-3'>
+                            Total de dias que as férias vão ocupar: {duracao}
+                        </Typography>
+
+
+                        <Button variant="contained" color="primary" onClick={handleCriarFerias}>
+                            Criar
+                        </Button>
+                    </Stack>
+                </form>
+            </div>
+        )
     }
 }
 

@@ -177,7 +177,6 @@ export default function MarcarFerias() {
             .catch(err => {
                 console.log(err)
             })
-
     }
 
     return (

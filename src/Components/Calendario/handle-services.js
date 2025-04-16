@@ -56,7 +56,7 @@ class HandleServices {
         let url = process.env.REACT_APP_BACKEND_LINK;
         const headers = {
             ...authHeader().headers,
-            'Content-Type': 'application/json',
+            'Content-Type': 'multipart/form-data',
         };
 
         return axios.post(url + "faltas/create", formData, { headers })
@@ -98,6 +98,22 @@ class HandleServices {
             .then(res => {
                 if (res.data.success) {
                     return res.data.data;
+                }
+            }, reason => {
+                throw new Error('Erro a atualizar a falta');
+            });
+    }
+
+    atualizarFeria(datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json'
+        };
+        return axios.post(url + "ferias/update/" + datapost.id_solicitacao, datapost, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
                 }
             }, reason => {
                 throw new Error('Erro a atualizar a falta');
