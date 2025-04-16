@@ -62,7 +62,7 @@ class HandleServices {
         return axios.post(url + "faltas/create", formData, { headers })
             .then(res => {
                 if (res.data.success) {
-                    return res.data.message;
+                    return res.data;
                 }
             }, reason => { throw new Error('Erro a criar o comentario: ' + reason); });
     }
@@ -70,6 +70,16 @@ class HandleServices {
     carregarFaltas(){
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.get(url + "faltas/list", authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar todas as faltas'); });
+    }
+
+    carregarFeriasAprovadas(){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "ferias/listAprovadas", authHeader())
             .then(res => {
                 if (res.data.success) {
                     return res.data.data;

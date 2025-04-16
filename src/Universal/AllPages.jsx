@@ -13,6 +13,7 @@ import MarcarFerias from "../Components/Calendario/MarcarFerias";
 import FaltasUtilizadores from "../Components/Calendario/FaltasUtilizadores";
 import FaltasPessoais from "../Components/Calendario/FaltasPessoais";
 import FeriasPessoais from "../Components/Calendario/FeriasPessoais";
+import MapaFerias from "../Components/Calendario/MapaFerias";
 
 import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
@@ -50,6 +51,8 @@ export default function MainPage(){
                 <Route path='/calendario/faltas_pessoais' element={<FaltasPessoais></FaltasPessoais>}>
                 </Route>
                 <Route path='/calendario/ferias_pessoais' element={<FeriasPessoais></FeriasPessoais>}>
+                </Route>
+                <Route path='/calendario/mapa_ferias' element={<MapaFerias></MapaFerias>}>
                 </Route>
 
                 <Route path='/projetos' element={<Projetos></Projetos>}>

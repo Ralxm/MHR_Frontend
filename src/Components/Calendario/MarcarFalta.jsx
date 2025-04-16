@@ -10,6 +10,7 @@ import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import SidebarItems from './SidebarItems';
+import FileDropZone from '../../Universal/FileDropZoneSingle';
 
 export default function MarcarFalta() {
     const navigate = useNavigate();
@@ -32,6 +33,7 @@ export default function MarcarFalta() {
     const [tipo_falta, setTipo_Falta] = useState()
     const [data_falta, setData_Falta] = useState()
     const [comentario, setComentario] = useState('')
+    const [newFile, setNewFile] = useState();
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -125,25 +127,34 @@ export default function MarcarFalta() {
             })
     }
 
-    function handleCriarFalta(event){
-        event.preventDefault();
+    function handleCriarFalta(event) {
+        event.preventDefault()
 
-        const datapost = {
-            id_tipofalta: tipo_falta,
-            id_perfil: perfil,
-            id_calendario: calendario.id_calendario,
-            data_falta: data_falta,
-            comentarios: comentario,
-            estado: "Em análise"
+        const formData = new FormData()
+
+        console.log(formData)
+
+        formData.append('id_calendario', calendario.id_calendario);
+        formData.append('id_perfil', id_perfil);
+        formData.append('id_tipofalta', tipo_falta);
+
+        formData.append('comentarios', comentario);
+        formData.append('data_falta', data_falta);
+        formData.append('estado', "Em análise");
+
+        if (newFile) {
+            formData.append('justificacao', newFile)
         }
 
-        handleServices.createFalta(datapost)
-        .then(res => {
-            alert(res)
-        })
-        .catch(err => {
-            console.log(err)
-        })
+        handleServices.createFalta(formData)
+            .then(res => {
+                alert(res.message)
+                sessionStorage.setItem('openFalta', res.data.id_falta);
+                navigate('/calendario/faltas_utilizadores')
+            })
+            .catch(err => {
+                console.log(err)
+            })
     }
 
     return (
@@ -168,7 +179,7 @@ export default function MarcarFalta() {
             <div className="app-container" style={{ position: 'relative', zIndex: 1000 }}>
                 <NavBar />
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
-                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto' }}>
+                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0  }}>
                         <SidebarItems tipo_user={tipo_user}></SidebarItems>
                     </div>
 
@@ -220,7 +231,7 @@ export default function MarcarFalta() {
                             </div>
                         </div>
 
-                        <div className='row mb-4'>
+                        <div className='row mb-4 justify-content-between'>
                             <div className='col-md-5'>
                                 <TextField
                                     label="Data"
@@ -230,6 +241,21 @@ export default function MarcarFalta() {
                                     InputLabelProps={{ shrink: true }}
                                     value={data_falta}
                                     onChange={(value) => setData_Falta(value.target.value)}
+                                />
+                            </div>
+                            <div className='col-md-5'>
+                            <FileDropZone
+                                    onDrop={(files) => {
+                                        if (files && files.length > 0) {
+                                            setNewFile(files[0]);
+                                        }
+                                    }}
+                                    accept={{
+                                        'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+                                        'application/pdf': ['.pdf'],
+                                    }}
+                                    maxSize={5 * 1024 * 1024}
+                                    multiple={true}
                                 />
                             </div>
                         </div>

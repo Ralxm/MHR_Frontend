@@ -96,9 +96,9 @@ export default function SidebarItems({ tipo_user }) {
                         <span><strong>Gestão</strong></span>
                     </div>
 
-                    <a href="/calendario/ferias_aprovadas"
+                    <a href="/calendario/mapa_ferias"
                         className="sidebar-item"
-                        onClick={handleNavigation('/calendario/ferias_aprovadas')}
+                        onClick={handleNavigation('/calendario/mapa_ferias')}
                         style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                         Mapa de férias
                     </a>  
@@ -123,6 +123,24 @@ export default function SidebarItems({ tipo_user }) {
                         style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                         Ver pedidos de férias
                     </a>    
+
+                    <div className="mt-4">
+                        <span><strong>Definições</strong></span>
+                    </div>
+
+                    <a href="/calendario/pedidos_ferias"
+                        className="sidebar-item"
+                        onClick={handleNavigation('/calendario/tipos_faltas')}
+                        style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
+                        Tipos de faltas
+                    </a>   
+
+                    <a href="/calendario/pedidos_ferias"
+                        className="sidebar-item"
+                        onClick={handleNavigation('/calendario/feriados')}
+                        style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
+                        Definir feriados
+                    </a>   
                 </>
             }
         </div>

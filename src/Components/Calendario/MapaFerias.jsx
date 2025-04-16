@@ -6,21 +6,22 @@ import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField } from '@mui/material';
-import FileDropZone from '../../Universal/FileDropZoneSingle'
+import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Stack } from '@mui/material';
 import SidebarItems from './SidebarItems';
-import FaltasPieChart from './FaltasPieChart';
+import moment from 'moment';
+import { Calendar, momentLocalizer } from 'react-big-calendar';
 
-export default function FaltasPessoais() {
+export default function MapaFerias() {
     const navigate = useNavigate();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
     const [id_perfil, setPerfil] = useState()
 
-    const [faltas, setFaltas] = useState([])
+    const [ferias, setFerias] = useState([])
 
-    const [selectedFalta, setSelectedFalta] = useState(null)
+    const [selectedFeria, setSelectedFeria] = useState(null)
+    const [selectedFeriaApagar, setSelectedFeriaApagar] = useState(null)
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -56,9 +57,9 @@ export default function FaltasPessoais() {
 
     useEffect(() => {
         if (id_perfil) {
-            handleServices.carregarFaltasPessoais(id_perfil)
+            handleServices.carregarFeriasAprovadas()
                 .then(res => {
-                    setFaltas(res);
+                    setFerias(res);
                 })
                 .catch(err => {
                     console.log("Não foi possivel encontrar as faltas: " + err)
@@ -67,7 +68,11 @@ export default function FaltasPessoais() {
     }, [id_perfil])
 
     const handleCloseVerDetalhes = () => {
-        setSelectedFalta(null)
+        setSelectedFeria(null)
+    }
+
+    const handleCloseApagar = () => {
+        setSelectedFeriaApagar(null)
     }
 
     const getShadowClass = (estado) => {
@@ -93,10 +98,22 @@ export default function FaltasPessoais() {
         return formattedDate
     }
 
-    function getQuantidadeFaltas(tipo, faltas){
+    function handleApagarFeria(event){
+        event.preventDefault();
+        handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
+            .then(res => {
+                alert("Pedido de ferias apagado com sucesso")
+                navigate(0)
+            })
+            .catch(err => {
+                console.log("Erro a apagar a despesa: " + err);
+            });
+    }
+
+    function getQuantidadeFerias(tipo, ferias){
         let count = 0;
-        faltas.map((falta) => {
-            if(falta.estado == tipo){
+        ferias.map((feria) => {
+            if(feria.estado == tipo){
                 count++;
             }
         })
@@ -131,66 +148,23 @@ export default function FaltasPessoais() {
 
 
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
-                        <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Faltas</h2>
+                        <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Férias</h2>
                         <div className='row'>
-                            <div className='col-md-3'>
-                                <Paper elevation={3} sx={{
-                                    p: 2,
-                                    height: '100%',
-                                    minHeight: '70vh',
-                                    borderRadius: '12px',
-                                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)',
-                                }} >
-                                    {faltas.length > 0 ? (
-                                        <>
-                                            <FaltasPieChart faltas={faltas} />
-                                            <TableContainer component={Box} sx={{ pl: 0, mt: 3 }}>
-                                                <Table aria-label="simple table" className="disable-edge-padding">
-                                                    <TableHead>
-                                                        <TableRow>
-                                                            <TableCell align="left">Estado</TableCell>
-                                                            <TableCell align="left">Quantidade</TableCell>
-                                                        </TableRow>
-                                                    </TableHead>
-                                                    <TableBody>
-                                                        <TableRow>
-                                                            <TableCell align="left"><Chip label={"Pendente"} size='10px' color={getShadowClass('Pendente')} /></TableCell>
-                                                            <TableCell align="left">{getQuantidadeFaltas('Pendente', faltas)}</TableCell>
-                                                        </TableRow>
-                                                        <TableRow>
-                                                            <TableCell align="left"><Chip label={"Em análise"} size='10px' color={getShadowClass('Em análise')} /></TableCell>
-                                                            <TableCell align="left">{getQuantidadeFaltas('Em análise', faltas)}</TableCell>
-                                                        </TableRow>
-                                                        <TableRow>
-                                                            <TableCell align="left"><Chip label={"Rejeitada"} size='10px' color={getShadowClass('Rejeitada')} /></TableCell>
-                                                            <TableCell align="left">{getQuantidadeFaltas('Rejeitada', faltas)}</TableCell>
-                                                        </TableRow>
-                                                        <TableRow>
-                                                            <TableCell align="left"><Chip label={"Aprovada"} size='10px' color={getShadowClass('Aprovada')} /></TableCell>
-                                                            <TableCell align="left">{getQuantidadeFaltas('Aprovada', faltas)}</TableCell>
-                                                        </TableRow>
-                                                    </TableBody>
-                                                </Table>
-                                            </TableContainer>
-                                        </>
-                                    ) : (
-                                        <Typography>Não há faltas registadas</Typography>
-                                    )}
-                                </Paper>
-
-
+                            <div className='col-md-6'>
+                                <CalendarComponent ferias={ferias}></CalendarComponent>
                             </div>
-                            <div className='col-md-9'>
-                                <ListFaltas></ListFaltas>
+                            <div className='col-md-6'>
+
+                                <ListFerias></ListFerias>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Modal para ver os detalhes de uma falta */}
+            {/* Modal para ver os detalhes de uma feria */}
             <Modal
-                open={selectedFalta}
+                open={selectedFeria}
                 onClose={handleCloseVerDetalhes}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
@@ -212,33 +186,81 @@ export default function FaltasPessoais() {
                         Detalhes da Falta
                     </Typography>
                     <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-                        {selectedFalta && <DetalhesFalta falta={selectedFalta} />}
+                        {selectedFeria && <DetalhesFeria feria={selectedFeria} />}
                     </Typography>
                     <Button onClick={handleCloseVerDetalhes} className='col-md-12'>Fechar</Button>
+                </Paper>
+            </Modal>
+
+            <Modal
+                open={selectedFeriaApagar}
+                onClose={handleCloseApagar}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 570 },
+                        borderRadius: 4,
+                        p: 4,
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                        Tem a certeza que quer eliminar este pedido de férias?
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => { handleCloseApagar() }}
+                            sx={{ width: '50%' }}
+                        >
+                            Fechar
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={(event) => { handleApagarFeria(event); handleCloseApagar() }}
+                            sx={{ width: '50%' }}
+                        >
+                            Apagar
+                        </Button>
+                    </Stack>
                 </Paper>
             </Modal>
         </div>
     );
 
-    function ListFaltas() {
+    function ListFerias() {
         return (
             <TableContainer component={Box} sx={{ pl: 0 }}>
                 <Table sx={{ minWidth: 750 }} aria-label="simple table" className="disable-edge-padding">
                     <TableHead>
                         <TableRow>
-                            <TableCell align="left">Data</TableCell>
-                            <TableCell align="left">Anexo</TableCell>
+                            <TableCell align="left">Data do pedido</TableCell>
+                            <TableCell align="left">Data de ínicio</TableCell>
+                            <TableCell align="left">Data de fim</TableCell>
+                            <TableCell align="left">Duração</TableCell>
                             <TableCell align="left">Estado</TableCell>
                             <TableCell align="right"></TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {faltas.map((falta) => (
-                            <TableRow key={falta.id_falta} >
-                                <TableCell align="left">{convertDate(falta.data_falta)}</TableCell>
-                                <TableCell align="left">{falta.justificacao && <a href={falta.justificacao} target="_blank"><button className='btn btn-outline-primary'>Abrir</button></a>}</TableCell>
-                                <TableCell align="left"><Chip label={falta.estado} size='10px' color={getShadowClass(falta.estado)}></Chip></TableCell>
-                                <TableCell align="right"><button className='btn btn-secondary' onClick={() => { setSelectedFalta(falta) }}>{falta.estado == "Pendente" ? "Justificar" : "Ver detalhes"}</button></TableCell>
+                        {ferias.map((feria) => (
+                            <TableRow key={feria.id_falta} >
+                                <TableCell align="left">{convertDate(feria.data_pedido)}</TableCell>
+                                <TableCell align="left">{convertDate(feria.data_inicio)}</TableCell>
+                                <TableCell align="left">{convertDate(feria.data_conclusao)}</TableCell>
+                                <TableCell align="left">{feria.duracao} {feria.duracao > 1 ? "dias" : "dia"} </TableCell>
+                                <TableCell align="left"><Chip label={feria.estado} size='10px' color={getShadowClass(feria.estado)}></Chip></TableCell>
+                                <TableCell align="right">
+                                    {feria.estado == "Pendente" && <button className='btn btn-outline-danger mx-2' onClick={() => { setSelectedFeriaApagar(feria) }}>Apagar</button>}
+                                    <button className='btn btn-secondary' onClick={() => { setSelectedFeria(feria) }}>Ver detalhes</button>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
@@ -247,20 +269,19 @@ export default function FaltasPessoais() {
         )
     }
 
-    function DetalhesFalta({ falta }) {
-        const [newFile, setNewFile] = useState([]);
-
+    function DetalhesFeria({ feria }) {
+        console.log(feria)
         const convertDateToInputFormat = (date) => {
             const datePart = date.split('T')[0];
             return datePart;
         };
 
         const [formData, setFormData] = useState({
-            ...falta,
-            data_falta: convertDateToInputFormat(falta.data_falta),
+            ...feria,
+            data_inicio: convertDateToInputFormat(feria.data_inicio),
+            data_conclusao: convertDateToInputFormat(feria.data_conclusao),
+            data_pedido: convertDateToInputFormat(feria.data_pedido),
         });
-
-        console.log(formData)
 
         const handleChange = (e) => {
             const { name, value } = e.target;
@@ -286,10 +307,6 @@ export default function FaltasPessoais() {
             formDataToSend.append('data_falta', formData.data_falta);
             formDataToSend.append('estado', "Em análise");
 
-            if (newFile) {
-                formDataToSend.append('justificacao', newFile)
-            }
-
             handleServices.atualizarFalta(formDataToSend)
                 .then(res => {
                     alert("Despesa atualizada com sucesso")
@@ -304,58 +321,41 @@ export default function FaltasPessoais() {
         return (
             <form onSubmit={handleSubmit}>
                 <div className='mb-3'>
-                    <label><strong>Nome:</strong>&nbsp;<span>{falta.perfil.nome}</span></label>
+                    <label><strong>Nome:</strong>&nbsp;<span>{feria.perfil.nome}</span></label>
                 </div>
 
-                <div className="mb-3">
-                    <div className='d-flex justify-content-between align-items-center my-2'>
-                        <label className="form-label"><strong>Anexo:</strong></label>
-                        {falta.justificacao && (
-                            <a href={falta.justificacao} target="_blank" rel="noopener noreferrer">
-                                <button type="button" className='btn btn-outline-info btn-sm'>Abrir</button>
-                            </a>
-                        )}
-                    </div>
-
-                    <FileDropZone
-                        onDrop={(files) => {
-                            if (files && files.length > 0) {
-                                setNewFile(files[0]);
-                            }
-                        }}
-                        accept={{
-                            'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
-                            'application/pdf': ['.pdf'],
-                        }}
-                        maxSize={5 * 1024 * 1024}
-                        multiple={true}
-                        disabled={falta.estado == "Aprovada" || falta.estado == "Rejeitada"}
-                    />
-                </div>
-                <div className="mb-4">
-                    <TextField
-                        label="Motivo"
-                        type="text"
-                        name="motivo"
-                        rows={6}
-                        multiline
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={formData.motivo}
-                        onChange={handleChange}
-                        disabled={falta.estado == "Aprovada" || falta.estado == "Rejeitada"}
-                    />
-                </div>
-
-                <label><strong>Informações:</strong></label>
                 <div className="my-3">
                     <TextField
-                        label="Data"
+                        label="Data do pedido"
                         type="date"
-                        name="data"
+                        name="data_pedido"
                         InputLabelProps={{ shrink: true }}
                         fullWidth
-                        value={formData.data_falta}
+                        value={formData.data_pedido}
+                        onChange={handleChange}
+                        disabled
+                    />
+                </div>
+                <div className="my-3">
+                    <TextField
+                        label="Data de início"
+                        type="date"
+                        name="data_inicio"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={formData.data_inicio}
+                        onChange={handleChange}
+                        disabled
+                    />
+                </div>
+                <div className="my-3">
+                    <TextField
+                        label="Data de fim"
+                        type="date"
+                        name="data_conclusao"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={formData.data_conclusao}
                         onChange={handleChange}
                         disabled
                     />
@@ -367,7 +367,7 @@ export default function FaltasPessoais() {
                         name="validador"
                         InputLabelProps={{ shrink: true }}
                         fullWidth
-                        value={formData.validador ? formData.validadorPerfil.nome : "Sem validador"}
+                        value={formData.validador}
                         onChange={handleChange}
                         disabled
                     />
@@ -401,9 +401,85 @@ export default function FaltasPessoais() {
 
 
                 <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1">
-                    Justificar
+                    Guardar
                 </button>
             </form>
         );
     }
+
+    function CalendarComponent({ ferias }) {
+            if ( ferias) {
+                moment.locale("pt")
+                const localizer = momentLocalizer(moment);
+                const events = transformFeriasToEvents(ferias);
+    
+                const eventPropGetter = (event) => {
+                    let backgroundColor = '';
+                    switch (event.resource.estado) {
+                        case "Rejeitada":
+                            backgroundColor = '#dc3545';
+                            break;
+                        case "Em análise":
+                            backgroundColor = 'orange';
+                            break;
+                        case "Aprovada":
+                            backgroundColor = '#28a745';
+                            break;
+                        default:
+                            backgroundColor = '#6c757d';
+                    }
+    
+                    return {
+                        style: {
+                            backgroundColor,
+                            color: '#fff',
+                            borderRadius: '4px',
+                            border: 'none',
+                        },
+                    };
+                };
+    
+                return (
+                    <div style={{ minHeight: '70vh' }}>
+                        <Calendar
+                            localizer={localizer}
+                            events={events}
+                            startAccessor="start"
+                            endAccessor="end"
+                            style={{ minHeight: '70vh' }}
+                            eventPropGetter={eventPropGetter}
+                            messages={{
+                                today: 'Hoje',
+                                previous: 'Anterior',
+                                next: 'Próximo',
+                                month: 'Mês',
+                                week: 'Semana',
+                                day: 'Dia',
+                                agenda: 'Agenda',
+                                date: 'Data',
+                                time: 'Hora',
+                                event: 'Evento',
+                            }}
+                        />
+                    </div>
+                );
+            }
+        };
 }
+
+function transformFeriasToEvents(ferias) {
+    const eventos = [];
+
+    const feriasEvents = ferias.map((feria) => ({
+        title: 'Férias: ' + feria.perfil.nome,
+        start: new Date(moment(feria.data_inicio, "YYYY-MM-DD").toDate()),
+        end: new Date(moment(feria.data_conclusao).toDate() + 1),
+        allDay: true,
+        resource: feria,
+    }));
+
+    eventos.push(...feriasEvents);
+
+    return eventos;
+};
+

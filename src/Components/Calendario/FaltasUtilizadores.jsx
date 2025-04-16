@@ -57,6 +57,28 @@ export default function FaltasUtilizadores() {
         }
     }, [id_user])
 
+    useEffect(() => {
+        const openFalta = sessionStorage.getItem('openFalta');
+        if (openFalta) {
+            faltas.map((falta) => {
+                console.log(falta.id_falta)
+                console.log(openFalta)
+                if (falta.id_falta == openFalta) {
+                    setSelectedFalta(falta)
+                }
+            })
+        }
+    }, [faltas])
+
+    useEffect(() => {
+        if (selectedFalta) {
+            const openFalta = sessionStorage.getItem('openFalta');
+            if (openFalta) {
+                sessionStorage.removeItem('openFalta');
+            }
+        }
+    }, [selectedFalta])
+
     const handleCloseVerDetalhes = () => {
         setSelectedFalta(null)
     }
@@ -116,7 +138,7 @@ export default function FaltasUtilizadores() {
             <div className="app-container" style={{ position: 'relative', zIndex: 1000 }}>
                 <NavBar />
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
-                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto' }}>
+                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
                         <SidebarItems tipo_user={tipo_user}></SidebarItems>
                     </div>
 
@@ -180,7 +202,7 @@ export default function FaltasUtilizadores() {
                             <TableRow key={falta.id_falta} >
                                 <TableCell align="left">{falta.perfil.nome}</TableCell>
                                 <TableCell align="left">{convertDate(falta.data_falta)}</TableCell>
-                                <TableCell align="left">{falta.justificacao && <a href={falta.justificacao} target="_blank"><button className='btn btn-outline-primary'>Abrir</button></a>}</TableCell>
+                                <TableCell align="left">{falta.justificacao ? <a href={falta.justificacao} target="_blank"><button className='btn btn-outline-primary'>Abrir</button></a> : "Sem justificação"}</TableCell>
                                 <TableCell align="left"><Chip label={falta.estado} size='10px' color={getShadowClass(falta.estado)}></Chip></TableCell>
                                 <TableCell align="right"><button className='btn btn-secondary' onClick={() => setSelectedFalta(falta)}>Ver detalhes</button></TableCell>
 

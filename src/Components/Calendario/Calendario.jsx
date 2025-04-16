@@ -312,7 +312,7 @@ export default function Calendario() {
                     <div className='row d-flex justify-content-between'>
                         {(tipo_user == 1 || tipo_user == 2) &&
                             <div className='col-md-3'>
-                                <div className="sidebar" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto' }}>
+                                <div className="sidebar" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
                                     <SidebarItems tipo_user={tipo_user}></SidebarItems>
                                 </div>
 
@@ -1183,7 +1183,7 @@ export default function Calendario() {
 
             formData.append('motivo', _motivo);
             formData.append('data_falta', data_falta);
-            formData.append('estado', "Em análise");
+            formData.append('estado', "Pendente");
 
             if (newFile) {
                 formData.append('justificacao', newFile)

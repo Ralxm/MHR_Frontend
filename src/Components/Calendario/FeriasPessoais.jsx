@@ -3,15 +3,12 @@ import { useNavigate } from "react-router-dom";
 import NavBar from "../../Universal/NavBar";
 import './Calendario.css';
 import '../../index.css'
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Stack } from '@mui/material';
-import FileDropZone from '../../Universal/FileDropZoneSingle'
-import { ArrowForward } from '@mui/icons-material';
 import SidebarItems from './SidebarItems';
+import FeriasPieChart from './FeriasPieChart';
 
 export default function FeriasPessoais() {
     const navigate = useNavigate();
@@ -80,7 +77,7 @@ export default function FeriasPessoais() {
     const getShadowClass = (estado) => {
         switch (estado) {
             case "Aprovada":
-                return "primary";
+                return "success";
             case "Em análise":
                 return "warning";
             case "Rejeitada":
@@ -112,6 +109,16 @@ export default function FeriasPessoais() {
             });
     }
 
+    function getQuantidadeFerias(tipo, ferias){
+        let count = 0;
+        ferias.map((feria) => {
+            if(feria.estado == tipo){
+                count++;
+            }
+        })
+        return count;
+    }
+
     return (
         <div id="root">
             <div
@@ -134,7 +141,7 @@ export default function FeriasPessoais() {
             <div className="app-container" style={{ position: 'relative', zIndex: 1000 }}>
                 <NavBar />
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
-                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto' }}>
+                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0  }}>
                         <SidebarItems tipo_user={tipo_user}></SidebarItems>
                     </div>
 
@@ -142,7 +149,57 @@ export default function FeriasPessoais() {
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
                         <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Férias</h2>
                         <div className='row'>
-                            <ListFerias></ListFerias>
+                            <div className='col-md-3'>
+                                <Paper elevation={3} sx={{
+                                    p: 2,
+                                    height: '100%',
+                                    minHeight: '70vh',
+                                    borderRadius: '12px',
+                                    boxShadow: '0px 2px 4px rgba(0, 0, 0, 0.1)'
+                                }}>
+                                    {ferias.length > 0 ? (
+                                        <>
+                                            <FeriasPieChart ferias={ferias} />
+                                            <TableContainer component={Box} sx={{ pl: 0, mt: 3 }}>
+                                                <Table aria-label="simple table" className="disable-edge-padding">
+                                                    <TableHead>
+                                                        <TableRow>
+                                                            <TableCell align="left">Estado</TableCell>
+                                                            <TableCell align="left">Quantidade</TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        <TableRow>
+                                                            <TableCell align="left"><Chip label={"Pendente"} size='10px' color={getShadowClass('Pendente')} /></TableCell>
+                                                            <TableCell align="left">{getQuantidadeFerias('Pendente', ferias)}</TableCell>
+                                                        </TableRow>
+                                                        <TableRow>
+                                                            <TableCell align="left"><Chip label={"Em análise"} size='10px' color={getShadowClass('Em análise')} /></TableCell>
+                                                            <TableCell align="left">{getQuantidadeFerias('Em análise', ferias)}</TableCell>
+                                                        </TableRow>
+                                                        <TableRow>
+                                                            <TableCell align="left"><Chip label={"Rejeitada"} size='10px' color={getShadowClass('Rejeitada')} /></TableCell>
+                                                            <TableCell align="left">{getQuantidadeFerias('Rejeitada', ferias)}</TableCell>
+                                                        </TableRow>
+                                                        <TableRow>
+                                                            <TableCell align="left"><Chip label={"Aprovada"} size='10px' color={getShadowClass('Aprovada')} /></TableCell>
+                                                            <TableCell align="left">{getQuantidadeFerias('Aprovada', ferias)}</TableCell>
+                                                        </TableRow>
+                                                    </TableBody>
+                                                </Table>
+                                            </TableContainer>
+                                        </>
+                                    ) : (
+                                        <Typography>Não há faltas registadas</Typography>
+                                    )}
+                                </Paper>
+
+
+                            </div>
+                            <div className='col-md-9'>
+
+                                <ListFerias></ListFerias>
+                            </div>
                         </div>
                     </div>
                 </div>
