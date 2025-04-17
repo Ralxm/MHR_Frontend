@@ -14,6 +14,7 @@ import FaltasUtilizadores from "../Components/Calendario/FaltasUtilizadores";
 import FaltasPessoais from "../Components/Calendario/FaltasPessoais";
 import FeriasPessoais from "../Components/Calendario/FeriasPessoais";
 import MapaFerias from "../Components/Calendario/MapaFerias";
+import PedidosFérias from "../Components/Calendario/PedidoFerias";
 
 import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
@@ -53,6 +54,8 @@ export default function MainPage(){
                 <Route path='/calendario/ferias_pessoais' element={<FeriasPessoais></FeriasPessoais>}>
                 </Route>
                 <Route path='/calendario/mapa_ferias' element={<MapaFerias></MapaFerias>}>
+                </Route>
+                <Route path='/calendario/pedidos_ferias' element={<PedidosFérias></PedidosFérias>}>
                 </Route>
 
                 <Route path='/projetos' element={<Projetos></Projetos>}>

@@ -311,14 +311,14 @@ export default function Calendario() {
                 <div className="container-fluid">
                     <div className='row d-flex justify-content-between'>
                         {(tipo_user == 1 || tipo_user == 2) &&
-                            <div className='col-md-3'>
+                            <div className='col-md-2'>
                                 <div className="sidebar" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
                                     <SidebarItems tipo_user={tipo_user}></SidebarItems>
                                 </div>
 
                             </div>
                         }
-                        <div className={(tipo_user == 1 || tipo_user == 2) ? 'col-md-9 mt-3' : 'col-md-12 mt-3'}>
+                        <div className={(tipo_user == 1 || tipo_user == 2) ? 'col-md-10 mt-3' : 'col-md-12 mt-3'}>
                             {/* DIV COM OS DOIS CARDS COM INFORMAÇÕES DE FÉRIAS E FALTAS */}
                             <div className='row d-flex'>
                                 <div className="col-md-6">

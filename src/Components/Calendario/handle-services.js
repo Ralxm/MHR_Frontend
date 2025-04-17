@@ -77,6 +77,16 @@ class HandleServices {
             }, reason => { throw new Error('Erro a listar todas as faltas'); });
     }
 
+    carregarFerias() {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "ferias/list", authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar todas as ferias'); });
+    }
+
     carregarFeriasAprovadas(){
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.get(url + "ferias/listAprovadas", authHeader())

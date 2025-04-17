@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { use, useEffect, useRef, useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import NavBar from "../../Universal/NavBar";
 import './Calendario.css';
@@ -8,9 +8,10 @@ import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Select, MenuItem, FormControl, InputLabel } from '@mui/material';
+import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Select, MenuItem, FormControl, InputLabel, Stack } from '@mui/material';
 import { ArrowForward } from '@mui/icons-material';
 import SidebarItems from './SidebarItems';
+import * as XLSX from 'xlsx';
 
 export default function FaltasUtilizadores() {
     const navigate = useNavigate();
@@ -22,6 +23,12 @@ export default function FaltasUtilizadores() {
     const [faltas, setFaltas] = useState([])
 
     const [selectedFalta, setSelectedFalta] = useState(null)
+
+    const [filtro, setFiltro] = useState('Todos');
+    const [filtro_data_inicio, setFiltro_Data_Inicio] = useState(null)
+    const [filtro_data_fim, setFiltro_Data_Fim] = useState(null)
+
+    const [selectedFaltas, setSelectedFaltas] = useState([]);
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -96,6 +103,34 @@ export default function FaltasUtilizadores() {
         }
     };
 
+    const exportToExcel = (selectedFaltas) => {
+        if (selectedFaltas.length === 0) {
+            alert("Nenhuma falta selecionada para exportar!");
+            return;
+        }
+    
+        const data = selectedFaltas.map((falta) => ({
+            "ID da Falta": falta.id_falta,
+            "Nome do utilizador": falta.perfil.nome,
+            "Data da Falta": convertDate(falta.data_falta),
+            "Estado": falta.estado,
+            "Justificação": falta.justificacao ? "Com anexo" : "Sem justificação",
+            "Link da justificação": falta.justificacao ? falta.justificacao : "",
+            "Motivo": falta.motivo || "N/A",
+            "Comentários": falta.comentarios || "N/A",
+            "Validado por": falta.validadorPerfil?.nome || "N/A",
+            "Data de criação da falta": falta.created_at || "N/A",
+            "Data de última edição da falta": falta.updated_at || "N/A",
+        }));
+    
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        
+        const workbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(workbook, worksheet, "Faltas");
+    
+        XLSX.writeFile(workbook, `faltas_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
+
     function carregarFaltas() {
         handleServices.carregarFaltas()
             .then(res => {
@@ -138,15 +173,51 @@ export default function FaltasUtilizadores() {
             <div className="app-container" style={{ position: 'relative', zIndex: 1000 }}>
                 <NavBar />
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
-                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
+                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', overflowY: 'auto', position: 'sticky', top: 0 }}>
                         <SidebarItems tipo_user={tipo_user}></SidebarItems>
                     </div>
 
 
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
-                        <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Ver faltas de utilizadores</h2>
+                        <div className='d-flex justify-content-between align-items-center'>
+                            <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Ver faltas de utilizadores</h2>
+                            <div>
+                                <TextField
+                                    label="Data Inicial"
+                                    type="date"
+                                    name="filtro_data_inicio"
+                                    onChange={(value) => setFiltro_Data_Inicio(value.target.value)}
+                                    InputLabelProps={{ shrink: true }}
+                                />
+                                <TextField
+                                    label="Data Final"
+                                    type="date"
+                                    name="filtro_data_inicio"
+                                    onChange={(value) => setFiltro_Data_Fim(value.target.value)}
+                                    InputLabelProps={{ shrink: true }}
+                                    sx={{ mx: 2 }}
+                                />
+                                <FormControl sx={{ minWidth: '150px' }}>
+                                    <InputLabel shrink>Estado</InputLabel>
+                                    <Select
+                                        label="Estado"
+                                        name="estado"
+                                        InputLabelProps={{ shrink: true }}
+                                        onChange={(value) => setFiltro(value.target.value)}
+                                        value={filtro}
+                                    >
+                                        <MenuItem value={"Todos"} selected>Todos</MenuItem>
+                                        <MenuItem value={"Pendente"}>Pendente</MenuItem>
+                                        <MenuItem value={"Em análise"}>Em análise</MenuItem>
+                                        <MenuItem value={"Rejeitada"}>Rejeitada</MenuItem>
+                                        <MenuItem value={"Aprovada"}>Aprovada</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </div>
+                        </div>
+
                         <div className='row'>
-                            <ListFaltas></ListFaltas>
+                            <ListFaltas filtro={filtro} filtro_data_inicio={filtro_data_inicio} filtro_data_fim={filtro_data_fim} selectedFaltas={selectedFaltas}></ListFaltas>
                         </div>
                     </div>
                 </div>
@@ -184,12 +255,76 @@ export default function FaltasUtilizadores() {
         </div>
     );
 
-    function ListFaltas() {
+    function ListFaltas({ filtro, filtro_data_inicio, filtro_data_fim, selectedFaltas }) {
+
+        const selectAllFaltas = () => {
+            const filteredIds = filteredFaltas.map(falta => falta.id_falta);
+
+            const newSelection = [...new Set([
+                ...selectedFaltas,
+                ...filteredFaltas
+            ])];
+
+            setSelectedFaltas(newSelection);
+        };
+
+        const deselectAllFaltas = () => {
+            const filteredIds = filteredFaltas.map(falta => falta.id_falta);
+            setSelectedFaltas(selectedFaltas.filter(
+                falta => !filteredIds.includes(falta.id_falta)
+            ));
+        };
+
+        const toggleSelectAll = () => {
+            const allFilteredSelected = filteredFaltas.every(falta =>
+                selectedFaltas.some(f => f.id_falta === falta.id_falta)
+            );
+
+            if (allFilteredSelected) {
+                deselectAllFaltas();
+            } else {
+                selectAllFaltas();
+            }
+        };
+
+        const handleSelectFalta = (falta, isChecked) => {
+            if (isChecked) {
+                setSelectedFaltas([...selectedFaltas, falta]);
+            } else {
+                setSelectedFaltas(selectedFaltas.filter(f => f.id_falta !== falta.id_falta));
+            }
+        };
+
+        const filteredFaltas = faltas.filter((falta) => {
+            const estadoMatches = filtro == "Todos" || falta.estado === filtro;
+
+            const faltaDate = new Date(falta.data_falta);
+
+            const afterStartDate = !filtro_data_inicio || faltaDate >= new Date(filtro_data_inicio);
+
+            const beforeEndDate = !filtro_data_fim || faltaDate <= new Date(filtro_data_fim);
+
+            return estadoMatches && afterStartDate && beforeEndDate;
+        });
+
         return (
             <TableContainer component={Box} sx={{ pl: 0 }}>
+                <div>
+                    <button className='btn btn-outline-primary' onClick={toggleSelectAll}>
+                        {selectedFaltas.length > 0 ? "Remover seleção" : "Selecionar todas"}
+                    </button>
+                    <button className='btn btn-outline-primary mx-2' onClick={() => exportToExcel(selectedFaltas)} disabled={selectedFaltas.length == 0}>
+                        Exportar faltas selecionadas
+                    </button>
+                    <button className='btn btn-outline-primary'>
+                        Importar faltas
+                    </button>
+                </div>
                 <Table sx={{ minWidth: 750 }} aria-label="simple table" className="disable-edge-padding">
                     <TableHead>
                         <TableRow>
+                            <TableCell padding="checkbox">
+                            </TableCell>
                             <TableCell align="left">Nome</TableCell>
                             <TableCell align="left">Data</TableCell>
                             <TableCell align="left">Anexo</TableCell>
@@ -198,16 +333,26 @@ export default function FaltasUtilizadores() {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {faltas.map((falta) => (
-                            <TableRow key={falta.id_falta} >
-                                <TableCell align="left">{falta.perfil.nome}</TableCell>
-                                <TableCell align="left">{convertDate(falta.data_falta)}</TableCell>
-                                <TableCell align="left">{falta.justificacao ? <a href={falta.justificacao} target="_blank"><button className='btn btn-outline-primary'>Abrir</button></a> : "Sem justificação"}</TableCell>
-                                <TableCell align="left"><Chip label={falta.estado} size='10px' color={getShadowClass(falta.estado)}></Chip></TableCell>
-                                <TableCell align="right"><button className='btn btn-secondary' onClick={() => setSelectedFalta(falta)}>Ver detalhes</button></TableCell>
+                        {filteredFaltas.map((falta) => {
+                            const isSelected = selectedFaltas.some(f => f.id_falta === falta.id_falta);
 
-                            </TableRow>
-                        ))}
+                            return (
+                                <TableRow key={falta.id_falta}>
+                                    <TableCell padding="checkbox">
+                                        <input
+                                            type="checkbox"
+                                            checked={isSelected}
+                                            onChange={(e) => handleSelectFalta(falta, e.target.checked)}
+                                        />
+                                    </TableCell>
+                                    <TableCell align="left">{falta.perfil.nome}</TableCell>
+                                    <TableCell align="left">{convertDate(falta.data_falta)}</TableCell>
+                                    <TableCell align="left">{falta.justificacao ? <a href={falta.justificacao} target="_blank"><button className='btn btn-outline-primary'>Abrir</button></a> : "Sem justificação"}</TableCell>
+                                    <TableCell align="left"><Chip label={falta.estado} size='10px' color={getShadowClass(falta.estado)}></Chip></TableCell>
+                                    <TableCell align="right"><button className='btn btn-secondary' onClick={() => setSelectedFalta(falta)}>Ver detalhes</button></TableCell>
+                                </TableRow>
+                            )
+                        })}
                     </TableBody>
                 </Table>
             </TableContainer>

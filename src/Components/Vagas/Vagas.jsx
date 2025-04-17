@@ -262,16 +262,22 @@ export default function Vagas() {
                     <div className="row">
                         {/* Coluna da esquerda */}
                         <div className="col-md-3" style={{ zIndex: 1000, position: 'sticky', top: 0 }}>
-                            <div className='row' style={{position: 'sticky', top: 10 }}>
+                            <div className='row' style={{ position: 'sticky', top: 10 }}>
                                 <div className="items-container " style={{ minHeight: '85vh' }}>
                                     <div className='d-flex justify-content-between align-items-center'>
                                         <span><strong>Departamentos</strong></span>
                                     </div>
 
-                                    <div className='row d-flex justify-content-center mt-4'>
-                                        <DoughnutPieChart vagas={vagas} departamentos={departamentos} candidaturas={candidaturas} onSetDepartamento={setSelectedDepartamentoGrafico} tipo='vagas'></DoughnutPieChart>
-                                        <DoughnutPieChart vagas={vagas} departamentos={departamentos} candidaturas={candidaturas} onSetDepartamento={setSelectedDepartamentoGrafico} tipo='candidaturas'></DoughnutPieChart>
+                                    <div className='row d-flex justify-content-between mt-4'>
+                                        <div className='col-md-6'>
+                                            <DoughnutPieChart vagas={vagas} departamentos={departamentos} candidaturas={candidaturas} onSetDepartamento={setSelectedDepartamentoGrafico} tipo='vagas'></DoughnutPieChart>
+                                        </div>
+                                        <div className='col-md-6'>
+                                            <DoughnutPieChart vagas={vagas} departamentos={departamentos} candidaturas={candidaturas} onSetDepartamento={setSelectedDepartamentoGrafico} tipo='candidaturas'></DoughnutPieChart>
+                                        </div>
                                     </div>
+
+
                                     <div className='row'>
                                         <SumarioVagas vagas={vagas} departamentos={departamentos} candidaturas={candidaturas} tipo_user={tipo_user} onSetDepartamento={setSelectedDepartamentoGrafico}></SumarioVagas>
                                     </div>
@@ -282,17 +288,17 @@ export default function Vagas() {
 
                         {/* Coluna da direita */}
                         <div className="col-md-9">
-                            <div className="items-container" style={{ minHeight: '85vh'}}>
+                            <div className="items-container" style={{ minHeight: '85vh' }}>
                                 <div className='d-flex justify-content-between align-items-center mx-3 mb-3 mt-1'>
                                     <span>{selectedDepartamento ?
-                                        <div style={{zIndex: 1001}}>
+                                        <div style={{ zIndex: 1001 }}>
                                             <strong>Vagas do departamento: </strong>
                                             <span>{selectedDepartamento.nome_departamento}</span>
                                         </div>
                                         :
-                                        <strong style={{zIndex: 1001}}>Todas as vagas</strong>}</span>
-                                    <div className='d-flex' style={{zIndex: 1001}}>
-                                        <input className='mx-2' onChange={(value) => {setFiltroTitulo(value.target.value)}}></input>
+                                        <strong style={{ zIndex: 1001 }}>Todas as vagas</strong>}</span>
+                                    <div className='d-flex' style={{ zIndex: 1001 }}>
+                                        <input className='mx-2' onChange={(value) => { setFiltroTitulo(value.target.value) }}></input>
                                         {selectedDepartamento && <button className='btn btn-warning mx-2' onClick={() => { setSelectedDepartamento(null) }}>Remover Filtro</button>}
                                         {(tipo_user == 1 || tipo_user == 2) && <a href='/vagas/criar'><button className='btn btn-outline-secondary'>Criar Vaga</button></a>}
                                     </div>
