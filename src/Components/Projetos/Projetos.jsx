@@ -1,9 +1,15 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useNavigate } from "react-router-dom";
+import { data, useNavigate } from "react-router-dom";
 import NavBar from "../../Universal/NavBar";
 import './Projetos.css';
 import '../../index.css'
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
+import handleServices from './handle-services';
+import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Tab, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { TabContext, TabList, TabPanel } from '@mui/lab';
+import FileDropZone from '../../Universal/FileDropZoneSingle';
+import TabelaProjetos from './TabelaProjetos';
 
 let projetos = [{
     id_projeto: 1,
@@ -48,6 +54,9 @@ let projetos = [{
 export default function Projetos() {
     const navigate = useNavigate();
 
+    //const [projetos, setProjetos] = useState([]);
+    const [tab, setTab] = useState('1')
+
     useEffect(() => {
         document.title = "Projetos e ideias"
 
@@ -60,6 +69,10 @@ export default function Projetos() {
             navigate('/vagas')
         }
     }, [])
+
+    const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
+        setTab(newValue);
+    };
 
     return (
         <div id="root">
@@ -83,33 +96,52 @@ export default function Projetos() {
                 <div className="container-fluid">
                     <div className="row" >
                         {/* Coluna da esquerda */}
-                        <div className="col-md-9" style={{ zIndex: 1000 }}>
-                            <div className='row items-container'>
-                                <div className='d-flex align-items-center justify-content-between mb-3'>
-                                    <h3 className='mb-0'>Projetos</h3>
-                                    {/* função de criação de projeto apenas se a conta logada for um manager
-                                        <button className='btn btn-info'>Criar um projeto</button>
-                                         */}
-                                </div>
-
-                                <ListProjetos></ListProjetos>
-                            </div>
-                        </div>
-
-                        {/* Coluna da direita */}
                         <div className="col-md-3" style={{ zIndex: 1000 }}>
                             <div className='row items-container'>
-                                <h3>Submissão de Ideia</h3>
-                                <form>
-                                    <label>Título</label>
-                                    <input></input>
-                                </form>
-                            </div>
-                            <div className='row items-container'>
-                                <h3>Ideias</h3>
+                                {tab == 1 ?
+                                    <span><strong>Projetos</strong></span>
+                                    :
+                                    <span><strong>Ideias</strong></span>
+                                }
                             </div>
                         </div>
 
+
+                        {/* Coluna da direita */}
+                        <div className="col-md-9" style={{ zIndex: 1000 }}>
+                            <div className="items-container" style={{ minHeight: '85vh' }}>
+                                <div className='row mb-3'>
+                                    <Box sx={{ width: 1, typography: 'body1' }}>
+                                        <TabContext value={tab}>
+                                            <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+                                                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                                                    <TabList onChange={handleChangeTab} aria-label="lab API tabs example" style={{ flexGrow: 1 }}>
+                                                        <Tab label="Projetos" value="1" sx={{ textTransform: 'none' }} />
+                                                        <Tab label="Ideias" value="2" sx={{ textTransform: 'none' }} />
+                                                    </TabList>
+
+                                                    {tab == 2 &&
+                                                        <button className='btn btn-outline-secondary mb-2'>
+                                                            Sugerir ideia
+                                                        </button>
+                                                    }
+                                                </div>
+                                            </Box>
+
+                                            <TabPanel value="1">
+                                                <div className='container-fluid'>
+                                                    <div className='row g-3'>
+                                                        <TabelaProjetos projetos={projetos}></TabelaProjetos>
+                                                    </div>
+                                                </div>
+                                            </TabPanel>
+                                            <TabPanel value="2">
+                                            </TabPanel>
+                                        </TabContext>
+                                    </Box>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
