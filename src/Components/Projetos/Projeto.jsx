@@ -4,7 +4,7 @@ import NavBar from "../../Universal/NavBar";
 import './Projetos.css';
 import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Card, CardContent, Avatar, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Card, CardContent, Avatar, FormControl, InputLabel, Select, MenuItem, IconButton } from '@mui/material';
 import { LockOpen, Lock, Person, ArrowBack, Close, Phone, LocationOn, Attachment } from '@mui/icons-material'
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
@@ -456,6 +456,7 @@ export default function Projeto() {
                                             </div>
 
                                             <div style={{ position: 'relative', marginLeft: '16px' }}>
+                                                {/* Linha que fica do lado esquerdo dos cards */}
                                                 <div style={{
                                                     position: 'absolute',
                                                     left: '16px',
@@ -464,13 +465,16 @@ export default function Projeto() {
                                                     width: '2px',
                                                     backgroundColor: 'black',
                                                 }} />
+                                                {/* Linha que fica do lado esquerdo dos cards */}
+
 
                                                 {linha_temporal && linha_temporal.map((registo, index) => (
                                                     <div key={registo.id_registo} style={{
                                                         position: 'relative',
                                                         marginBottom: '16px',
-                                                        paddingLeft: '32px'
+                                                        paddingLeft: '32px',
                                                     }}>
+                                                        {/* Bolinhas na linha */}
                                                         <div style={{
                                                             position: 'absolute',
                                                             left: '8px',
@@ -482,20 +486,21 @@ export default function Projeto() {
                                                             border: '3px solid white',
                                                             zIndex: 1
                                                         }} />
+                                                        {/* Bolinhas na linha */}
 
                                                         <Card sx={{
                                                             width: '100%',
                                                             boxShadow: 1,
-                                                            borderLeft: registo.tipo === "Objetivo" ? '3px solid #1976d2' : '3px solid #ff0000'
+                                                            borderLeft: registo.tipo === "Objetivo" ? '3px solid #1976d2' : '3px solid #ff0000',
                                                         }}>
-                                                            <CardContent>
+                                                            <CardContent className='p-2 pt-0'>
                                                                 <Stack direction="row" justifyContent="space-between" alignItems="center">
                                                                     <Typography variant="subtitle2" color={registo.tipo === "Objetivo" ? "primary" : "error"}>
                                                                         {registo.tipo}
                                                                     </Typography>
-                                                                    <Typography variant="caption" color="text.secondary">
-                                                                        {new Date(registo.created_at).toLocaleDateString()}
-                                                                    </Typography>
+                                                                    <IconButton sx={{marginRight: '-5px'}}>
+                                                                        <Close color='error' />
+                                                                    </IconButton>
                                                                 </Stack>
 
                                                                 <Typography variant="body2" sx={{ mt: 1 }}>
@@ -679,8 +684,8 @@ export default function Projeto() {
             formData.append('id_ideia', projeto.id_ideia);
             formData.append('autor', id_perfil);
             formData.append('comentario', comentario);
- 
-            if(newFile){
+
+            if (newFile) {
                 formData.append('anexo', newFile)
             }
 
