@@ -2,14 +2,80 @@ import authHeader from "../../Universal/auth-header";
 import axios from 'axios';
 
 class HandleServices{
-    loadProjetos(){
+    carregarProjetos(){
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.get(url + "projetos/list", authHeader())
             .then(res => {
                 if (res.data.success) {
                     return res.data.data;
                 }
-            }, reason => { throw new Error('Erro a listar todas as ferias'); });
+            }, reason => { throw new Error('Erro a listar os projetos'); });
+    }
+
+    carregarPerfis() {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "perfis/list", authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar os perfis'); });
+    }
+
+    criarProjeto(datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json',
+        };
+        return axios.post(url + "projetos/create", datapost, {headers})
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a criar o projeto'); });
+    }
+
+    criarPerfisProjetos(perfisSelecionados, projetoId) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json',
+        };
+        return axios.post(url + "perfil_projeto/createMany", 
+            {
+                perfis: perfisSelecionados,
+                id_projeto: projetoId
+            }, 
+            {headers}
+        )
+        .then(res => {
+            if (res.data.success) {
+                return res.data.data;
+            }
+        }, reason => { 
+            throw new Error('Erro ao associar perfis ao projeto'); 
+        });
+    }
+
+    getProjeto(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "projetos/get/" + id, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar os projetos'); });
+    }
+
+    carregarUtilizadores(id) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "perfil_projeto/listByProject/" + id, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar os perfis'); });
     }
 
     find_perfil(id_utilizador) {
@@ -20,6 +86,55 @@ class HandleServices{
                     return res.data.data[0];
                 }
             }, reason => { throw new Error('Utilizador Inválido'); });
+    }
+
+    criarLinhaTemporal(datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json',
+        };
+        return axios.post(url + "linha_temporal/create/", datapost, {headers})
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data[0];
+                }
+            }, reason => { throw new Error('Erro a criar a linha temporal'); });
+    }
+
+    carregarLinhaTemporalProjeto(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "linha_temporal/listProjeto/" + id, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar os pontos da linha temporal'); });
+    }
+
+    carregarComentariosProjeto(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "comentarios_projetos/listProjeto/" + id, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar os comentarios do projeto'); });
+    }
+
+    criarComentarioProjeto(formData){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'multipart/form-data'
+        };
+
+        return axios.post(url + "comentarios_projetos/create", formData, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a criar o comentário: ' + reason); });
     }
 }
 

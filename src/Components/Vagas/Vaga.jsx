@@ -230,11 +230,7 @@ export default function Vagas() {
         formData.append('email', email);
         formData.append('status', "Pendente");
 
-        console.log("a")
-        console.log(curriculo)
         if (curriculo) {
-            console.log("tenho um curriculo")
-            console.log(curriculo)
             formData.append('curriculo', curriculo)
         }
 

@@ -43,7 +43,7 @@ export default function TabelaProjetos({ projetos }) {
     <>
       {projetos.map((projeto) => {
         return (
-          <div className="col-md-4" key={projeto.id_projeto} style={{zIndex: 1001}}>
+          <div className="col-md-3" key={projeto.id_projeto} style={{zIndex: 1001}}>
             <Card
               sx={{
                 height: '100%',
@@ -111,7 +111,7 @@ export default function TabelaProjetos({ projetos }) {
                       variant="outlined"
                       size="small"
                       endIcon={<ArrowForward />}
-                      onClick={() => navigate(`/vagas/${projeto.id_projeto}`, { state: { projeto } })}
+                      onClick={() => navigate(`/projeto/${projeto.id_projeto}`, { state: { projeto } })}
                       fullWidth
                       sx={{ mb: 1 }}
                     >
