@@ -436,11 +436,11 @@ export default function Projeto() {
                                         </div>
                                     </div>
 
-                                    <div className='col-md-2' style={{ display: 'flex', flexDirection: 'column', height: '80vh', overflow: 'hidden' }}>
+                                    <div className='col-md-2' style={{ display: 'flex', flexDirection: 'column' }}>
                                         <header className='mb-2' style={{ width: '100%', zIndex: 1, }}>
                                             <div className='d-flex justify-content-end'>
                                                 <button className='btn btn-success' style={{ width: '90%' }} onClick={() => setIsLinhaTemporalModalOpen(true)} disabled={!pertenceProjeto}>
-                                                    Linha temporal
+                                                    Criar ponto
                                                 </button>
                                             </div>
                                         </header>
@@ -482,7 +482,7 @@ export default function Projeto() {
                                                             width: '16px',
                                                             height: '16px',
                                                             borderRadius: '50%',
-                                                            backgroundColor: registo.tipo === "Objetivo" ? '#1976d2' : '#ff0000',
+                                                            backgroundColor: registo.tipo == "Objetivo" ? 'lime' : registo.tipo == "Bloqueio" ? 'red' : registo.tipo == "Melhorias" ? 'aqua' : registo.tipo == "Alerta" ? 'yellow' : 'gray',
                                                             border: '3px solid white',
                                                             zIndex: 1
                                                         }} />
@@ -491,7 +491,7 @@ export default function Projeto() {
                                                         <Card sx={{
                                                             width: '100%',
                                                             boxShadow: 1,
-                                                            borderLeft: registo.tipo === "Objetivo" ? '3px solid #1976d2' : '3px solid #ff0000',
+                                                            borderLeft: registo.tipo == "Objetivo" ? '3px solid lime' : registo.tipo == "Bloqueio" ? '3px solid red' : registo.tipo == "Melhorias" ? '3px solid aqua' : registo.tipo == "Alerta" ? '3px solid yellow' : '3px solid gray',
                                                         }}>
                                                             <CardContent className='p-2 pt-0'>
                                                                 <Stack direction="row" justifyContent="space-between" alignItems="center">
@@ -652,6 +652,9 @@ export default function Projeto() {
                         >
                             <MenuItem value={"Objetivo"}>Objetivo</MenuItem>
                             <MenuItem value={"Bloqueio"}>Bloqueio</MenuItem>
+                            <MenuItem value={"Melhorias"}>Melhorias</MenuItem>
+                            <MenuItem value={"Alerta"}>Alerta</MenuItem>
+                            <MenuItem value={"Outros"}>Outros</MenuItem>
                         </Select>
                     </FormControl>
 
