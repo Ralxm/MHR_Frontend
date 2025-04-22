@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/MHR_Frontend/static/css/main.300e5c82.css",
+    "main.js": "/MHR_Frontend/static/js/main.5e02ab8d.js",
+    "static/js/453.55c614b0.chunk.js": "/MHR_Frontend/static/js/453.55c614b0.chunk.js",
+    "index.html": "/MHR_Frontend/index.html",
+    "main.300e5c82.css.map": "/MHR_Frontend/static/css/main.300e5c82.css.map",
+    "main.5e02ab8d.js.map": "/MHR_Frontend/static/js/main.5e02ab8d.js.map",
+    "453.55c614b0.chunk.js.map": "/MHR_Frontend/static/js/453.55c614b0.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.300e5c82.css",
+    "static/js/main.5e02ab8d.js"
+  ]
+}
