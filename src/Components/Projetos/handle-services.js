@@ -136,6 +136,56 @@ class HandleServices{
                 }
             }, reason => { throw new Error('Erro a criar o comentário: ' + reason); });
     }
+
+    apagarPontoLinhaTemporalProjeto(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.put(url + "linha_temporal/delete/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a listar os pontos da linha temporal'); });
+    }
+
+    updateProjeto(projeto) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json',
+        };
+
+        return axios.post(url + "projetos/update/" + projeto.id_projeto, projeto, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a atualizar o projeto'); });
+    }
+
+    atualizarPerfisProjeto(perfisOriginais, perfisAtualizados, projetoId) {
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json',
+        };
+        
+        return axios.put(url + "perfil_projeto/updateMany", 
+            {
+                originalProfiles: perfisOriginais,
+                updatedProfiles: perfisAtualizados,
+                id_projeto: projetoId
+            }, 
+            {headers}
+        )
+        .then(res => {
+            if (res.data.success) {
+                return res.data.data;
+            }
+        })
+        .catch(error => { 
+            throw new Error('Erro ao atualizar perfis do projeto: ' + error.message); 
+        });
+    }
 }
 
 export default new HandleServices();

@@ -18,6 +18,7 @@ import PedidosFérias from "../Components/Calendario/PedidoFerias";
 
 import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
+import EditarProjeto from "../Components/Projetos/EditarProjeto";
 
 import Vagas from "../Components/Vagas/Vagas";
 import Vaga from '../Components/Vagas/Vaga'
@@ -61,6 +62,8 @@ export default function MainPage(){
                 <Route path='/projetos' element={<Projetos></Projetos>}>
                 </Route>
                 <Route path='/projeto/:id' element={<Projeto></Projeto>}>
+                </Route>
+                <Route path='/projeto/editar/:id' element={<EditarProjeto></EditarProjeto>}>
                 </Route>
 
                 <Route path='/vagas' element={<Vagas></Vagas>}>

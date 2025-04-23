@@ -188,7 +188,7 @@ export default function Projetos() {
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: { xs: 500, sm: 900 },
+                        width: { xs: 500, sm: 1400 },
                         borderRadius: 4,
                         p: 4,
                         display: 'flex'
@@ -217,7 +217,8 @@ export default function Projetos() {
     function ModalCriarProjeto({ titulo_projeto, data_inicio, data_final_prevista, descricao, objetivos, perfis }) {
         const [_titulo, set_Titulo] = useState(titulo_projeto || "");
         const [_descricao, set_Descricao] = useState(descricao || "");
-        const [_objetivos, set_Objetivos] = useState(objetivos || "");
+        const [_requisitos, set_Objetivos] = useState(objetivos || "");
+        const [_futuras_melhorias, set_Futuras_Melhorias] = useState();
         const [_data_inicio, setData_Inicio] = useState(data_inicio || "");
         const [_data_final_prevista, setData_Final_Prevista] = useState(data_final_prevista || "");
 
@@ -243,7 +244,8 @@ export default function Projetos() {
                 titulo_projeto: _titulo,
                 estado: "Em desenvolvimento",
                 descricao: _descricao,
-                objetivos: _objetivos,
+                requisitos: _requisitos,
+                futuras_melhorias: _futuras_melhorias,
                 data_inicio: data_inicio,
                 data_final_prevista: data_final_prevista,
             }
@@ -272,7 +274,7 @@ export default function Projetos() {
         return (
             <>
                 <div className='row d-flex'>
-                    <Box className='col-md-6'>
+                    <Box className='col-md-4'>
                         <form>
                             <Stack spacing={2}>
                                 <TextField
@@ -304,21 +306,13 @@ export default function Projetos() {
                                     fullWidth
                                     value={_descricao}
                                     multiline
-                                    rows={6}
+                                    rows={8}
                                     onChange={(value) => { set_Descricao(value.target.value) }}
-                                />
-                                <TextField
-                                    label="Objetivos"
-                                    fullWidth
-                                    multiline
-                                    rows={6}
-                                    value={_objetivos}
-                                    onChange={(value) => { set_Objetivos(value.target.value) }}
                                 />
                             </Stack>
                         </form>
                     </Box>
-                    <Box className='col-md-6'>
+                    <Box className='col-md-4'>
                         <form>
                             <Stack spacing={2}>
                                 <FormControl fullWidth>
@@ -377,8 +371,28 @@ export default function Projetos() {
                                         ))}
                                     </List>
                                 </Box>
-
-
+                            </Stack>
+                        </form>
+                    </Box>
+                    <Box className='col-md-4'>
+                        <form>
+                            <Stack spacing={2}>
+                                <TextField
+                                    label="Requisitos"
+                                    fullWidth
+                                    multiline
+                                    rows={8}
+                                    value={_requisitos}
+                                    onChange={(value) => { set_Objetivos(value.target.value) }}
+                                />
+                                <TextField
+                                    label="Futuras Melhorias"
+                                    fullWidth
+                                    multiline
+                                    rows={7}
+                                    value={_futuras_melhorias}
+                                    onChange={(value) => { set_Futuras_Melhorias(value.target.value) }}
+                                />
                             </Stack>
                         </form>
                     </Box>

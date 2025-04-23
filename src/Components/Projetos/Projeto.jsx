@@ -23,6 +23,8 @@ export default function Projeto() {
 
     const [isLinhaTemporalModalOpen, setIsLinhaTemporalModalOpen] = useState(false)
 
+    const [selectedLinhaTemporal, setSelectedLinhaTemporal] = useState(null)
+
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
     const [id_perfil, setPerfil] = useState()
@@ -84,6 +86,10 @@ export default function Projeto() {
             })
         }
     }, [utilizadores])
+
+    const closeApgarModalLinhaTemporal = () => {
+        setSelectedLinhaTemporal(null)
+    }
 
     async function carregarProjeto(id) {
         setIsProjetoLoading(true);
@@ -155,6 +161,20 @@ export default function Projeto() {
 
     const handleCloseLinhaTemporalModal = () => {
         setIsLinhaTemporalModalOpen(false)
+    }
+
+    function handleApagarPontoLinhaTemporal(event){
+        event.preventDefault();
+
+        handleServices.apagarPontoLinhaTemporalProjeto(selectedLinhaTemporal.id_registo)
+        .then(res => {
+            alert(res);
+            navigate(0);
+        })
+        .catch(err => {
+            console.log(err)
+        })
+
     }
 
     /*function handleCriarCandidatura(event) {
@@ -288,28 +308,6 @@ export default function Projeto() {
                                                     <h2 className='mb-0' style={{ color: '#2c3e50', fontWeight: '600' }}>
                                                         {projeto && projeto.titulo_projeto}
                                                     </h2>
-                                                    <Chip icon={projeto?.estado === 'Concluído' ?
-                                                        <LockOpen />
-                                                        :
-                                                        projeto?.estado === 'Parado' ?
-                                                            <Lock />
-                                                            :
-                                                            <Person />
-                                                    }
-                                                        label={projeto?.estado || ''}
-                                                        sx={{
-                                                            borderRadius: '20px',
-                                                            fontSize: '1rem',
-                                                            fontWeight: 500,
-                                                            height: '36px',
-                                                            padding: '0 12px'
-                                                        }}
-                                                        color={
-                                                            projeto?.estado === 'Concluído' ? 'success' :
-                                                                projeto?.estado === 'Parado' ? 'error' :
-                                                                    'warning'
-                                                        }
-                                                    />
                                                 </div>
                                             </div>
 
@@ -325,14 +323,35 @@ export default function Projeto() {
                                                             </div>
                                                         </div>
                                                     </div>
-                                                    <div className='vacancy-container p-3' style={{ backgroundColor: '#e8f8f0', borderRadius: '8px', textAlign: 'center', minWidth: '120px' }}>
-                                                        <h5 style={{ color: '#27ae60', marginBottom: '5px' }}>
-                                                            <i className="bi bi-people-fill me-2"></i>
-                                                            Utilizadores no projeto
+                                                    <div className='vacancy-container p-3' style={{
+                                                        backgroundColor:
+                                                            projeto?.estado === 'Concluído' ? '#e8f8f0' :
+                                                                projeto?.estado === 'Parado' ? '#fde8e8' :
+                                                                    '#fef5e6',
+                                                        borderRadius: '20px',
+                                                        textAlign: 'center',
+                                                        minWidth: '120px',
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        gap: '8px'
+                                                    }}>
+                                                        <h5 style={{
+                                                            color:
+                                                                projeto?.estado === 'Concluído' ? '#27ae60' :
+                                                                    projeto?.estado === 'Parado' ? '#e74c3c' :
+                                                                        '#f39c12',
+                                                            marginBottom: '0',
+                                                            fontSize: '1rem',
+                                                            fontWeight: 500,
+                                                            display: 'flex',
+                                                            alignItems: 'center'
+                                                        }}>
+                                                            {projeto?.estado === 'Concluído' ? <LockOpen style={{ marginRight: '8px' }} /> :
+                                                                projeto?.estado === 'Parado' ? <Lock style={{ marginRight: '8px' }} /> :
+                                                                    <Person style={{ marginRight: '8px' }} />}
+                                                            {projeto?.estado || ''}
                                                         </h5>
-                                                        <h4 style={{ color: '#2c3e50', fontWeight: '600' }}>
-                                                            {utilizadores && utilizadores.length}
-                                                        </h4>
                                                     </div>
                                                 </div>
                                             </div>
@@ -361,10 +380,10 @@ export default function Projeto() {
 
 
                                             <div className='row flex-grow-1'>
-                                                <div className='col-md-12'>
+                                                <div className='col-md-6'>
                                                     <h5 className='mb-3' style={{ color: '#2c3e50', borderBottom: '2px solid #3498db', paddingBottom: '6px' }}>
                                                         <i className="bi bi-list-check me-2"></i>
-                                                        Objetivos
+                                                        Requisitos
                                                     </h5>
                                                     <textarea
                                                         className='form-control mt-2 p-3 bg-light'
@@ -377,7 +396,26 @@ export default function Projeto() {
                                                             lineHeight: '1.6'
                                                         }}
                                                         disabled={tipo_user != 1 && tipo_user != 2}
-                                                        value={projeto && projeto.objetivos}
+                                                        value={projeto && projeto.requisitos}
+                                                    />
+                                                </div>
+                                                <div className='col-md-6'>
+                                                    <h5 className='mb-3' style={{ color: '#2c3e50', borderBottom: '2px solid #3498db', paddingBottom: '6px' }}>
+                                                        <i className="bi bi-list-check me-2"></i>
+                                                        Futuras Melhorias
+                                                    </h5>
+                                                    <textarea
+                                                        className='form-control mt-2 p-3 bg-light'
+                                                        style={{
+                                                            resize: 'none',
+                                                            border: "1px solid #ddd",
+                                                            minHeight: '50vh',
+                                                            borderRadius: '8px',
+                                                            fontSize: '1rem',
+                                                            lineHeight: '1.6'
+                                                        }}
+                                                        disabled={tipo_user != 1 && tipo_user != 2}
+                                                        value={projeto && projeto.futuras_melhorias}
                                                     />
                                                 </div>
                                             </div>
@@ -498,7 +536,7 @@ export default function Projeto() {
                                                                     <Typography variant="subtitle2" color={registo.tipo === "Objetivo" ? "primary" : "error"}>
                                                                         {registo.tipo}
                                                                     </Typography>
-                                                                    <IconButton sx={{marginRight: '-5px'}}>
+                                                                    <IconButton sx={{ marginRight: '-5px' }} onClick={() => setSelectedLinhaTemporal(registo)}>
                                                                         <Close color='error' />
                                                                     </IconButton>
                                                                 </Stack>
@@ -610,6 +648,48 @@ export default function Projeto() {
                         Linha temporal
                     </Typography>
                     <ModalLinhaTemporal></ModalLinhaTemporal>
+                </Paper>
+            </Modal>
+
+            {/* Modal para apgar um ponto da linha temporal */}
+            <Modal
+                open={selectedLinhaTemporal}
+                onClose={closeApgarModalLinhaTemporal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 500 },
+                        borderRadius: 4,
+                        p: 4,
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                        Tem a certeza que quer eliminar o ponto: {selectedLinhaTemporal && selectedLinhaTemporal.descricao}
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => { closeApgarModalLinhaTemporal() }}
+                            sx={{ width: '50%' }}
+                        >
+                            Fechar
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={(event) => { handleApagarPontoLinhaTemporal(event); closeApgarModalLinhaTemporal() }}
+                            sx={{ width: '50%' }}
+                        >
+                            Apagar
+                        </Button>
+                    </Stack>
                 </Paper>
             </Modal>
         </div >

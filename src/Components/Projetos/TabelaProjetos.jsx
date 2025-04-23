@@ -73,7 +73,7 @@ export default function TabelaProjetos({ projetos }) {
                   <Chip
                     label={projeto.estado}
                     size="small"
-                    color={ projeto.estado === 'Em Desenvolvimento' ? 'primary' : projeto.estado === 'Concluído' ? 'success' : 'warning' }
+                    color={ projeto.estado === 'Em desenvolvimento' ? 'warning' : projeto.estado === 'Concluído' ? 'success' : 'error' }
                     sx={{ fontWeight: 500 }}
                   />
                 </Stack>
@@ -134,7 +134,7 @@ export default function TabelaProjetos({ projetos }) {
                         <Button
                           variant="contained"
                           size="small"
-                          onClick={() => {}}
+                          onClick={() => {navigate(`/projeto/editar/${projeto.id_projeto}`)}}
                         >
                           Editar
                         </Button>
