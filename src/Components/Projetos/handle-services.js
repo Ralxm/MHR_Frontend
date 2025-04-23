@@ -12,6 +12,16 @@ class HandleServices{
             }, reason => { throw new Error('Erro a listar os projetos'); });
     }
 
+    carregarIdeias(){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "ideia/list", authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar as ideias'); });
+    }
+
     carregarPerfis() {
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.get(url + "perfis/list", authHeader())
@@ -185,6 +195,22 @@ class HandleServices{
         .catch(error => { 
             throw new Error('Erro ao atualizar perfis do projeto: ' + error.message); 
         });
+    }
+
+    criarIdeia(formData){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'multipart/form-data'
+        };
+
+        return axios.post(url + "ideia/create", formData, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a atualizar o projeto'); });
+        
     }
 }
 

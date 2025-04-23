@@ -5,7 +5,7 @@ import { Box, Chip, Stack, Card, Typography, Divider, CardContent, Button } from
 import { LockOpen, Lock, People, Business, CalendarToday, ArrowForward } from '@mui/icons-material'
 
 
-export default function TabelaProjetos({ projetos }) {
+export default function TabelaIdeias({ ideias }) {
   let tipo_user = localStorage.getItem("tipo")
   const navigate = useNavigate();
 
@@ -41,9 +41,9 @@ export default function TabelaProjetos({ projetos }) {
 
   return (
     <>
-      {projetos.map((projeto) => {
+      {ideias.map((ideia) => {
         return (
-          <div className="col-md-3" key={projeto.id_projeto} style={{zIndex: 1001}}>
+          <div className="col-md-3" key={ideia.id_ideia} style={{zIndex: 1001}}>
             <Card
               sx={{
                 height: '100%',
@@ -71,9 +71,9 @@ export default function TabelaProjetos({ projetos }) {
                   mb={2}
                 >
                   <Chip
-                    label={projeto.estado}
+                    label={ideia.estado}
                     size="small"
-                    color={ projeto.estado === 'Em desenvolvimento' ? 'warning' : projeto.estado === 'Concluído' ? 'success' : 'error' }
+                    color={ ideia.estado === 'Em análise' ? 'warning' : ideia.estado === 'Aceite' ? 'success' : 'error' }
                     sx={{ fontWeight: 500 }}
                   />
                 </Stack>
@@ -87,7 +87,7 @@ export default function TabelaProjetos({ projetos }) {
                     minHeight: '64px'
                   }}
                 >
-                  {projeto.titulo_projeto}
+                  {ideia.titulo_ideia}
                 </Typography>
 
                 <Typography
@@ -102,7 +102,7 @@ export default function TabelaProjetos({ projetos }) {
                     textOverflow: 'ellipsis'
                   }}
                 >
-                  {projeto.descricao ? projeto.descricao.substring(0, 100) : "Sem descrição"}...
+                  {ideia.descricao ? ideia.descricao.substring(0, 100) : "Sem descrição"}...
                 </Typography>
 
                 <Box sx={{ mt: 'auto' }}>
@@ -111,7 +111,7 @@ export default function TabelaProjetos({ projetos }) {
                       variant="outlined"
                       size="small"
                       endIcon={<ArrowForward />}
-                      onClick={() => navigate(`/projeto/${projeto.id_projeto}`, { state: { projeto } })}
+                      onClick={() => navigate(`/ideia/${ideia.id_ideia}`, { state: { ideia } })}
                       fullWidth
                       sx={{ mb: 1 }}
                     >
@@ -134,7 +134,7 @@ export default function TabelaProjetos({ projetos }) {
                         <Button
                           variant="contained"
                           size="small"
-                          onClick={() => {navigate(`/projeto/editar/${projeto.id_projeto}`)}}
+                          onClick={() => {navigate(`/ideia/editar/${ideia.id_ideia}`)}}
                         >
                           Editar
                         </Button>

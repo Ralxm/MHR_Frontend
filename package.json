@@ -1,6 +1,5 @@
 {
   "name": "mhr",
-  "homepage": "https://ralxm.github.io/MHR_Frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

@@ -12,6 +12,7 @@ import { Delete } from '@mui/icons-material'
 import FileDropZone from '../../Universal/FileDropZoneSingle';
 import TabelaProjetos from './TabelaProjetos';
 import ProjetosPieChart from './ProjetosPieChart'
+import TabelaIdeias from './TabelaIdeias';
 
 export default function Projetos() {
     const navigate = useNavigate();
@@ -21,9 +22,11 @@ export default function Projetos() {
     const [id_perfil, setPerfil] = useState()
 
     const [projetos, setProjetos] = useState([]);
+    const [ideias, setIdeias] = useState([]);
     const [tab, setTab] = useState('1')
 
     const [isCreateProjetoModalOpen, setIsCreateProjetoModalOpen] = useState(false)
+    const [isCreateIdeiaModalOpen, setIsCreateIdeiaModalOpen] = useState(false)
 
     {/* Variáveis para a criação de um projeto */ }
     const [perfis, setPerfis] = useState([]);
@@ -53,6 +56,7 @@ export default function Projetos() {
 
         carregarPerfis();
         carregarProjetos();
+        carregarIdeias();
     }, [])
 
     useEffect(() => {
@@ -75,6 +79,10 @@ export default function Projetos() {
         setIsCreateProjetoModalOpen(false)
     }
 
+    const handleCloseCreateIdeiaModal = () => {
+        setIsCreateIdeiaModalOpen(false)
+    }
+
     function carregarPerfis() {
         handleServices.carregarPerfis(id_user)
             .then(res => {
@@ -89,6 +97,16 @@ export default function Projetos() {
         handleServices.carregarProjetos()
             .then(res => {
                 setProjetos(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
+            })
+    }
+
+    function carregarIdeias(){
+        handleServices.carregarIdeias()
+            .then(res => {
+                setIdeias(res);
             })
             .catch(err => {
                 console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
@@ -150,7 +168,7 @@ export default function Projetos() {
                                                         </button>
                                                     }
                                                     {tab == 2 &&
-                                                        <button className='btn btn-outline-secondary mb-2'>
+                                                        <button className='btn btn-outline-secondary mb-2' onClick={() => setIsCreateIdeiaModalOpen(true)}>
                                                             Sugerir ideia
                                                         </button>
                                                     }
@@ -165,6 +183,11 @@ export default function Projetos() {
                                                 </div>
                                             </TabPanel>
                                             <TabPanel value="2">
+                                            <div className='container-fluid'>
+                                                    <div className='row g-3'>
+                                                        <TabelaIdeias ideias={ideias}></TabelaIdeias>
+                                                    </div>
+                                                </div>
                                             </TabPanel>
                                         </TabContext>
                                     </Box>
@@ -208,6 +231,35 @@ export default function Projetos() {
                             perfis={perfis}
                         >
                         </ModalCriarProjeto>
+                    </Box>
+                </Paper>
+            </Modal>
+
+            {/* Modal para a criação de uma ideia */}
+            <Modal
+                open={isCreateIdeiaModalOpen}
+                onClose={handleCloseCreateIdeiaModal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 500, sm: 700 },
+                        borderRadius: 4,
+                        p: 4,
+                        display: 'flex'
+                    }}
+                    className='row'
+                >
+                    <Box className='col-md-12'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Sugerir uma ideia
+                        </Typography>
+                        <ModalCriarIdeia></ModalCriarIdeia>
                     </Box>
                 </Paper>
             </Modal>
@@ -393,6 +445,78 @@ export default function Projetos() {
                                     value={_futuras_melhorias}
                                     onChange={(value) => { set_Futuras_Melhorias(value.target.value) }}
                                 />
+                            </Stack>
+                        </form>
+                    </Box>
+                </div>
+                <Button fullWidth sx={{ mt: 3 }} variant="contained" color="primary" onClick={handleCriar}>
+                    Criar
+                </Button>
+            </>
+        )
+    }
+
+    function ModalCriarIdeia() {
+        const [titulo_ideia, setTitulo_Ideia] = useState();
+        const [descricao, setDescricao] = useState();
+        const [newFile, setNewFile] = useState()
+
+        function handleCriar() {
+            const formData = new FormData();
+            
+            formData.append('id_perfil', id_perfil)
+            formData.append('titulo_ideia', titulo_ideia)
+            formData.append('descricao', descricao)
+            formData.append('estado', "Em análise")
+
+            if(newFile){
+                formData.append('ficheiro_complementar', newFile)
+            }
+
+            handleServices.criarIdeia(formData)
+                .then(res => {
+                    alert(res)
+                    navigate(0)
+                })
+                .catch(err => {
+                    alert(err)
+                })
+        }
+
+        return (
+            <>
+                <div className='row d-flex'>
+                    <Box className='col-md-12'>
+                        <form>
+                            <Stack spacing={2}>
+                                <TextField
+                                    label="Título do projeto"
+                                    type="text"
+                                    InputLabelProps={{ shrink: true }}
+                                    fullWidth
+                                    value={titulo_ideia}
+                                    onChange={(value) => { setTitulo_Ideia(value.target.value) }}
+                                />
+                                <TextField
+                                    label="Descrição"
+                                    fullWidth
+                                    value={descricao}
+                                    multiline
+                                    rows={8}
+                                    onChange={(value) => { setDescricao(value.target.value) }}
+                                />
+                                <FileDropZone
+                                onDrop={(files) => {
+                                    if (files && files.length > 0) {
+                                        setNewFile(files[0]);
+                                    }
+                                }}
+                                accept={{
+                                    'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+                                    'application/pdf': ['.pdf'],
+                                }}
+                                maxSize={10 * 1024 * 1024}
+                            />
                             </Stack>
                         </form>
                     </Box>
