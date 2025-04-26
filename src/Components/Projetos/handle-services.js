@@ -212,6 +212,32 @@ class HandleServices{
             }, reason => { throw new Error('Erro a atualizar o projeto'); });
         
     }
+
+    atualizarIdeia(formData){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'multipart/form-data'
+        };
+
+        return axios.post(url + "ideia/update/" + formData.get('id_ideia'), formData, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a atualizar a ideia'); });
+    }
+
+    aceitarIdeia(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+
+        return axios.post(url + "ideia/aceitar/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a atualizar a ideia'); });
+    }
 }
 
 export default new HandleServices();

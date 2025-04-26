@@ -27,6 +27,8 @@ export default function Projetos() {
 
     const [isCreateProjetoModalOpen, setIsCreateProjetoModalOpen] = useState(false)
     const [isCreateIdeiaModalOpen, setIsCreateIdeiaModalOpen] = useState(false)
+    const [selectedIdeia, setSelectedIdeia] = useState();
+    const [selectedIdeiaTransformar, setSelectedIdeiaTransformar] = useState();
 
     {/* Variáveis para a criação de um projeto */ }
     const [perfis, setPerfis] = useState([]);
@@ -103,7 +105,7 @@ export default function Projetos() {
             })
     }
 
-    function carregarIdeias(){
+    function carregarIdeias() {
         handleServices.carregarIdeias()
             .then(res => {
                 setIdeias(res);
@@ -183,9 +185,9 @@ export default function Projetos() {
                                                 </div>
                                             </TabPanel>
                                             <TabPanel value="2">
-                                            <div className='container-fluid'>
+                                                <div className='container-fluid'>
                                                     <div className='row g-3'>
-                                                        <TabelaIdeias ideias={ideias}></TabelaIdeias>
+                                                        <TabelaIdeias ideias={ideias} onVerDetalhes={setSelectedIdeia} onAceitar={setSelectedIdeiaTransformar}></TabelaIdeias>
                                                     </div>
                                                 </div>
                                             </TabPanel>
@@ -211,7 +213,7 @@ export default function Projetos() {
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: { xs: 500, sm: 1400 },
+                        width: { xs: 700, sm: 1400 },
                         borderRadius: 4,
                         p: 4,
                         display: 'flex'
@@ -260,6 +262,64 @@ export default function Projetos() {
                             Sugerir uma ideia
                         </Typography>
                         <ModalCriarIdeia></ModalCriarIdeia>
+                    </Box>
+                </Paper>
+            </Modal>
+
+            {/* Modal para ver os detalhes de uma ideia */}
+            <Modal
+                open={selectedIdeia}
+                onClose={() => setSelectedIdeia(null)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 500, sm: 700 },
+                        borderRadius: 4,
+                        p: 4,
+                        display: 'flex'
+                    }}
+                    className='row'
+                >
+                    <Box className='col-md-12'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Detalhes de ideia
+                        </Typography>
+                        {selectedIdeia && <DetalhesIdeia ideia={selectedIdeia}></DetalhesIdeia>}
+                    </Box>
+                </Paper>
+            </Modal>
+
+            {/* Modal para transformar uma ideia num projeto */}
+            <Modal
+                open={selectedIdeiaTransformar}
+                onClose={() => setSelectedIdeiaTransformar(null)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 700, sm: 1400 },
+                        borderRadius: 4,
+                        p: 4,
+                        display: 'flex'
+                    }}
+                    className='row'
+                >
+                    <Box className='col-md-12'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Transformar a ideia em um projeto
+                        </Typography>
+                        <ModalTransformarIdeia ideia={selectedIdeiaTransformar} perfis={perfis}></ModalTransformarIdeia>
                     </Box>
                 </Paper>
             </Modal>
@@ -463,13 +523,13 @@ export default function Projetos() {
 
         function handleCriar() {
             const formData = new FormData();
-            
+
             formData.append('id_perfil', id_perfil)
             formData.append('titulo_ideia', titulo_ideia)
             formData.append('descricao', descricao)
             formData.append('estado', "Em análise")
 
-            if(newFile){
+            if (newFile) {
                 formData.append('ficheiro_complementar', newFile)
             }
 
@@ -506,17 +566,344 @@ export default function Projetos() {
                                     onChange={(value) => { setDescricao(value.target.value) }}
                                 />
                                 <FileDropZone
-                                onDrop={(files) => {
-                                    if (files && files.length > 0) {
-                                        setNewFile(files[0]);
-                                    }
-                                }}
-                                accept={{
-                                    'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
-                                    'application/pdf': ['.pdf'],
-                                }}
-                                maxSize={10 * 1024 * 1024}
-                            />
+                                    onDrop={(files) => {
+                                        if (files && files.length > 0) {
+                                            setNewFile(files[0]);
+                                        }
+                                    }}
+                                    accept={{
+                                        'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+                                        'application/pdf': ['.pdf'],
+                                    }}
+                                    maxSize={10 * 1024 * 1024}
+                                />
+                            </Stack>
+                        </form>
+                    </Box>
+                </div>
+                <Button fullWidth sx={{ mt: 3 }} variant="contained" color="primary" onClick={handleCriar}>
+                    Criar
+                </Button>
+            </>
+        )
+    }
+
+    function DetalhesIdeia({ ideia }) {
+        const [newFile, setNewFile] = useState();
+        const [descricao, setDescricao] = useState(ideia.descricao || '');
+        const [titulo_ideia, setTitulo_Ideia] = useState(ideia.titulo_ideia.trim() || '');
+
+        const formData = new FormData()
+
+        formData.append('id_ideia', ideia.id_ideia)
+        formData.append('titulo_ideia', titulo_ideia)
+        formData.append('descricao', descricao)
+        formData.append('estado', ideia.estado)
+        formData.append('validador', ideia.validador)
+
+        if(newFile){
+            formData.append('ficheiro_complementar', newFile)
+        }
+
+        function handleSubmit(event){
+            event.preventDefault();
+
+            console.log(formData)
+
+            handleServices.atualizarIdeia(formData)
+            .then(res => {
+                alert(res)
+                navigate(0)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        }
+
+        return (
+            <form onSubmit={{}}>
+                <div className='mb-3'>
+                    <label><strong>Nome do sugestor:</strong>&nbsp;<span>{ideia && ideia.perfil.nome}</span></label>
+                </div>
+
+                <div className="mb-3">
+                    <div className='d-flex justify-content-between align-items-center my-2'>
+                        <label className="form-label"><strong>Anexo:</strong></label>
+                        {ideia.ficheiro_complementar && (
+                            <a href={ideia.ficheiro_complementar} target="_blank" rel="noopener noreferrer">
+                                <button type="button" className='btn btn-outline-info btn-sm'>Abrir</button>
+                            </a>
+                        )}
+                    </div>
+                    <FileDropZone
+                        onDrop={(files) => {
+                            if (files && files.length > 0) {
+                                setNewFile(files[0]);
+                            }
+                        }}
+                        accept={{
+                            'image/*': ['.png', '.gif', '.jpeg', '.jpg'],
+                            'application/pdf': ['.pdf'],
+                        }}
+                        maxSize={10 * 1024 * 1024}
+                        disabled={ideia.estado != "Em análise" || id_perfil != ideia.id_perfil}
+                    ></FileDropZone>
+                </div>
+
+                <div className="mb-3">
+                    <TextField
+                        label="Título"
+                        type="text"
+                        name="titulo_ideia"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={titulo_ideia}
+                        onChange={(value) => setTitulo_Ideia(value.target.value)}
+                        disabled={ideia.estado != "Em análise" || id_perfil != ideia.id_perfil}
+                    />
+                </div>
+                <div className="mb-3">
+                    <TextField
+                        label="Descrição"
+                        type="text"
+                        name="descricao"
+                        multiline
+                        rows={6}
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={descricao}
+                        onChange={(value) => setDescricao(value.target.value)}
+                        disabled={ideia.estado != "Em análise" || id_perfil != ideia.id_perfil}
+                    />
+                </div>
+                <div className="mb-3">
+                    <TextField
+                        label="Validador"
+                        type="text"
+                        name="validador"
+                        InputLabelProps={{ shrink: true }}
+                        fullWidth
+                        value={ideia.validador ? ideia.validadorPerfil.nome : "Sem validador"}
+                        onChange={{}}
+                        disabled
+                    />
+                </div>
+                <div className="mb-3">
+                    <FormControl fullWidth disabled={(ideia.estado != "Em análise" || id_perfil != ideia.id_perfil) || (tipo_user != 1 && tipo_user != 2)}>
+                        <InputLabel shrink>Estado</InputLabel>
+                        <Select
+                            label="Estado"
+                            name="estado"
+                            value={ideia.estado || ''}
+                            onChange={{}}
+                            InputLabelProps={{ shrink: true }}
+                        >
+                            <MenuItem value={"Rejeitada"}>Rejeitada</MenuItem>
+                            <MenuItem value={"Aceite"}>Aceite</MenuItem>
+                            <MenuItem value={"Em análise"}>Em análise</MenuItem>
+                        </Select>
+                    </FormControl>
+
+                </div>
+
+
+                <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1">
+                    Guardar
+                </button>
+            </form>
+        )
+    }
+
+    function ModalTransformarIdeia({ideia, perfis}){
+        const [_titulo, set_Titulo] = useState(ideia.titulo_ideia.trim() || "");
+        const [_descricao, set_Descricao] = useState(ideia.descricao || "");
+        const [_requisitos, set_Objetivos] = useState();
+        const [_futuras_melhorias, set_Futuras_Melhorias] = useState();
+        const [_data_inicio, setData_Inicio] = useState();
+        const [_data_final_prevista, setData_Final_Prevista] = useState();
+
+        const [perfisSelecionados, setPerfisSelecionados] = useState([])
+
+        useEffect(() => {
+            handleSelectPerfil({ target: { value: ideia.id_perfil } })
+        }, ideia, perfis)
+
+        const handleSelectPerfil = (event) => {
+            const id = event.target.value;
+
+            if (!perfisSelecionados.some(perfil => perfil.id_perfil === id)) {
+                const selectedPerfil = perfis.find(p => p.id_perfil === id);
+                setPerfisSelecionados([...perfisSelecionados, selectedPerfil]);
+            }
+        }
+
+        const handleRemovePerfil = (id) => {
+            setPerfisSelecionados(perfisSelecionados.filter(perfil => perfil.id_perfil !== id));
+        }
+
+        function handleCriar() {
+            const datapost = {
+                id_ideia: ideia.id_ideia,
+                titulo_projeto: _titulo,
+                estado: "Em desenvolvimento",
+                descricao: _descricao,
+                requisitos: _requisitos,
+                futuras_melhorias: _futuras_melhorias,
+                data_inicio: _data_inicio,
+                data_final_prevista: _data_final_prevista,
+            }
+
+            console.log(datapost)
+
+            handleServices.aceitarIdeia(ideia.id_ideia)
+            .then(res => {
+                handleServices.criarProjeto(datapost)
+                .then(res => {
+                    if (perfisSelecionados.length > 0 && res.id_projeto) {
+
+                        handleServices.criarPerfisProjetos(perfisSelecionados, res.id_projeto)
+                            .then(res => {
+                                alert("Ideia transformada em projeto com sucesso e utilizadores foram associados ao projeto!");
+                            })
+                            .catch(err => {
+                                alert(err)
+                            })
+                    } else {
+                        alert(res.message || "Ideia transformada em projeto com sucesso!");
+                    }
+                    navigate('/projeto/' + res.id_projeto)
+                })
+                .catch(err => {
+                    alert(err)
+                })
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        }
+
+        return (
+            <>
+                <div className='row d-flex'>
+                    <Box className='col-md-4'>
+                        <form>
+                            <Stack spacing={2}>
+                                <TextField
+                                    label="Título do projeto"
+                                    type="text"
+                                    InputLabelProps={{ shrink: true }}
+                                    fullWidth
+                                    value={_titulo}
+                                    onChange={(value) => { set_Titulo(value.target.value) }}
+                                />
+                                <TextField
+                                    label="Data de ínicio"
+                                    type="date"
+                                    InputLabelProps={{ shrink: true }}
+                                    fullWidth
+                                    value={_data_inicio}
+                                    onChange={(value) => { setData_Inicio(value.target.value) }}
+                                />
+                                <TextField
+                                    label="Data de final prevista"
+                                    type="date"
+                                    InputLabelProps={{ shrink: true }}
+                                    fullWidth
+                                    value={_data_final_prevista}
+                                    onChange={(value) => { setData_Final_Prevista(value.target.value) }}
+                                />
+                                <TextField
+                                    label="Descrição"
+                                    fullWidth
+                                    value={_descricao}
+                                    multiline
+                                    rows={8}
+                                    onChange={(value) => { set_Descricao(value.target.value) }}
+                                />
+                            </Stack>
+                        </form>
+                    </Box>
+                    <Box className='col-md-4'>
+                        <form>
+                            <Stack spacing={2}>
+                                <FormControl fullWidth>
+                                    <Autocomplete
+                                        options={perfis.filter(perfil =>
+                                            perfil.nome && !perfisSelecionados.some(p => p.id_perfil === perfil.id_perfil)
+                                        )}
+                                        getOptionLabel={(option) => option.nome}
+                                        renderOption={(props, option) => (
+                                            <MenuItem {...props} key={option.id_perfil}>
+                                                <div>
+                                                    <div style={{ fontWeight: 500 }}>{option.nome}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#666' }}>{option.email}</div>
+                                                </div>
+                                            </MenuItem>
+                                        )}
+                                        onChange={(event, newValue) => {
+                                            if (newValue) {
+                                                handleSelectPerfil({ target: { value: newValue.id_perfil } });
+                                            }
+                                        }}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Utilizadores"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                        fullWidth
+                                    />
+                                </FormControl>
+
+                                <Box sx={{ mt: 2 }}>
+                                    <Typography variant="subtitle1" gutterBottom>
+                                        Perfis Selecionados:
+                                    </Typography>
+                                    <List>
+                                        {perfisSelecionados.map((perfil) => (
+                                            <ListItem
+                                                key={perfil.id_perfil}
+                                                secondaryAction={
+                                                    <IconButton
+                                                        edge="end"
+                                                        aria-label="delete"
+                                                        onClick={() => handleRemovePerfil(perfil.id_perfil)}
+                                                    >
+                                                        <Delete />
+                                                    </IconButton>
+                                                }
+                                            >
+                                                <ListItemText
+                                                    primary={perfil.nome}
+                                                    secondary={perfil.email}
+                                                />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                </Box>
+                            </Stack>
+                        </form>
+                    </Box>
+                    <Box className='col-md-4'>
+                        <form>
+                            <Stack spacing={2}>
+                                <TextField
+                                    label="Requisitos"
+                                    fullWidth
+                                    multiline
+                                    rows={8}
+                                    value={_requisitos}
+                                    onChange={(value) => { set_Objetivos(value.target.value) }}
+                                />
+                                <TextField
+                                    label="Futuras Melhorias"
+                                    fullWidth
+                                    multiline
+                                    rows={7}
+                                    value={_futuras_melhorias}
+                                    onChange={(value) => { set_Futuras_Melhorias(value.target.value) }}
+                                />
                             </Stack>
                         </form>
                     </Box>
