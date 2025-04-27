@@ -5,7 +5,7 @@ import { Box, Chip, Stack, Card, Typography, Divider, CardContent, Button } from
 import { LockOpen, Lock, People, Business, CalendarToday, ArrowForward } from '@mui/icons-material'
 
 
-export default function TabelaIdeias({ ideias, onVerDetalhes, onAceitar }) {
+export default function TabelaIdeias({ ideias, onVerDetalhes, onAceitar, onApagar }) {
   let tipo_user = localStorage.getItem("tipo")
   const navigate = useNavigate();
 
@@ -132,6 +132,7 @@ export default function TabelaIdeias({ ideias, onVerDetalhes, onAceitar }) {
                         variant="outlined"
                         color="error"
                         size="small"
+                        onClick={() => {onApagar(ideia)}}
                       >
                         Rejeitar
                       </Button>

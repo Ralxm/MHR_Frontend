@@ -5,7 +5,7 @@ import { Box, Chip, Stack, Card, Typography, Divider, CardContent, Button } from
 import { LockOpen, Lock, People, Business, CalendarToday, ArrowForward } from '@mui/icons-material'
 
 
-export default function TabelaProjetos({ projetos }) {
+export default function TabelaProjetos({ projetos, onApagar }) {
   let tipo_user = localStorage.getItem("tipo")
   const navigate = useNavigate();
 
@@ -127,7 +127,8 @@ export default function TabelaProjetos({ projetos }) {
                           variant="outlined"
                           color="error"
                           size="small"
-                          onClick={() => {}}
+                          onClick={() => {onApagar(projeto)}}
+                          disabled={projeto.estado != "Em desenvolvimento"}
                         >
                           Apagar
                         </Button>

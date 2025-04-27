@@ -238,6 +238,28 @@ class HandleServices{
                 }
             }, reason => { throw new Error('Erro a atualizar a ideia'); });
     }
+
+    apagarIdeia(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+
+        return axios.post(url + "ideia/rejeitar/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a apagar a ideia'); });
+    }
+
+    apagarProjeto(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+
+        return axios.put(url + "projetos/delete/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a apagar o projeto'); });
+    }
 }
 
 export default new HandleServices();

@@ -8,10 +8,11 @@ import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import { Box, Modal, Paper, Typography, Button, TextField, Tab, Stack, FormControl, InputLabel, Select, MenuItem, List, ListItem, IconButton, ListItemText, Autocomplete } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Delete } from '@mui/icons-material'
+import { Delete, Close } from '@mui/icons-material'
 import FileDropZone from '../../Universal/FileDropZoneSingle';
 import TabelaProjetos from './TabelaProjetos';
 import ProjetosPieChart from './ProjetosPieChart'
+import IdeiasPieChart from './IdeiasPieChart'
 import TabelaIdeias from './TabelaIdeias';
 
 export default function Projetos() {
@@ -29,6 +30,8 @@ export default function Projetos() {
     const [isCreateIdeiaModalOpen, setIsCreateIdeiaModalOpen] = useState(false)
     const [selectedIdeia, setSelectedIdeia] = useState();
     const [selectedIdeiaTransformar, setSelectedIdeiaTransformar] = useState();
+    const [selectedIdeiaApagar, setSelectedIdeiaApagar] = useState();
+    const [selectedProjetoApagar, setSelectedProjetoApagar] = useState();
 
     {/* Variáveis para a criação de um projeto */ }
     const [perfis, setPerfis] = useState([]);
@@ -115,6 +118,28 @@ export default function Projetos() {
             })
     }
 
+    function handleApagarIdeia() {
+        handleServices.apagarIdeia(selectedIdeiaApagar.id_ideia)
+            .then(res => {
+                alert(res);
+                navigate(0)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
+    function handleApagarProjeto() {
+        handleServices.apagarProjeto(selectedProjetoApagar.id_projeto)
+            .then(res => {
+                alert(res);
+                navigate(0)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
     return (
         <div id="root">
             <div className="content" style={{
@@ -144,7 +169,11 @@ export default function Projetos() {
                                     <span><strong>Ideias</strong></span>
                                 }
                                 <div className='row mt-4'>
-                                    <ProjetosPieChart projetos={projetos}></ProjetosPieChart>
+                                    {tab == 1 ?
+                                        <ProjetosPieChart projetos={projetos}></ProjetosPieChart>
+                                        :
+                                        <IdeiasPieChart ideias={ideias}></IdeiasPieChart>
+                                    }
                                 </div>
                             </div>
 
@@ -180,14 +209,14 @@ export default function Projetos() {
                                             <TabPanel value="1">
                                                 <div className='container-fluid'>
                                                     <div className='row g-3'>
-                                                        <TabelaProjetos projetos={projetos}></TabelaProjetos>
+                                                        <TabelaProjetos projetos={projetos} onApagar={setSelectedProjetoApagar}></TabelaProjetos>
                                                     </div>
                                                 </div>
                                             </TabPanel>
                                             <TabPanel value="2">
                                                 <div className='container-fluid'>
                                                     <div className='row g-3'>
-                                                        <TabelaIdeias ideias={ideias} onVerDetalhes={setSelectedIdeia} onAceitar={setSelectedIdeiaTransformar}></TabelaIdeias>
+                                                        <TabelaIdeias ideias={ideias} onVerDetalhes={setSelectedIdeia} onAceitar={setSelectedIdeiaTransformar} onApagar={setSelectedIdeiaApagar}></TabelaIdeias>
                                                     </div>
                                                 </div>
                                             </TabPanel>
@@ -286,10 +315,17 @@ export default function Projetos() {
                     }}
                     className='row'
                 >
+
+
                     <Box className='col-md-12'>
-                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
-                            Detalhes de ideia
-                        </Typography>
+                        <div className='d-flex justify-content-between align-items-center'>
+                            <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                                Detalhes de ideia
+                            </Typography>
+                            <IconButton className='mb-3' onClick={() => setSelectedIdeia(null)}>
+                                <Close />
+                            </IconButton>
+                        </div>
                         {selectedIdeia && <DetalhesIdeia ideia={selectedIdeia}></DetalhesIdeia>}
                     </Box>
                 </Paper>
@@ -320,6 +356,98 @@ export default function Projetos() {
                             Transformar a ideia em um projeto
                         </Typography>
                         <ModalTransformarIdeia ideia={selectedIdeiaTransformar} perfis={perfis}></ModalTransformarIdeia>
+                    </Box>
+                </Paper>
+            </Modal>
+
+            {/* Modal para apagar uma ideia */}
+            <Modal
+                open={selectedIdeiaApagar}
+                onClose={() => setSelectedIdeiaApagar(null)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 500 },
+                        borderRadius: 4,
+                        p: 4,
+                        display: 'flex'
+                    }}
+                    className='row'
+                >
+                    <Box className='col-md-12'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Tem a certeza que pretende rejeitar a ideia?
+                        </Typography>
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => { setSelectedIdeiaApagar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Fechar
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={() => { handleApagarIdeia(); setSelectedIdeiaApagar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Apagar
+                            </Button>
+                        </Stack>
+                    </Box>
+                </Paper>
+            </Modal>
+
+            {/* Modal para apagar um projeto */}
+            <Modal
+                open={selectedProjetoApagar}
+                onClose={() => setSelectedProjetoApagar(null)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 500 },
+                        borderRadius: 4,
+                        p: 4,
+                        display: 'flex'
+                    }}
+                    className='row'
+                >
+                    <Box className='col-md-12'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Tem a certeza que pretende apagar o projeto?
+                        </Typography>
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => { setSelectedProjetoApagar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Fechar
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={() => { handleApagarProjeto(); setSelectedProjetoApagar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Apagar
+                            </Button>
+                        </Stack>
                     </Box>
                 </Paper>
             </Modal>
@@ -601,23 +729,23 @@ export default function Projetos() {
         formData.append('estado', ideia.estado)
         formData.append('validador', ideia.validador)
 
-        if(newFile){
+        if (newFile) {
             formData.append('ficheiro_complementar', newFile)
         }
 
-        function handleSubmit(event){
+        function handleSubmit(event) {
             event.preventDefault();
 
             console.log(formData)
 
             handleServices.atualizarIdeia(formData)
-            .then(res => {
-                alert(res)
-                navigate(0)
-            })
-            .catch(err => {
-                console.log(err)
-            })
+                .then(res => {
+                    alert(res)
+                    navigate(0)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
         }
 
         return (
@@ -714,7 +842,7 @@ export default function Projetos() {
         )
     }
 
-    function ModalTransformarIdeia({ideia, perfis}){
+    function ModalTransformarIdeia({ ideia, perfis }) {
         const [_titulo, set_Titulo] = useState(ideia.titulo_ideia.trim() || "");
         const [_descricao, set_Descricao] = useState(ideia.descricao || "");
         const [_requisitos, set_Objetivos] = useState();
@@ -756,30 +884,30 @@ export default function Projetos() {
             console.log(datapost)
 
             handleServices.aceitarIdeia(ideia.id_ideia)
-            .then(res => {
-                handleServices.criarProjeto(datapost)
                 .then(res => {
-                    if (perfisSelecionados.length > 0 && res.id_projeto) {
+                    handleServices.criarProjeto(datapost)
+                        .then(res => {
+                            if (perfisSelecionados.length > 0 && res.id_projeto) {
 
-                        handleServices.criarPerfisProjetos(perfisSelecionados, res.id_projeto)
-                            .then(res => {
-                                alert("Ideia transformada em projeto com sucesso e utilizadores foram associados ao projeto!");
-                            })
-                            .catch(err => {
-                                alert(err)
-                            })
-                    } else {
-                        alert(res.message || "Ideia transformada em projeto com sucesso!");
-                    }
-                    navigate('/projeto/' + res.id_projeto)
+                                handleServices.criarPerfisProjetos(perfisSelecionados, res.id_projeto)
+                                    .then(res => {
+                                        alert("Ideia transformada em projeto com sucesso e utilizadores foram associados ao projeto!");
+                                    })
+                                    .catch(err => {
+                                        alert(err)
+                                    })
+                            } else {
+                                alert(res.message || "Ideia transformada em projeto com sucesso!");
+                            }
+                            navigate('/projeto/' + res.id_projeto)
+                        })
+                        .catch(err => {
+                            alert(err)
+                        })
                 })
                 .catch(err => {
-                    alert(err)
+                    console.log(err)
                 })
-            })
-            .catch(err => {
-                console.log(err)
-            })
         }
 
         return (

@@ -163,17 +163,17 @@ export default function Projeto() {
         setIsLinhaTemporalModalOpen(false)
     }
 
-    function handleApagarPontoLinhaTemporal(event){
+    function handleApagarPontoLinhaTemporal(event) {
         event.preventDefault();
 
         handleServices.apagarPontoLinhaTemporalProjeto(selectedLinhaTemporal.id_registo)
-        .then(res => {
-            alert(res);
-            navigate(0);
-        })
-        .catch(err => {
-            console.log(err)
-        })
+            .then(res => {
+                alert(res);
+                navigate(0);
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
     }
 
@@ -580,9 +580,15 @@ export default function Projeto() {
                         p: 4,
                     }}
                 >
-                    <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
-                        Linha temporal
-                    </Typography>
+                    <div className='d-flex justify-content-between align-items-center'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Linha temporal
+                        </Typography>
+                        <IconButton className='mb-3' onClick={handleCloseLinhaTemporalModal}>
+                            <Close />
+                        </IconButton>
+                    </div>
+
                     <ModalLinhaTemporal></ModalLinhaTemporal>
                 </Paper>
             </Modal>
@@ -600,14 +606,18 @@ export default function Projeto() {
                         top: '50%',
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
-                        width: { xs: 300, sm: 500 },
+                        width: { xs: 300, sm: 550 },
                         borderRadius: 4,
                         p: 4,
                     }}
                 >
-                    <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
-                        Tem a certeza que quer eliminar o ponto: {selectedLinhaTemporal && selectedLinhaTemporal.descricao}
-                    </Typography>
+
+                    <div className='d-flex justify-content-between align-items-center'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Tem a certeza que quer eliminar o ponto: {selectedLinhaTemporal && selectedLinhaTemporal.descricao}
+                        </Typography>
+                    </div>
+
                     <Stack direction="row" spacing={2}>
                         <Button
                             variant="contained"
