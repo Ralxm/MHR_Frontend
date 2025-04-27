@@ -46,7 +46,7 @@ const DoughnutPieChart = ({ data }) => {
                 {
                     type: 'pie',
                     padAngle: 1,
-                    radius: ['100%', '94%'],
+                    radius: ['100%', '85%'],
                     avoidLabelOverlap: false,
                     emphasis: {
                         scale: false,

@@ -25,6 +25,8 @@ import Vaga from '../Components/Vagas/Vaga'
 import CriarVaga from "../Components/Vagas/CriarVaga";
 import EditarVaga from "../Components/Vagas/EditarVaga";
 
+import Blog from "../Components/Blog/Blog";
+
 
 export default function MainPage(){
     return (
@@ -73,6 +75,9 @@ export default function MainPage(){
                 <Route path='/vagas/criar' element={<CriarVaga></CriarVaga>}>
                 </Route>
                 <Route path='/vagas/editar/:id' element={<EditarVaga></EditarVaga>}>
+                </Route>
+
+                <Route path='/blog' element={<Blog></Blog>}>
                 </Route>
             </Routes>
         </div>
