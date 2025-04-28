@@ -14,6 +14,8 @@ import TabelaProjetos from './TabelaProjetos';
 import ProjetosPieChart from './ProjetosPieChart'
 import IdeiasPieChart from './IdeiasPieChart'
 import TabelaIdeias from './TabelaIdeias';
+import TabelaSumarioProjetos from './TabelaSumarioProjetos';
+import TabelaSumarioIdeias from './TabelaSumarioIdeias';
 
 export default function Projetos() {
     const navigate = useNavigate();
@@ -119,7 +121,7 @@ export default function Projetos() {
     }
 
     function handleApagarIdeia() {
-        handleServices.apagarIdeia(selectedIdeiaApagar.id_ideia)
+        handleServices.apagarIdeia(selectedIdeiaApagar.id_ideia, id_perfil)
             .then(res => {
                 alert(res);
                 navigate(0)
@@ -162,7 +164,7 @@ export default function Projetos() {
                     <div className="row" >
                         {/* Coluna da esquerda */}
                         <div className="col-md-3" style={{ zIndex: 1000 }}>
-                            <div className='row items-container'>
+                            <div className='row items-container' style={{position: 'sticky', top: 10}}>
                                 {tab == 1 ?
                                     <span><strong>Projetos</strong></span>
                                     :
@@ -173,6 +175,13 @@ export default function Projetos() {
                                         <ProjetosPieChart projetos={projetos}></ProjetosPieChart>
                                         :
                                         <IdeiasPieChart ideias={ideias}></IdeiasPieChart>
+                                    }
+                                </div>
+                                <div className='row mt-4'>
+                                    {tab == 1 ?
+                                        <TabelaSumarioProjetos projetos={projetos}></TabelaSumarioProjetos>
+                                        :
+                                        <TabelaSumarioIdeias ideias={ideias}></TabelaSumarioIdeias>
                                     }
                                 </div>
                             </div>
@@ -881,9 +890,7 @@ export default function Projetos() {
                 data_final_prevista: _data_final_prevista,
             }
 
-            console.log(datapost)
-
-            handleServices.aceitarIdeia(ideia.id_ideia)
+            handleServices.aceitarIdeia(ideia.id_ideia, id_perfil)
                 .then(res => {
                     handleServices.criarProjeto(datapost)
                         .then(res => {

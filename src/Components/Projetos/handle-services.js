@@ -228,10 +228,13 @@ class HandleServices{
             }, reason => { throw new Error('Erro a atualizar a ideia'); });
     }
 
-    aceitarIdeia(id){
+    aceitarIdeia(id, id_perfil){
         let url = process.env.REACT_APP_BACKEND_LINK;
+        const datapost = {
+            id_perfil: id_perfil
+        }
 
-        return axios.post(url + "ideia/aceitar/" + id, null, authHeader())
+        return axios.post(url + "ideia/aceitar/" + id, datapost, authHeader())
             .then(res => {
                 if (res.data.success) {
                     return res.data.message;
@@ -239,10 +242,13 @@ class HandleServices{
             }, reason => { throw new Error('Erro a atualizar a ideia'); });
     }
 
-    apagarIdeia(id){
+    apagarIdeia(id, id_perfil){
         let url = process.env.REACT_APP_BACKEND_LINK;
+        const datapost = {
+            id_perfil: id_perfil
+        }
 
-        return axios.post(url + "ideia/rejeitar/" + id, null, authHeader())
+        return axios.post(url + "ideia/rejeitar/" + id, datapost, authHeader())
             .then(res => {
                 if (res.data.success) {
                     return res.data.message;

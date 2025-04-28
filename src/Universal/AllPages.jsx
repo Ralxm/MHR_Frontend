@@ -26,6 +26,8 @@ import CriarVaga from "../Components/Vagas/CriarVaga";
 import EditarVaga from "../Components/Vagas/EditarVaga";
 
 import Blog from "../Components/Blog/Blog";
+import Publicacao from "../Components/Blog/Publicacao";
+import EditarPublicacao from "../Components/Blog/EditarPublicacao";
 
 
 export default function MainPage(){
@@ -78,6 +80,10 @@ export default function MainPage(){
                 </Route>
 
                 <Route path='/blog' element={<Blog></Blog>}>
+                </Route>
+                <Route path='/blog/:id' element={<Publicacao></Publicacao>}>
+                </Route>
+                <Route path='/blog/editar/:id' element={<EditarPublicacao></EditarPublicacao>}>
                 </Route>
             </Routes>
         </div>

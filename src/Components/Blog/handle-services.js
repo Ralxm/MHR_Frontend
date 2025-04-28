@@ -286,6 +286,54 @@ class HandleServices{
                 }
             }, reason => { throw new Error('Erro a criar a publicação no blog'); });
     }
+
+    aceitarPublicacao(id, id_perfil){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const datapost = {
+            id_perfil: id_perfil
+        }
+
+        return axios.post(url + "blog/aceitar/" + id, datapost, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a aprovar a publicação'); });
+    }
+
+    rejeitarPublicacao(id, id_perfil){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const datapost = {
+            id_perfil: id_perfil
+        }
+
+        return axios.post(url + "blog/rejeitar/" + id, datapost, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a rejeitar a publicação'); });
+    }
+
+    getPublicacao(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "blog/get/" + id, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a ir buscar a publicação'); });
+    }
+
+    ver(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.put(url + "blog/view/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a acrescentar a visualização'); });
+    }
 }
 
 export default new HandleServices();

@@ -22,6 +22,9 @@ export default function Blog() {
     const [posts, setPosts] = useState([]);
     const [tab, setTab] = useState('1')
 
+    const [selectedPostAprovar, setSelectedPostAprovar] = useState()
+    const [selectedPostRejeitar, setSelectedPostRejeitar] = useState();
+
     const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
 
     useEffect(() => {
@@ -57,6 +60,7 @@ export default function Blog() {
         }
     }, [id_user])
 
+
     const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
         setTab(newValue);
     };
@@ -64,11 +68,32 @@ export default function Blog() {
     function carregarBlog() {
         handleServices.carregarBlog()
             .then(res => {
-                console.log(res)
                 setPosts(res);
             })
             .catch(err => {
                 console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
+            })
+    }
+
+    function handleAceitarPublicacao(id) {
+        handleServices.aceitarPublicacao(id, id_perfil)
+            .then(res => {
+                alert(res);
+                navigate(0);
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
+    function handleRejeitarPublicacao(id) {
+        handleServices.rejeitarPublicacao(id, id_perfil)
+            .then(res => {
+                alert(res);
+                navigate(0);
+            })
+            .catch(err => {
+                console.log(err)
             })
     }
 
@@ -103,6 +128,10 @@ export default function Blog() {
                                                         <Tab label="Tudo" value="1" sx={{ textTransform: 'none' }} />
                                                         <Tab label="Notícias" value="2" sx={{ textTransform: 'none' }} />
                                                         <Tab label="Visitas" value="3" sx={{ textTransform: 'none' }} />
+                                                        <Tab label="Criados por mim" value="4" sx={{ textTransform: 'none' }} />
+                                                        {(tipo_user == 1 || tipo_user == 2) &&
+                                                            <Tab label="Gestão de publicações" value="5" sx={{ textTransform: 'none' }} />
+                                                        }
                                                     </TabList>
 
                                                     <button className='btn btn-outline-primary mb-2' onClick={() => setIsCreatePostModalOpen(true)}>
@@ -114,24 +143,85 @@ export default function Blog() {
                                             <TabPanel value="1">
                                                 <div className='container-fluid'>
                                                     <div className='row g-3'>
-                                                        <TabelaPosts posts={posts} tipo_user={tipo_user}></TabelaPosts>
+                                                        <TabelaPosts
+                                                            posts={posts}
+                                                            tipo_user={tipo_user}
+                                                            id_perfil={id_perfil}
+                                                            tipo={'User'}
+                                                            onAceitar={setSelectedPostAprovar}
+                                                            onRejeitar={setSelectedPostRejeitar}
+                                                        >
+
+                                                        </TabelaPosts>
                                                     </div>
                                                 </div>
                                             </TabPanel>
                                             <TabPanel value="2">
                                                 <div className='container-fluid'>
                                                     <div className='row g-3'>
+                                                        <TabelaPosts
+                                                            posts={posts}
+                                                            tipo_user={tipo_user}
+                                                            id_perfil={id_perfil}
+                                                            tipo={'Notícias'}
+                                                            onAceitar={setSelectedPostAprovar}
+                                                            onRejeitar={setSelectedPostRejeitar}
+                                                        >
 
+                                                        </TabelaPosts>
                                                     </div>
                                                 </div>
                                             </TabPanel>
                                             <TabPanel value="3">
                                                 <div className='container-fluid'>
                                                     <div className='row g-3'>
+                                                        <TabelaPosts
+                                                            posts={posts}
+                                                            tipo_user={tipo_user}
+                                                            id_perfil={id_perfil}
+                                                            tipo={'Visitas'}
+                                                            onAceitar={setSelectedPostAprovar}
+                                                            onRejeitar={setSelectedPostRejeitar}
+                                                        >
 
+                                                        </TabelaPosts>
                                                     </div>
                                                 </div>
                                             </TabPanel>
+                                            <TabPanel value="4">
+                                                <div className='container-fluid'>
+                                                    <div className='row g-3'>
+                                                        <TabelaPosts
+                                                            posts={posts}
+                                                            tipo_user={tipo_user}
+                                                            id_perfil={id_perfil}
+                                                            tipo={'Self'}
+                                                            onAceitar={setSelectedPostAprovar}
+                                                            onRejeitar={setSelectedPostRejeitar}
+                                                        >
+
+                                                        </TabelaPosts>
+                                                    </div>
+                                                </div>
+                                            </TabPanel>
+                                            {(tipo_user == 1 || tipo_user == 2) &&
+                                                <TabPanel value="5">
+                                                    <div className='container-fluid'>
+                                                        <div className='row g-3'>
+                                                            <TabelaPosts
+                                                                posts={posts}
+                                                                tipo_user={tipo_user}
+                                                                id_perfil={id_perfil}
+                                                                tipo={'Admin'}
+                                                                onAceitar={setSelectedPostAprovar}
+                                                                onRejeitar={setSelectedPostRejeitar}
+                                                            >
+
+                                                            </TabelaPosts>
+                                                        </div>
+                                                    </div>
+                                                </TabPanel>
+                                            }
                                         </TabContext>
                                     </Box>
                                 </div>
@@ -159,7 +249,99 @@ export default function Blog() {
                         p: 4,
                     }}
                 >
-                    <ModalCriarPost/>
+                    <ModalCriarPost />
+                </Paper>
+            </Modal>
+
+            {/* Modal para aceitar uma publicação */}
+            <Modal
+                open={selectedPostAprovar}
+                onClose={() => setSelectedPostAprovar(null)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 550 },
+                        borderRadius: 4,
+                        p: 4,
+                        display: 'flex'
+                    }}
+                    className='row'
+                >
+                    <Box className='col-md-12'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Tem a certeza que pretende aprovar a publicação?
+                        </Typography>
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => { setSelectedPostAprovar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Fechar
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="success"
+                                onClick={() => { handleAceitarPublicacao(selectedPostAprovar.id_publicacao); setSelectedPostAprovar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Aprovar
+                            </Button>
+                        </Stack>
+                    </Box>
+                </Paper>
+            </Modal>
+
+            {/* Modal para rejeitar uma publicação */}
+            <Modal
+                open={selectedPostRejeitar}
+                onClose={() => setSelectedPostRejeitar(null)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 550 },
+                        borderRadius: 4,
+                        p: 4,
+                        display: 'flex'
+                    }}
+                    className='row'
+                >
+                    <Box className='col-md-12'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Tem a certeza que pretende rejeitar a publicação?
+                        </Typography>
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => { setSelectedPostRejeitar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Fechar
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={() => { handleRejeitarPublicacao(selectedPostRejeitar.id_publicacao); setSelectedPostRejeitar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Apagar
+                            </Button>
+                        </Stack>
+                    </Box>
                 </Paper>
             </Modal>
         </div>
@@ -175,17 +357,17 @@ export default function Blog() {
         const [duracao_visita, setDuracaoVisita] = useState('');
         const [motivo_visita, setMotivoVisita] = useState('');
         const [imagem, setImagem] = useState(null);
-    
+
         const handleSubmit = async (e) => {
             e.preventDefault();
-    
+
             const formData = new FormData();
             formData.append('id_perfil', id_perfil);
             formData.append('tipo', tipo);
             formData.append('titulo', titulo);
             formData.append('texto', texto);
             formData.append('estado', 'Em análise');
-            
+
             if (tipo === 'Notícia') {
                 formData.append('data_noticia', data_noticia);
             } else {
@@ -194,21 +376,21 @@ export default function Blog() {
                 formData.append('duracao_visita', duracao_visita);
                 formData.append('motivo_visita', motivo_visita);
             }
-            
+
             if (imagem) {
                 formData.append('imagem', imagem);
             }
-    
+
             handleServices.criarPublicacao(formData)
-            .then(res => {
-                alert(res)
-                navigate(0)
-            })
-            .catch(err => {
-                console.log(err)
-            })
+                .then(res => {
+                    alert(res)
+                    navigate(0)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
         };
-    
+
         return (
             <>
                 <div className='d-flex justify-content-between align-items-center mb-3'>
@@ -219,7 +401,7 @@ export default function Blog() {
                         <Close />
                     </IconButton>
                 </div>
-    
+
                 <form onSubmit={handleSubmit}>
                     <Stack spacing={3}>
                         <FormControl fullWidth>
@@ -234,7 +416,7 @@ export default function Blog() {
                                 <MenuItem value="Visita">Visita</MenuItem>
                             </Select>
                         </FormControl>
-    
+
                         <TextField
                             label="Título"
                             value={titulo}
@@ -242,7 +424,7 @@ export default function Blog() {
                             fullWidth
                             required
                         />
-    
+
                         <TextField
                             label="Texto"
                             value={texto}
@@ -252,7 +434,7 @@ export default function Blog() {
                             fullWidth
                             required
                         />
-    
+
                         {tipo === 'Notícia' ? (
                             <>
                                 <TextField
@@ -300,7 +482,7 @@ export default function Blog() {
                                 />
                             </>
                         ) : null}
-    
+
                         <FileDropZone
                             onDrop={(files) => {
                                 if (files && files.length > 0) {
@@ -312,17 +494,17 @@ export default function Blog() {
                             }}
                             maxSize={10 * 1024 * 1024}
                         />
-    
+
                         <Stack direction="row" spacing={2} justifyContent="flex-end">
-                            <Button 
-                                variant="outlined" 
+                            <Button
+                                variant="outlined"
                                 onClick={() => setIsCreatePostModalOpen(false)}
                             >
                                 Cancelar
                             </Button>
-                            <Button 
-                                type="submit" 
-                                variant="contained" 
+                            <Button
+                                type="submit"
+                                variant="contained"
                                 color="primary"
                             >
                                 Criar

@@ -10,13 +10,38 @@ import { Box, Modal, Paper, Typography, Button, Stack, Chip, Avatar, Divider } f
 import { CalendarToday, LocationOn, Schedule } from '@mui/icons-material'
 
 
-export default function TabelaPosts({ posts, tipo_user }) {
+export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar }) {
     const navigate = useNavigate();
 
+    const filteredPosts = posts.filter(post => {
+        if (tipo === "User") {
+            return post.estado != "Em análise";
+        }
+
+        if (tipo === "Admin") {
+            return post.estado == "Em análise";
+        }
+
+        if (tipo === "Self") {
+            return post.id_perfil == id_perfil;
+        }
+
+        if (tipo === "Visitas") {
+            return post.tipo == "Visita" && post.estado == "Aprovada";
+        }
+
+        if (tipo === "Notícias") {
+            return post.tipo == "Notícia" && post.estado == "Aprovada";
+        }
+
+        return false;
+    });
+
     return (
-        posts.map((post) => {
+        filteredPosts.map((post) => {
             return (
-                <Paper elevation={2} sx={{ p: 3, borderRadius: 2, display: 'flex', gap: 3, cursor: 'pointer' }} onClick={() => navigate('/blog/' + post.id_publicacao)}>
+                <Paper elevation={2} sx={{ p: 3, borderRadius: 2, display: 'flex', gap: 3, cursor: 'pointer', width: '100%', overflow: 'auto', flexDirection: { xs: 'column', md: 'row' } }} 
+                onClick={() => navigate('/blog/' + post.id_publicacao, {state: {post}})}>
                     {post.imagem && (
                         <Box
                             sx={{
@@ -39,7 +64,7 @@ export default function TabelaPosts({ posts, tipo_user }) {
                         </Box>
                     )}
 
-                    <Box sx={{ flexGrow: 1 }}>
+                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>
                         <Stack spacing={2}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                 <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
@@ -48,7 +73,7 @@ export default function TabelaPosts({ posts, tipo_user }) {
                                 <Chip
                                     label={post.estado}
                                     color={
-                                        post.estado === "Validada" ? "success" :
+                                        post.estado === "Aprovada" ? "success" :
                                             post.estado === "Rejeitada" ? "error" : "warning"
                                     }
                                     size="small"
@@ -94,7 +119,14 @@ export default function TabelaPosts({ posts, tipo_user }) {
                                 </div>
                             )}
 
-                            <Typography variant="body1" sx={{ mt: 1 }}>
+                            <Typography variant="body1" sx={{
+                                mt: 1,
+                                wordBreak: 'break-word',
+                                overflow: 'hidden',
+                                display: '-webkit-box',
+                                WebkitLineClamp: 3,
+                                WebkitBoxOrient: 'vertical'
+                            }}>
                                 {post.texto?.length > 200 ? `${post.texto.substring(0, 200)}...` : post.texto}
                             </Typography>
 
@@ -108,7 +140,45 @@ export default function TabelaPosts({ posts, tipo_user }) {
                                     {post.views || 0} visualizações
                                 </Typography>
                             </div>
-                            {(tipo_user == 1 || tipo_user == 2) && (
+
+                            {tipo === "Self" ? (
+                                <>
+                                    <Divider sx={{ my: 1 }} />
+                                    <div
+                                        style={{
+                                            display: 'flex',
+                                            justifyContent: 'flex-end',
+                                            gap: 1,
+                                            cursor: 'default'
+                                        }}
+                                        onClick={(e) => e.stopPropagation()}
+                                    >
+                                        <Button
+                                            size="small"
+                                            color="primary"
+                                            variant="outlined"
+                                            sx={{mx: 1}}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate('/blog/editar/' + post.id_publicacao)
+                                            }}
+                                        >
+                                            Editar
+                                        </Button>
+                                        <Button
+                                            size="small"
+                                            color="error"
+                                            variant="outlined"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                navigate('/blog/editar/' + post.id_publicacao)
+                                            }}
+                                        >
+                                            Apagar
+                                        </Button>
+                                    </div>
+                                </>
+                            ) : (tipo == "Admin" && (tipo_user == 1 || tipo_user == 2)) ? (
                                 <>
                                     <Divider sx={{ my: 1 }} />
                                     <div
@@ -124,9 +194,10 @@ export default function TabelaPosts({ posts, tipo_user }) {
                                             size="small"
                                             color="error"
                                             variant="outlined"
-                                            sx={{mx: 1}}
+                                            sx={{ mx: 1 }}
                                             onClick={(e) => {
                                                 e.stopPropagation();
+                                                onRejeitar(post)
                                             }}
                                         >
                                             Rejeitar
@@ -137,13 +208,14 @@ export default function TabelaPosts({ posts, tipo_user }) {
                                             variant="outlined"
                                             onClick={(e) => {
                                                 e.stopPropagation();
+                                                onAceitar(post)
                                             }}
                                         >
                                             Aceitar
                                         </Button>
                                     </div>
                                 </>
-                            )}
+                            ) : null}
                         </Stack>
                     </Box>
                 </Paper >
