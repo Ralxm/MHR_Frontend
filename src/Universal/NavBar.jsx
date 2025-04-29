@@ -102,12 +102,12 @@ export default function NavBar() {
             {(tipo == 1 || tipo == 2) &&
               <div className="nav-item">
                 <a
-                  className={`nav-link ${link === "blog" ? "active" : ""}`}
+                  className={`nav-link ${link === "gestao" ? "active" : ""}`}
                   href='/gestao'
                 >
-                  Perfis & Departamentos
+                  Empresa
                 </a>
-                <div className={`underline ${link === "blog" ? "active" : ""}`} />
+                <div className={`underline ${link === "gestao" ? "active" : ""}`} />
               </div>
             }
           </div>

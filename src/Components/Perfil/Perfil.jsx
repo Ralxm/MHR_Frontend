@@ -144,12 +144,9 @@ export default function Perfil() {
                                                     <h2 className='mb-0' style={{ color: '#2c3e50', fontWeight: '600' }}>
                                                         Dados do utilizador
                                                     </h2>
-                                                    <Button
-                                                        variant="contained"
-                                                        onClick={() => setAction(action === 'ver' ? 'editar' : 'ver')}
-                                                    >
+                                                    <button className='btn btn-primary' onClick={() => setAction(action === 'ver' ? 'editar' : 'ver')}>
                                                         {action === 'ver' ? 'Editar Perfil' : 'Cancelar Edição'}
-                                                    </Button>
+                                                    </button>
                                                 </div>
                                             </div>
 
@@ -263,7 +260,7 @@ export default function Perfil() {
 
                                             {action === 'editar' && (
                                                 <div className='row p-3 d-flex' style={{ flexGrow: 1 }}>
-                                                    <button className='btn btn-primary' onClick={handleEditar}>
+                                                    <button className='btn btn-success' onClick={handleEditar}>
                                                         Guardar Alterações
                                                     </button>
                                                 </div>

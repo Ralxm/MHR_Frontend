@@ -13,7 +13,7 @@ import TabelaPosts from './TabelaPosts';
 import FileDropZone from '../../Universal/FileDropZoneSingle';
 import SidebarItems from '../Blog/Sidebar';
 
-export default function Blog() {
+export default function BlogPorAprovar() {
     const navigate = useNavigate();
 
     const [id_user, setUtilizador] = useState();
@@ -21,7 +21,6 @@ export default function Blog() {
     const [id_perfil, setPerfil] = useState()
 
     const [posts, setPosts] = useState([]);
-    const [tab, setTab] = useState('1')
 
     const [selectedPostAprovar, setSelectedPostAprovar] = useState()
     const [selectedPostRejeitar, setSelectedPostRejeitar] = useState();
@@ -39,10 +38,6 @@ export default function Blog() {
         let tipo = localStorage.getItem('tipo');
         if (tipo == 5) {
             navigate('/vagas')
-        }
-
-        if (tipo == 1 || tipo == 2) {
-            navigate('/blog/todas')
         }
 
         let user = localStorage.getItem("id_utilizador")
@@ -65,11 +60,6 @@ export default function Blog() {
                 })
         }
     }, [id_user])
-
-
-    const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
-        setTab(newValue);
-    };
 
     function carregarBlog() {
         handleServices.carregarBlog()
@@ -132,36 +122,24 @@ export default function Blog() {
             }}> </div>
             <div className="app-container" style={{ position: 'relative', zIndex: 1000 }}>
                 <NavBar />
-                <div className="container-fluid">
-                    <div className="row d-flex justify-content-between">
-                        {(tipo_user == 1 || tipo_user == 2) &&
-                            <div className='col-md-2'>
-                                <div className="sidebar" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
-                                    <SidebarItems tipo_user={tipo_user}></SidebarItems>
-                                </div>
-
-                            </div>
-                        }
-                        <div className="col-md-12" style={{ zIndex: 1000 }}>
-                            <div className="items-container mt-3" style={{ minHeight: '85vh', border: 'none' }}>
-                                <div className='row mb-3'>
-                                    <div className='container-fluid'>
-                                        <div className='row g-3'>
-                                            <TabelaPosts
-                                                posts={posts}
-                                                tipo_user={tipo_user}
-                                                id_perfil={id_perfil}
-                                                tipo={'User'}
-                                                onAceitar={setSelectedPostAprovar}
-                                                onRejeitar={setSelectedPostRejeitar}
-                                                cols={3}
-                                            >
-
-                                            </TabelaPosts>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
+                    {(tipo_user == 1 || tipo_user == 2) &&
+                        <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
+                            <SidebarItems tipo_user={tipo_user}></SidebarItems>
+                        </div>
+                    }
+                    <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
+                        <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Publicações por aprovar</h2>
+                        <div className='row d-flex'>
+                            <TabelaPosts
+                                posts={posts}
+                                tipo_user={tipo_user}
+                                id_perfil={id_perfil}
+                                tipo={'Admin'}
+                                onAceitar={setSelectedPostAprovar}
+                                onRejeitar={setSelectedPostRejeitar}
+                                cols={4}
+                            />
                         </div>
                     </div>
                 </div>
@@ -274,7 +252,7 @@ export default function Blog() {
                                 onClick={() => { handleRejeitarPublicacao(selectedPostRejeitar.id_publicacao); setSelectedPostRejeitar(null) }}
                                 sx={{ width: '50%' }}
                             >
-                                Apagar
+                                Rejeitar
                             </Button>
                         </Stack>
                     </Box>

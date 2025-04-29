@@ -10,10 +10,14 @@ import { Box, Modal, Paper, Typography, Button, Stack, Chip, Avatar, Divider } f
 import { CalendarToday, LocationOn, Schedule } from '@mui/icons-material'
 
 
-export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar, onApagar }) {
+export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar, onApagar, user, loggedid, cols }) {
     const navigate = useNavigate();
 
     const filteredPosts = posts.filter(post => {
+        if (tipo === "Por_User") {
+            return post.id_perfil === user?.id_perfil;
+        }
+
         if (tipo === "User") {
             return post.estado != "Em análise";
         }
@@ -40,185 +44,177 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
     return (
         filteredPosts.map((post) => {
             return (
-                <Paper elevation={2} sx={{ p: 3, borderRadius: 2, display: 'flex', gap: 3, cursor: 'pointer', width: '100%', overflow: 'auto', flexDirection: { xs: 'column', md: 'row' } }} 
-                onClick={() => navigate('/blog/' + post.id_publicacao, {state: {post}})}>
-                    {post.imagem && (
+                <div className={`col-md-${cols} mb-3`}>
+                    <Paper
+                        elevation={2}
+                        sx={{
+                            p: 2,
+                            borderRadius: 2,
+                            cursor: 'pointer',
+                            width: '100%',
+                            height: '400px',
+                            display: 'flex',
+                            flexDirection: 'column',
+                            gap: 2,
+                            '&:hover': {
+                                boxShadow: 4
+                            }
+                        }}
+                        onClick={() => navigate('/blog/' + post.id_publicacao, { state: { post } })}
+                    >
                         <Box
                             sx={{
-                                minWidth: 300,
-                                height: 150,
-                                borderRadius: 2,
+                                width: '100%',
+                                height: '180px',
+                                borderRadius: 1,
                                 overflow: 'hidden',
-                                flexShrink: 0
+                                mb: 1,
+                                backgroundColor: post.imagem ? 'transparent' : 'action.hover',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center'
                             }}
                         >
-                            <img
-                                src={`http://localhost:8080/${post.imagem}`}
-                                alt={post.titulo}
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    objectFit: 'cover'
-                                }}
-                            />
-                        </Box>
-                    )}
-
-                    <Box sx={{ flexGrow: 1, minWidth: 0 }}>
-                        <Stack spacing={2}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Typography variant="h5" component="h2" sx={{ fontWeight: 'bold' }}>
-                                    {post.titulo}
-                                </Typography>
-                                <Chip
-                                    label={post.estado}
-                                    color={
-                                        post.estado === "Aprovada" ? "success" :
-                                            post.estado === "Rejeitada" ? "error" : "warning"
-                                    }
-                                    size="small"
+                            {post.imagem ? (
+                                <img
+                                    src={`http://localhost:8080/${post.imagem}`}
+                                    alt={post.titulo}
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'cover'
+                                    }}
                                 />
-                            </div>
+                            ) : (
+                                <CalendarToday fontSize="large" color="disabled" />
+                            )}
+                        </Box>
 
-                            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                                <Avatar sx={{ width: 24, height: 24, fontSize: 12 }}>
-                                    {post.perfil?.nome?.charAt(0) || 'U'}
-                                </Avatar>
-                                <Typography variant="body2" color="text.secondary">
-                                    {post.perfil?.nome || 'Utilizador'} • {post.created_at}
-                                </Typography>
-                            </div>
+                        <Box sx={{
+                            flexGrow: 1,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'space-between'
+                        }}>
+                            <Typography variant="h6" component="h2" sx={{ fontWeight: 'bold' }}>
+                                {post.titulo}
+                            </Typography>
 
-                            {post.tipo === "Notícia" ? (
-                                <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                    <CalendarToday fontSize="small" color="action" />
+                            <Box sx={{ flexGrow: 1 }} />
+
+                            <Stack spacing={1.5}>
+                                <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                    <Avatar sx={{ width: 24, height: 24, fontSize: 12 }}>
+                                        {post.perfil?.nome?.charAt(0) || 'U'}
+                                    </Avatar>
                                     <Typography variant="body2" color="text.secondary">
-                                        {post.data_noticia}
+                                        {post.perfil?.nome || 'Utilizador'} • {post.created_at}
                                     </Typography>
                                 </div>
-                            ) : (
-                                <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        <LocationOn fontSize="small" color="action" />
-                                        <Typography variant="body2" color="text.secondary">
-                                            {post.local_visita}
-                                        </Typography>
-                                    </div>
+
+                                {post.tipo === "Notícia" ? (
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                         <CalendarToday fontSize="small" color="action" />
                                         <Typography variant="body2" color="text.secondary">
-                                            {post.data_visita}
+                                            {post.data_noticia}
                                         </Typography>
                                     </div>
-                                    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-                                        <Schedule fontSize="small" color="action" />
-                                        <Typography variant="body2" color="text.secondary">
-                                            {post.duracao_visita} horas
-                                        </Typography>
+                                ) : (
+                                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                                     </div>
+                                )}
+
+                                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                                    <Chip
+                                        label={post.tipo}
+                                        variant="outlined"
+                                        color={post.tipo === "Notícia" ? "primary" : "secondary"}
+                                        size="small"
+                                    />
+                                    <Typography variant="body2" color="text.secondary">
+                                        {post.views || 0} visualizações
+                                    </Typography>
                                 </div>
-                            )}
+                            </Stack>
+                        </Box>
 
-                            <Typography variant="body1" sx={{
-                                mt: 1,
-                                wordBreak: 'break-word',
-                                overflow: 'hidden',
-                                display: '-webkit-box',
-                                WebkitLineClamp: 3,
-                                WebkitBoxOrient: 'vertical'
-                            }}>
-                                {post.texto?.length > 200 ? `${post.texto.substring(0, 200)}...` : post.texto}
-                            </Typography>
+                        {(tipo == "Admin" || post.id_perfil == loggedid) &&
+                            <Divider></Divider>
+                        }
 
-                            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <Chip
-                                    label={post.tipo}
+                        {tipo == "Admin" &&
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    gap: 1,
+                                    cursor: 'default'
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <Button
+                                    size="small"
+                                    color="error"
                                     variant="outlined"
-                                    color={post.tipo === "Notícia" ? "primary" : "secondary"}
-                                />
-                                <Typography variant="body2" color="text.secondary">
-                                    {post.views || 0} visualizações
-                                </Typography>
+                                    sx={{ mx: 1 }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onRejeitar(post)
+                                    }}
+                                >
+                                    Rejeitar
+                                </Button>
+                                <Button
+                                    size="small"
+                                    color="success"
+                                    variant="outlined"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onAceitar(post)
+                                    }}
+                                >
+                                    Aceitar
+                                </Button>
                             </div>
+                        }
 
-                            {tipo === "Self" ? (
-                                <>
-                                    <Divider sx={{ my: 1 }} />
-                                    <div
-                                        style={{
-                                            display: 'flex',
-                                            justifyContent: 'flex-end',
-                                            gap: 1,
-                                            cursor: 'default'
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <Button
-                                            size="small"
-                                            color="primary"
-                                            variant="outlined"
-                                            sx={{mx: 1}}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                navigate('/blog/editar/' + post.id_publicacao)
-                                            }}
-                                        >
-                                            Editar
-                                        </Button>
-                                        <Button
-                                            size="small"
-                                            color="error"
-                                            variant="outlined"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onApagar(post)
-                                            }}
-                                        >
-                                            Apagar
-                                        </Button>
-                                    </div>
-                                </>
-                            ) : (tipo == "Admin" && (tipo_user == 1 || tipo_user == 2)) ? (
-                                <>
-                                    <Divider sx={{ my: 1 }} />
-                                    <div
-                                        style={{
-                                            display: 'flex',
-                                            justifyContent: 'flex-end',
-                                            gap: 1,
-                                            cursor: 'default'
-                                        }}
-                                        onClick={(e) => e.stopPropagation()}
-                                    >
-                                        <Button
-                                            size="small"
-                                            color="error"
-                                            variant="outlined"
-                                            sx={{ mx: 1 }}
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onRejeitar(post)
-                                            }}
-                                        >
-                                            Rejeitar
-                                        </Button>
-                                        <Button
-                                            size="small"
-                                            color="success"
-                                            variant="outlined"
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                onAceitar(post)
-                                            }}
-                                        >
-                                            Aceitar
-                                        </Button>
-                                    </div>
-                                </>
-                            ) : null}
-                        </Stack>
-                    </Box>
-                </Paper >
+                        {loggedid == post.id_perfil &&
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    gap: 1,
+                                    cursor: 'default'
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                            >
+                                <Button
+                                    size="small"
+                                    color="primary"
+                                    variant="outlined"
+                                    sx={{ mx: 1 }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        navigate('/blog/editar/' + post.id_publicacao)
+                                    }}
+                                >
+                                    Editar
+                                </Button>
+                                <Button
+                                    size="small"
+                                    color="error"
+                                    variant="outlined"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onApagar(post)
+                                    }}
+                                >
+                                    Apagar
+                                </Button>
+                            </div>
+                        }
+                    </Paper>
+                </div>
             );
         })
     )

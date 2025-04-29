@@ -26,10 +26,14 @@ import CriarVaga from "../Components/Vagas/CriarVaga";
 import EditarVaga from "../Components/Vagas/EditarVaga";
 
 import Blog from "../Components/Blog/Blog";
+import BlogTodasPublicacoes from "../Components/Blog/BlogTodasPublicacoes";
+import BlogPorUtilizador from "../Components/Blog/BlogPorUtilizador";
+import BlogPorAprovar from "../Components/Blog/BlogPorAprovar";
 import Publicacao from "../Components/Blog/Publicacao";
 import EditarPublicacao from "../Components/Blog/EditarPublicacao";
 
 import Perfil from "../Components/Perfil/Perfil";
+import Gestao from "../Components/Gestao/Gestao";
 
 
 export default function MainPage(){
@@ -83,6 +87,12 @@ export default function MainPage(){
 
                 <Route path='/blog' element={<Blog></Blog>}>
                 </Route>
+                <Route path='/blog/todas' element={<BlogTodasPublicacoes></BlogTodasPublicacoes>}>
+                </Route>
+                <Route path='/blog/por_utilizador' element={<BlogPorUtilizador></BlogPorUtilizador>}>
+                </Route>
+                <Route path='/blog/por_aprovar' element={<BlogPorAprovar></BlogPorAprovar>}>
+                </Route>
                 <Route path='/blog/:id' element={<Publicacao></Publicacao>}>
                 </Route>
                 <Route path='/blog/editar/:id' element={<EditarPublicacao></EditarPublicacao>}>
@@ -90,6 +100,8 @@ export default function MainPage(){
 
                 
                 <Route path='/perfil' element={<Perfil></Perfil>}>
+                </Route>
+                <Route path='/gestao' element={<Gestao></Gestao>}>
                 </Route>
             </Routes>
         </div>

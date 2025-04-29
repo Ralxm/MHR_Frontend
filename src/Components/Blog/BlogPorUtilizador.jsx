@@ -6,14 +6,14 @@ import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Box, Modal, Paper, Typography, Button, TextField, Tab, Stack, FormControl, InputLabel, Select, MenuItem, IconButton, Chip } from '@mui/material';
+import { Box, Modal, Paper, Typography, Button, TextField, Tab, Stack, FormControl, InputLabel, Select, MenuItem, IconButton, Autocomplete } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Delete, Close } from '@mui/icons-material'
 import TabelaPosts from './TabelaPosts';
 import FileDropZone from '../../Universal/FileDropZoneSingle';
 import SidebarItems from '../Blog/Sidebar';
 
-export default function Blog() {
+export default function BlogPotUtilizador() {
     const navigate = useNavigate();
 
     const [id_user, setUtilizador] = useState();
@@ -21,13 +21,15 @@ export default function Blog() {
     const [id_perfil, setPerfil] = useState()
 
     const [posts, setPosts] = useState([]);
-    const [tab, setTab] = useState('1')
 
     const [selectedPostAprovar, setSelectedPostAprovar] = useState()
     const [selectedPostRejeitar, setSelectedPostRejeitar] = useState();
     const [selectedPostApagar, setSelectedPostApagar] = useState();
 
     const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
+
+    const [perfis, setPerfis] = useState([]);
+    const [selectedPerfil, setSelectedPerfil] = useState();
 
     useEffect(() => {
         document.title = "Blog"
@@ -41,10 +43,6 @@ export default function Blog() {
             navigate('/vagas')
         }
 
-        if (tipo == 1 || tipo == 2) {
-            navigate('/blog/todas')
-        }
-
         let user = localStorage.getItem("id_utilizador")
         if (user) {
             setUtilizador(user)
@@ -52,6 +50,7 @@ export default function Blog() {
         }
 
         carregarBlog();
+        carregarPerfis();
     }, [])
 
     useEffect(() => {
@@ -59,6 +58,7 @@ export default function Blog() {
             handleServices.find_perfil(id_user)
                 .then(res => {
                     setPerfil(res.id_perfil);
+                    setSelectedPerfil(res)
                 })
                 .catch(err => {
                     console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
@@ -67,9 +67,15 @@ export default function Blog() {
     }, [id_user])
 
 
-    const handleChangeTab = (event: SyntheticEvent, newValue: string) => {
-        setTab(newValue);
-    };
+    function carregarPerfis() {
+        handleServices.carregarPerfis(id_user)
+            .then(res => {
+                setPerfis(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
+            })
+    }
 
     function carregarBlog() {
         handleServices.carregarBlog()
@@ -132,36 +138,55 @@ export default function Blog() {
             }}> </div>
             <div className="app-container" style={{ position: 'relative', zIndex: 1000 }}>
                 <NavBar />
-                <div className="container-fluid">
-                    <div className="row d-flex justify-content-between">
-                        {(tipo_user == 1 || tipo_user == 2) &&
-                            <div className='col-md-2'>
-                                <div className="sidebar" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
-                                    <SidebarItems tipo_user={tipo_user}></SidebarItems>
-                                </div>
+                <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
+                    {(tipo_user == 1 || tipo_user == 2) &&
+                        <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
+                            <SidebarItems tipo_user={tipo_user}></SidebarItems>
+                        </div>
+                    }
+                    <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
+                        <div className='d-flex justify-content-between align-items-center mb-3'>
+                            <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Filtrar publicações por utilizador</h2>
+                            <FormControl sx={{ width: '200px' }}>
+                                <Autocomplete
+                                    options={perfis.filter(perfil => perfil.nome)}
+                                    getOptionLabel={(option) => option.nome}
+                                    renderOption={(props, option) => (
+                                        <MenuItem {...props} key={option.id_perfil}>
+                                            <div>
+                                                <div style={{ fontWeight: 500 }}>{option.nome}</div>
+                                                <div style={{ fontSize: '0.8rem', color: '#666' }}>{option.email}</div>
+                                            </div>
+                                        </MenuItem>
+                                    )}
+                                    onChange={(event, newValue) => {
+                                        setSelectedPerfil(newValue);
+                                    }}
+                                    value={selectedPerfil}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            label="Utilizador"
+                                            variant="outlined"
+                                        />
+                                    )}
+                                    fullWidth
+                                />
+                            </FormControl>
+                        </div>
 
-                            </div>
-                        }
-                        <div className="col-md-12" style={{ zIndex: 1000 }}>
-                            <div className="items-container mt-3" style={{ minHeight: '85vh', border: 'none' }}>
-                                <div className='row mb-3'>
-                                    <div className='container-fluid'>
-                                        <div className='row g-3'>
-                                            <TabelaPosts
-                                                posts={posts}
-                                                tipo_user={tipo_user}
-                                                id_perfil={id_perfil}
-                                                tipo={'User'}
-                                                onAceitar={setSelectedPostAprovar}
-                                                onRejeitar={setSelectedPostRejeitar}
-                                                cols={3}
-                                            >
-
-                                            </TabelaPosts>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div className='row d-flex'>
+                            <TabelaPosts
+                                posts={posts}
+                                tipo_user={tipo_user}
+                                id_perfil={id_perfil}
+                                tipo={'Por_User'}
+                                onAceitar={setSelectedPostAprovar}
+                                onRejeitar={setSelectedPostRejeitar}
+                                user={selectedPerfil}
+                                loggedid={id_perfil}
+                                cols={4}
+                            />
                         </div>
                     </div>
                 </div>

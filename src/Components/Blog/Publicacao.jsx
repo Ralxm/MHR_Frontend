@@ -79,7 +79,6 @@ export default function Publicacao() {
         })
     }
 
-
     async function carregarPost(id) {
         setIsPostLoading(true);
         try {
