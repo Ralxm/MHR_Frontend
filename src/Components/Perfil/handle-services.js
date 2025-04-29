@@ -109,6 +109,23 @@ class HandleServices{
                 }
             }, reason => { throw new Error('Erro a apagar a publicação'); });
     }
+
+    ////////////////////////////////////////////
+
+    atualizarPerfil(datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json'
+        };
+
+        return axios.post(url + "perfis/update/" + datapost.id_perfil, datapost, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a editar o perfil'); });
+    }
 }
 
 export default new HandleServices();

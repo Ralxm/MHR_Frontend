@@ -10,7 +10,7 @@ import { Box, Modal, Paper, Typography, Button, Stack, Chip, Avatar, Divider } f
 import { CalendarToday, LocationOn, Schedule } from '@mui/icons-material'
 
 
-export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar }) {
+export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar, onApagar }) {
     const navigate = useNavigate();
 
     const filteredPosts = posts.filter(post => {
@@ -171,7 +171,7 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
                                             variant="outlined"
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                navigate('/blog/editar/' + post.id_publicacao)
+                                                onApagar(post)
                                             }}
                                         >
                                             Apagar

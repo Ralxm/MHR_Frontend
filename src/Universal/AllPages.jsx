@@ -29,6 +29,8 @@ import Blog from "../Components/Blog/Blog";
 import Publicacao from "../Components/Blog/Publicacao";
 import EditarPublicacao from "../Components/Blog/EditarPublicacao";
 
+import Perfil from "../Components/Perfil/Perfil";
+
 
 export default function MainPage(){
     return (
@@ -84,6 +86,10 @@ export default function MainPage(){
                 <Route path='/blog/:id' element={<Publicacao></Publicacao>}>
                 </Route>
                 <Route path='/blog/editar/:id' element={<EditarPublicacao></EditarPublicacao>}>
+                </Route>
+
+                
+                <Route path='/perfil' element={<Perfil></Perfil>}>
                 </Route>
             </Routes>
         </div>

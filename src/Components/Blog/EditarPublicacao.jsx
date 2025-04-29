@@ -15,6 +15,7 @@ export default function EditarPublicacao() {
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
+    const [perfil, setPerfil] = useState();
 
     const [post, setPost] = useState(null)
 
@@ -34,10 +35,11 @@ export default function EditarPublicacao() {
             navigate('/login')
         }
 
-        let tipo = localStorage.getItem('tipo');
-        if (tipo == 5 || tipo == 4 || tipo == 3) {
-            navigate('/projetos')
-        }
+
+        //let tipo = localStorage.getItem('tipo');
+        //if (tipo == 5 || tipo == 4 || tipo == 3) {
+        //    navigate('/blog')
+        //}
 
         let user = localStorage.getItem("id_utilizador")
         if (user) {
@@ -65,6 +67,26 @@ export default function EditarPublicacao() {
         }
     }, [post])
 
+    useEffect(() => {
+        if (id_user) {
+            handleServices.find_perfil(id_user)
+                .then(res => {
+                    setPerfil(res)
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+    }, [id_user])
+
+    useEffect(() => {
+        if(post && perfil){
+            if(post.id_perfil != perfil.id_perfil){
+                navigate('/blog')
+            }
+        }
+    }, [perfil, post])
+
     function carregarPost() {
         handleServices.getPublicacao(id)
             .then(res => {
@@ -89,9 +111,27 @@ export default function EditarPublicacao() {
         event.preventDefault();
 
         const datapost = {
-        }
+            id_publicacao: id,
+            tipo: tipo,
+            titulo: titulo,
+            texto: texto,
+            estado: estado,
+            data_noticia: tipo === 'Notícia' ? data_noticia : null,
+            local_visita: tipo === 'Visita' ? local_visita : null,
+            data_visita: tipo === 'Visita' ? data_visita : null,
+            duracao_visita: tipo === 'Visita' ? duracao_visita : null,
+            motivo_visita: tipo === 'Visita' ? motivo_visita : null
+        };
 
-
+        handleServices.editarPublicacao(datapost)
+            .then(res => {
+                console.log(res)
+                alert(res.message)
+                navigate('/blog/' + res.data)
+            })
+            .catch(err => {
+                console.log(err)
+            })
 
     }
 
@@ -139,7 +179,7 @@ export default function EditarPublicacao() {
                                             <div className='row mb-3'>
                                                 <div className='d-flex justify-content-between align-items-center'>
                                                     <h2 className='mb-0' style={{ color: '#2c3e50', fontWeight: '600' }}>
-                                                        Edição do projeto
+                                                        Edição da publicação
                                                     </h2>
                                                 </div>
                                             </div>

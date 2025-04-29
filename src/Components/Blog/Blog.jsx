@@ -24,6 +24,7 @@ export default function Blog() {
 
     const [selectedPostAprovar, setSelectedPostAprovar] = useState()
     const [selectedPostRejeitar, setSelectedPostRejeitar] = useState();
+    const [selectedPostApagar, setSelectedPostApagar] = useState();
 
     const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
 
@@ -88,6 +89,17 @@ export default function Blog() {
 
     function handleRejeitarPublicacao(id) {
         handleServices.rejeitarPublicacao(id, id_perfil)
+            .then(res => {
+                alert(res);
+                navigate(0);
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
+
+    function handleApagarPublicacao(id) {
+        handleServices.apagarPublicacao(id, id_perfil)
             .then(res => {
                 alert(res);
                 navigate(0);
@@ -198,6 +210,7 @@ export default function Blog() {
                                                             tipo={'Self'}
                                                             onAceitar={setSelectedPostAprovar}
                                                             onRejeitar={setSelectedPostRejeitar}
+                                                            onApagar={setSelectedPostApagar}
                                                         >
 
                                                         </TabelaPosts>
@@ -344,6 +357,52 @@ export default function Blog() {
                     </Box>
                 </Paper>
             </Modal>
+
+            {/* Modal para apagar uma publicação */}
+            <Modal
+                open={selectedPostApagar}
+                onClose={() => setSelectedPostApagar(null)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 550 },
+                        borderRadius: 4,
+                        p: 4,
+                        display: 'flex'
+                    }}
+                    className='row'
+                >
+                    <Box className='col-md-12'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Tem a certeza que pretende apagar a publicação?
+                        </Typography>
+                        <Stack direction="row" spacing={2}>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                onClick={() => { setSelectedPostApagar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Fechar
+                            </Button>
+                            <Button
+                                variant="contained"
+                                color="error"
+                                onClick={() => { handleApagarPublicacao(selectedPostApagar.id_publicacao); setSelectedPostApagar(null) }}
+                                sx={{ width: '50%' }}
+                            >
+                                Apagar
+                            </Button>
+                        </Stack>
+                    </Box>
+                </Paper>
+            </Modal>
         </div>
     );
 
@@ -357,6 +416,16 @@ export default function Blog() {
         const [duracao_visita, setDuracaoVisita] = useState('');
         const [motivo_visita, setMotivoVisita] = useState('');
         const [imagem, setImagem] = useState(null);
+
+        const [previewUrl, setPreviewUrl] = useState(null);
+
+        useEffect(() => {
+            return () => {
+                if (previewUrl) {
+                    URL.revokeObjectURL(previewUrl);
+                }
+            };
+        }, [previewUrl]);
 
         const handleSubmit = async (e) => {
             e.preventDefault();
@@ -487,6 +556,7 @@ export default function Blog() {
                             onDrop={(files) => {
                                 if (files && files.length > 0) {
                                     setImagem(files[0]);
+                                    setPreviewUrl(URL.createObjectURL(files[0]));
                                 }
                             }}
                             accept={{
@@ -494,6 +564,25 @@ export default function Blog() {
                             }}
                             maxSize={10 * 1024 * 1024}
                         />
+
+                        <div className='d-flex justify-content-center'>
+                        {previewUrl && (
+                            <div style={{ marginTop: '16px' }}>
+                                <Typography variant="subtitle2" gutterBottom>
+                                    Preview da Imagem:
+                                </Typography>
+                                <img
+                                    src={previewUrl}
+                                    alt="Preview"
+                                    style={{
+                                        maxWidth: '100%',
+                                        maxHeight: '200px',
+                                        borderRadius: '4px'
+                                    }}
+                                />
+                            </div>
+                        )}
+                        </div>
 
                         <Stack direction="row" spacing={2} justifyContent="flex-end">
                             <Button

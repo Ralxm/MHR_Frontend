@@ -50,7 +50,6 @@ export default function NavBar() {
 
         {isLoggedIn && tipo != 5 ? (
           <div className="navbar-items p-3">
-            {/* Vagas Link */}
             <div className="nav-item">
               <a
                 className={`nav-link ${link.includes("vagas") ? "active" : ""}`}
@@ -61,7 +60,6 @@ export default function NavBar() {
               <div className={`underline ${link.includes("vagas") ? "active" : ""}`} />
             </div>
 
-            {/* Calendário Link */}
             <div className="nav-item">
               <a
                 className={`nav-link ${link === "calendario" ? "active" : ""}`}
@@ -71,8 +69,6 @@ export default function NavBar() {
               </a>
               <div className={`underline ${link === "calendario" ? "active" : ""}`} />
             </div>
-
-            {/* Projetos Link */}
             <div className="nav-item">
               <a
                 className={`nav-link ${link === "projetos" ? "active" : ""}`}
@@ -83,7 +79,6 @@ export default function NavBar() {
               <div className={`underline ${link === "projetos" ? "active" : ""}`} />
             </div>
 
-            {/* Despesas Link */}
             <div className="nav-item">
               <a
                 className={`nav-link ${link === "despesas" ? "active" : ""}`}
@@ -94,7 +89,6 @@ export default function NavBar() {
               <div className={`underline ${link === "despesas" ? "active" : ""}`} />
             </div>
 
-            {/* Blog Link */}
             <div className="nav-item">
               <a
                 className={`nav-link ${link === "blog" ? "active" : ""}`}
@@ -104,6 +98,18 @@ export default function NavBar() {
               </a>
               <div className={`underline ${link === "blog" ? "active" : ""}`} />
             </div>
+
+            {(tipo == 1 || tipo == 2) &&
+              <div className="nav-item">
+                <a
+                  className={`nav-link ${link === "blog" ? "active" : ""}`}
+                  href='/gestao'
+                >
+                  Perfis & Departamentos
+                </a>
+                <div className={`underline ${link === "blog" ? "active" : ""}`} />
+              </div>
+            }
           </div>
         ) : (
           <div className="navbar-items p-3">
@@ -111,33 +117,34 @@ export default function NavBar() {
           </div>
         )}
         <IconButton
-              size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
-              onClick={handleMenu}
-              color="inherit"
-            >
-              <Icon icon="material-symbols:account-circle" sx={{ fontSize: 24 }} />
-            </IconButton>
-            <Menu
-              id="menu-appbar"
-              anchorEl={anchorEl}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'right',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'right',
-              }}
-              open={Boolean(anchorEl)}
-              onClose={handleClose}
-            >
-              <MenuItem disabled>{nome}</MenuItem>
-              <MenuItem onClick={handleLogout}>Logout</MenuItem>
-            </Menu>
+          size="large"
+          aria-label="account of current user"
+          aria-controls="menu-appbar"
+          aria-haspopup="true"
+          onClick={handleMenu}
+          color="inherit"
+        >
+          <Icon icon="material-symbols:account-circle" sx={{ fontSize: 24 }} />
+        </IconButton>
+        <Menu
+          id="menu-appbar"
+          anchorEl={anchorEl}
+          anchorOrigin={{
+            vertical: 'bottom',
+            horizontal: 'right',
+          }}
+          keepMounted
+          transformOrigin={{
+            vertical: 'top',
+            horizontal: 'right',
+          }}
+          open={Boolean(anchorEl)}
+          onClose={handleClose}
+        >
+          <MenuItem disabled>{nome}</MenuItem>
+          <MenuItem onClick={() => navigate('/perfil')}>Ver Perfil</MenuItem>
+          <MenuItem onClick={handleLogout}>Logout</MenuItem>
+        </Menu>
       </div>
     </div>
   );
