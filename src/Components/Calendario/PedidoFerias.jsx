@@ -11,7 +11,7 @@ import SidebarItems from './SidebarItems';
 import moment from 'moment';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
 
-export default function PedidosFérias() {
+export default function PedidosFerias() {
     const navigate = useNavigate();
 
     const [id_user, setUtilizador] = useState();

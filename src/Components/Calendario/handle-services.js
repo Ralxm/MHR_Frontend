@@ -185,6 +185,36 @@ class HandleServices {
                 }
             }, reason => { throw new Error('Utilizador Inválido'); });
     }
+
+    apagarTipoFalta(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.put(url + "tipo_faltas/delete/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Utilizador Inválido'); });
+    }
+
+    criarTipoFalta(datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.post(url + "tipo_faltas/create", datapost, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Utilizador Inválido'); });
+    }
+
+    atualizarTipoFalta(id, datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.post(url + "tipo_faltas/update/" + id, datapost, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Utilizador Inválido'); });
+    }
 }
 
 export default new HandleServices();
