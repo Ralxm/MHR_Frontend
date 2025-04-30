@@ -125,7 +125,7 @@ export default function BlogTodasPublicacoes() {
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
                     {(tipo_user == 1 || tipo_user == 2) &&
                         <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
-                            <SidebarItems tipo_user={tipo_user}></SidebarItems>
+                            <SidebarItems tipo_user={tipo_user} onCriar={setIsCreatePostModalOpen}></SidebarItems>
                         </div>
                     }
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
@@ -139,7 +139,7 @@ export default function BlogTodasPublicacoes() {
                                 onAceitar={setSelectedPostAprovar}
                                 onRejeitar={setSelectedPostRejeitar}
                                 loggedid={id_perfil}
-                                cols={4}
+                                cols={3}
                             />
                         </div>
                     </div>

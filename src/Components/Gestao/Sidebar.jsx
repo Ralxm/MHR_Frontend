@@ -23,19 +23,19 @@ export default function SidebarItems() {
         <div className='sidebar-items'>
             <a href="/calendario"
                 className="sidebar-item"
-                onClick={handleNavigation('/calendario')}
+                onClick={handleNavigation('/empresa')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                 Empresa
             </a>
             <a href="/calendario/marcar_ferias"
                 className="sidebar-item"
-                onClick={handleNavigation('/calendario/marcar_ferias')}
+                onClick={handleNavigation('/utilizadores')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                 Utilizadores
             </a>
             <a href="/calendario/marcar_ferias"
                 className="sidebar-item"
-                onClick={handleNavigation('/calendario/marcar_ferias')}
+                onClick={handleNavigation('/departamentos')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                 Departamentos
             </a>

@@ -103,7 +103,7 @@ export default function NavBar() {
               <div className="nav-item">
                 <a
                   className={`nav-link ${link === "gestao" ? "active" : ""}`}
-                  href='/gestao'
+                  href='/empresa'
                 >
                   Empresa
                 </a>

@@ -144,6 +144,9 @@ export default function Blog() {
                         }
                         <div className="col-md-12" style={{ zIndex: 1000 }}>
                             <div className="items-container mt-3" style={{ minHeight: '85vh', border: 'none' }}>
+                                <div className='d-flex justify-content-end mb-3'>
+                                    <button className='btn btn-primary' onClick={() => setIsCreatePostModalOpen(true)}>Criar publicação</button>
+                                </div>
                                 <div className='row mb-3'>
                                     <div className='container-fluid'>
                                         <div className='row g-3'>

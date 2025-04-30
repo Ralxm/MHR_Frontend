@@ -33,7 +33,9 @@ import Publicacao from "../Components/Blog/Publicacao";
 import EditarPublicacao from "../Components/Blog/EditarPublicacao";
 
 import Perfil from "../Components/Perfil/Perfil";
-import Gestao from "../Components/Gestao/Gestao";
+import Empresa from "../Components/Gestao/Empresa";
+import Utilizadores from "../Components/Gestao/Utilizadores";
+import Departamentos from "../Components/Gestao/Departamentos";
 
 
 export default function MainPage(){
@@ -101,7 +103,11 @@ export default function MainPage(){
                 
                 <Route path='/perfil' element={<Perfil></Perfil>}>
                 </Route>
-                <Route path='/gestao' element={<Gestao></Gestao>}>
+                <Route path='/empresa' element={<Empresa></Empresa>}>
+                </Route>
+                <Route path='/utilizadores' element={<Utilizadores></Utilizadores>}>
+                </Route>
+                <Route path='/departamentos' element={<Departamentos></Departamentos>}>
                 </Route>
             </Routes>
         </div>

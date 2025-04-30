@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useEffect, useRef, useState } from 'react';
 import handleServices from '../Blog/handle-services';
 
-export default function SidebarItems() {
+export default function SidebarItems({onCriar}) {
     const navigate = useNavigate();
 
     const [id_user, setUtilizador] = useState();
@@ -38,6 +38,12 @@ export default function SidebarItems() {
                 onClick={handleNavigation('/blog/por_aprovar')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                 Publicações por aprovar
+            </a>
+            <a
+                className="sidebar-item"
+                onClick={() => {onCriar(true)}}
+                style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
+                Criar publicação
             </a>
         </div>
     )

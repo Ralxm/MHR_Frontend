@@ -12,119 +12,117 @@ class HandleServices{
             }, reason => { throw new Error('Utilizador Inválido'); });
     }
 
-    carregarBlog(){
+    carregarEmpresa(){
         let url = process.env.REACT_APP_BACKEND_LINK;
-        return axios.get(url + "blog/list", authHeader())
+        return axios.get(url + "empresa/get", authHeader())
             .then(res => {
                 if (res.data.success) {
                     return res.data.data;
                 }
-            }, reason => { throw new Error('Erro a listar as publicações'); });
+            }, reason => { throw new Error('Erro a carregar a empresa'); });
     }
 
-    criarPublicacao(formData){
+    atualizarEmpresa(datapost){
         let url = process.env.REACT_APP_BACKEND_LINK;
-        const headers = {
-            ...authHeader().headers,
-            'Content-Type': 'multipart/form-data'
-        };
-
-        return axios.post(url + "blog/create", formData, { headers })
+        return axios.post(url + "empresa/update", datapost, authHeader())
             .then(res => {
                 if (res.data.success) {
                     return res.data.message;
                 }
-            }, reason => { throw new Error('Erro a criar a publicação no blog'); });
+            }, reason => { throw new Error('Erro a atualizar as informações empresa'); });
     }
 
-    aceitarPublicacao(id, id_perfil){
+    carregarUtilizadores(){
         let url = process.env.REACT_APP_BACKEND_LINK;
-        const datapost = {
-            id_perfil: id_perfil
-        }
-
-        return axios.post(url + "blog/aceitar/" + id, datapost, authHeader())
-            .then(res => {
-                if (res.data.success) {
-                    return res.data.message;
-                }
-            }, reason => { throw new Error('Erro a aprovar a publicação'); });
-    }
-
-    rejeitarPublicacao(id, id_perfil){
-        let url = process.env.REACT_APP_BACKEND_LINK;
-        const datapost = {
-            id_perfil: id_perfil
-        }
-
-        return axios.post(url + "blog/rejeitar/" + id, datapost, authHeader())
-            .then(res => {
-                if (res.data.success) {
-                    return res.data.message;
-                }
-            }, reason => { throw new Error('Erro a rejeitar a publicação'); });
-    }
-
-    getPublicacao(id){
-        let url = process.env.REACT_APP_BACKEND_LINK;
-        return axios.get(url + "blog/get/" + id, authHeader())
+        return axios.get(url + "utilizadores/list", authHeader())
             .then(res => {
                 if (res.data.success) {
                     return res.data.data;
                 }
-            }, reason => { throw new Error('Erro a ir buscar a publicação'); });
+            }, reason => { throw new Error('Erro a carregar os utilizadores'); });
     }
 
-    ver(id){
+    carregarCandidaturas(){
         let url = process.env.REACT_APP_BACKEND_LINK;
-        return axios.put(url + "blog/view/" + id, null, authHeader())
+        return axios.get(url + "candidaturas/list", authHeader())
             .then(res => {
                 if (res.data.success) {
-                    return res.data.message;
+                    return res.data.data;
                 }
-            }, reason => { throw new Error('Erro a acrescentar a visualização'); });
+            }, reason => { throw new Error('Erro a carregar as candidaturas'); });
     }
 
-    editarPublicacao(datapost){
+    carregarPerfis(){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "perfis/list", authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a carregar os perfis'); });
+    }
+
+    carregarDepartamentos(){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "departamento/list", authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a carregar os departamentos'); });
+    }
+
+    atualizarPerfil(perfilData, id){
         let url = process.env.REACT_APP_BACKEND_LINK;
         const headers = {
             ...authHeader().headers,
             'Content-Type': 'application/json'
         };
-
-        return axios.post(url + "blog/update/" + datapost.id_publicacao, datapost, { headers })
-            .then(res => {
-                if (res.data.success) {
-                    return res.data;
-                }
-            }, reason => { throw new Error('Erro a editar a publicação'); });
-    }
-
-    apagarPublicacao(id){
-        let url = process.env.REACT_APP_BACKEND_LINK;
-        return axios.put(url + "blog/delete/" + id, null, authHeader())
+        return axios.post(url + "perfis/update/" + id, perfilData, {headers})
             .then(res => {
                 if (res.data.success) {
                     return res.data.message;
                 }
-            }, reason => { throw new Error('Erro a apagar a publicação'); });
+            }, reason => { throw new Error('Erro a atualizar o perfil'); });
     }
 
-    ////////////////////////////////////////////
-
-    atualizarPerfil(datapost){
+    criarDepartamento(datapost){
         let url = process.env.REACT_APP_BACKEND_LINK;
         const headers = {
             ...authHeader().headers,
             'Content-Type': 'application/json'
         };
-
-        return axios.post(url + "perfis/update/" + datapost.id_perfil, datapost, { headers })
+        return axios.post(url + "departamento/create", datapost, {headers})
             .then(res => {
                 if (res.data.success) {
                     return res.data.message;
                 }
-            }, reason => { throw new Error('Erro a editar o perfil'); });
+            }, reason => { throw new Error('Erro a criar o departamento'); });
+    }
+
+    atualizarDepartamento(datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json'
+        };
+        return axios.post(url + "departamento/update/" + datapost.id_departamento, datapost, {headers})
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a atualizar o departamento'); });
+    }
+
+    apagarDepartamento(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+
+        return axios.put(url + "departamento/delete/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a criar o departamento'); });
     }
 }
 
