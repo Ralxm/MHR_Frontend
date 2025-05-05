@@ -79,7 +79,6 @@ export default function Empresa() {
     function carregarEmpresa() {
         handleServices.carregarEmpresa()
             .then(res => {
-                console.log(res[0])
                 setEmpresa(res[0]);
             })
             .catch(err => {
@@ -99,7 +98,8 @@ export default function Empresa() {
         handleServices.atualizarEmpresa(datapost)
             .then(res => {
                 alert(res)
-                navigate(0)
+                carregarEmpresa();
+                setAction('ver')
             })
             .catch(err => {
                 console.log(err);

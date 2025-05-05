@@ -91,7 +91,8 @@ export default function BlogPotUtilizador() {
         handleServices.aceitarPublicacao(id, id_perfil)
             .then(res => {
                 alert(res);
-                navigate(0);
+                carregarBlog();
+                setSelectedPostAprovar(null)
             })
             .catch(err => {
                 console.log(err)
@@ -102,7 +103,8 @@ export default function BlogPotUtilizador() {
         handleServices.rejeitarPublicacao(id, id_perfil)
             .then(res => {
                 alert(res);
-                navigate(0);
+                carregarBlog();
+                setSelectedPostRejeitar(null)
             })
             .catch(err => {
                 console.log(err)
@@ -113,7 +115,7 @@ export default function BlogPotUtilizador() {
         handleServices.apagarPublicacao(id, id_perfil)
             .then(res => {
                 alert(res);
-                navigate(0);
+                setSelectedPostApagar(null);
             })
             .catch(err => {
                 console.log(err)
@@ -186,6 +188,7 @@ export default function BlogPotUtilizador() {
                                 user={selectedPerfil}
                                 loggedid={id_perfil}
                                 cols={3}
+                                onApagar={setSelectedPostApagar}
                             />
                         </div>
                     </div>
@@ -403,7 +406,8 @@ export default function BlogPotUtilizador() {
             handleServices.criarPublicacao(formData)
                 .then(res => {
                     alert(res)
-                    navigate(0)
+                    carregarBlog();
+                    setIsCreatePostModalOpen(false);
                 })
                 .catch(err => {
                     console.log(err)

@@ -444,6 +444,7 @@ export default function Utilizadores() {
                         Candidaturas ({userCandidaturas.length})
                     </Typography>
                     {userCandidaturas.length > 0 ? (
+
                         <TableContainer component={Paper}>
                             <Table size="small">
                                 <TableHead>
@@ -454,31 +455,36 @@ export default function Utilizadores() {
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
+
                                     {userCandidaturas.map((candidatura) => (
-                                        <TableRow key={candidatura.id_candidatura}>
-                                            <TableCell>{candidatura.id_candidatura}</TableCell>
-                                            <TableCell>
-                                                <Chip
-                                                    label={candidatura.status}
-                                                    color={
-                                                        candidatura.status.includes('Aceite') ? 'success' :
-                                                            candidatura.status.includes('Rejeitada') ? 'error' : 'warning'
-                                                    }
-                                                    size="small"
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                {new Date(candidatura.data_submissao).toLocaleDateString()}
-                                            </TableCell>
-                                        </TableRow>
+                                        <a href={`http://localhost:3000/vagas/${candidatura.id_vaga}`} target="_blank">
+                                            <TableRow key={candidatura.id_candidatura}>
+                                                <TableCell>{candidatura.id_candidatura}</TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        label={candidatura.status}
+                                                        color={
+                                                            candidatura.status.includes('Aceite') ? 'success' :
+                                                                candidatura.status.includes('Rejeitada') ? 'error' : 'warning'
+                                                        }
+                                                        size="small"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    {new Date(candidatura.data_submissao).toLocaleDateString()}
+                                                </TableCell>
+
+                                            </TableRow>
+                                        </a>
                                     ))}
                                 </TableBody>
                             </Table>
                         </TableContainer>
+
                     ) : (
                         <Typography variant="body2">Nenhuma candidatura encontrada</Typography>
                     )}
-                </Box>
+                </Box >
             </>
         )
     }
@@ -677,13 +683,13 @@ export default function Utilizadores() {
             e.preventDefault();
 
             handleServices.atualizarPerfil(perfilData, selectedUserEditar.id_perfil)
-            .then(res => {
-                alert(res);
-                navigate(0);
-            })
-            .catch(err => {
-                console.log(err);
-            })
+                .then(res => {
+                    alert(res);
+                    navigate(0)
+                })
+                .catch(err => {
+                    console.log(err);
+                })
         };
 
         return (
@@ -722,7 +728,6 @@ export default function Utilizadores() {
                         value={perfilData.morada}
                         onChange={handleChange}
                         fullWidth
-                        multiline
                         rows={2}
                     />
 

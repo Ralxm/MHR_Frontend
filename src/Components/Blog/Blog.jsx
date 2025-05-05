@@ -85,7 +85,8 @@ export default function Blog() {
         handleServices.aceitarPublicacao(id, id_perfil)
             .then(res => {
                 alert(res);
-                navigate(0);
+                carregarBlog();
+                setSelectedPostAprovar(null)
             })
             .catch(err => {
                 console.log(err)
@@ -96,7 +97,8 @@ export default function Blog() {
         handleServices.rejeitarPublicacao(id, id_perfil)
             .then(res => {
                 alert(res);
-                navigate(0);
+                carregarBlog();
+                setSelectedPostRejeitar(null)
             })
             .catch(err => {
                 console.log(err)
@@ -107,7 +109,8 @@ export default function Blog() {
         handleServices.apagarPublicacao(id, id_perfil)
             .then(res => {
                 alert(res);
-                navigate(0);
+                carregarBlog();
+                setSelectedPostApagar(null);
             })
             .catch(err => {
                 console.log(err)
@@ -158,6 +161,7 @@ export default function Blog() {
                                                 onAceitar={setSelectedPostAprovar}
                                                 onRejeitar={setSelectedPostRejeitar}
                                                 cols={3}
+                                                onApagar={setSelectedPostApagar}
                                             >
 
                                             </TabelaPosts>
@@ -381,7 +385,8 @@ export default function Blog() {
             handleServices.criarPublicacao(formData)
                 .then(res => {
                     alert(res)
-                    navigate(0)
+                    carregarBlog();
+                    setIsCreatePostModalOpen(false);
                 })
                 .catch(err => {
                     console.log(err)
