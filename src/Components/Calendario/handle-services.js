@@ -113,14 +113,13 @@ class HandleServices {
             ...authHeader().headers,
             'Content-Type': 'multipart/form-data'
         };
-        console.log(formData)
         return axios.post(url + "faltas/update/" + formData.get('id_falta'), formData, { headers })
             .then(res => {
                 if (res.data.success) {
-                    return res.data.data;
+                    return res.data.message;
                 }
             }, reason => {
-                throw new Error('Erro a atualizar a falta');
+                throw new Error('Erro a atualizar o pedido de férias');
             });
     }
 
@@ -209,6 +208,16 @@ class HandleServices {
     atualizarTipoFalta(id, datapost){
         let url = process.env.REACT_APP_BACKEND_LINK;
         return axios.post(url + "tipo_faltas/update/" + id, datapost, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Utilizador Inválido'); });
+    }
+
+    CriarManyFaltas(faltas){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.post(url + "faltas/createMany", faltas, authHeader())
             .then(res => {
                 if (res.data.success) {
                     return res.data.message;

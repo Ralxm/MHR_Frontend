@@ -367,7 +367,7 @@ export default function MapaFerias() {
                         name="validador"
                         InputLabelProps={{ shrink: true }}
                         fullWidth
-                        value={formData.validador}
+                        value={formData.validador ? formData.validador : "Sem validador"}
                         onChange={handleChange}
                         disabled
                     />

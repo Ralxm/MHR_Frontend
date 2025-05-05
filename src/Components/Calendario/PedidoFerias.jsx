@@ -6,7 +6,7 @@ import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Stack } from '@mui/material';
+import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Stack, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import SidebarItems from './SidebarItems';
 import moment from 'moment';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
@@ -176,7 +176,7 @@ export default function PedidosFerias() {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: { xs: 300, sm: 500 },
-                        height: { xs: 500, sm: 850 },
+                        maxHeight: { xs: 500, sm: 850 },
                         borderRadius: 4,
                         p: 4,
                         overflowY: 'scroll'
@@ -298,22 +298,19 @@ export default function PedidosFerias() {
         const handleSubmit = async (e) => {
             e.preventDefault();
 
-            const formDataToSend = new FormData();
+            const datapost = {
+                id_solicitacao: formData.id_solicitacao,
+                data_inicio: formData.data_inicio,
+                data_conclusao: formData.data_conclusao,
+                duracao: formData.duracao,
+                estado: formData.estado,
+                validador: formData.validador,
+                comentario: formData.comentario,
+            }
 
-            formDataToSend.append('id_falta', formData.id_falta);
-            formDataToSend.append('id_calendario', formData.id_calendario);
-            formDataToSend.append('id_perfil', formData.id_perfil);
-            formDataToSend.append('id_tipofalta', formData.id_tipofalta);
-
-            formDataToSend.append('comentarios', formData.comentarios);
-            formDataToSend.append('motivo', formData.motivo);
-            formDataToSend.append('validador', formData.validador);
-            formDataToSend.append('data_falta', formData.data_falta);
-            formDataToSend.append('estado', "Em análise");
-
-            handleServices.atualizarFalta(formDataToSend)
+            handleServices.atualizarFeria(datapost)
                 .then(res => {
-                    alert("Despesa atualizada com sucesso")
+                    alert("Pedido de férias atualizado com sucesso")
                     navigate(0);
                 })
                 .catch(err => {
@@ -371,22 +368,26 @@ export default function PedidosFerias() {
                         name="validador"
                         InputLabelProps={{ shrink: true }}
                         fullWidth
-                        value={formData.validador}
+                        value={formData.validador ? formData.validador : "Sem validador"}
                         onChange={handleChange}
                         disabled
                     />
                 </div>
                 <div className="mb-3">
-                    <TextField
-                        label="Estado"
-                        type="text"
-                        name="estado"
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={formData.estado}
-                        onChange={handleChange}
-                        disabled
-                    />
+                    <FormControl fullWidth>
+                        <InputLabel shrink>Estado</InputLabel>
+                        <Select
+                            label="Estado"
+                            name="estado"
+                            InputLabelProps={{ shrink: true }}
+                            onChange={handleChange}
+                            value={formData.estado}
+                        >
+                            <MenuItem value={"Aprovada"}>Aprovada</MenuItem>
+                            <MenuItem value={"Pendente"}>Pendente</MenuItem>
+                            <MenuItem value={"Rejeitada"}>Rejeitada</MenuItem>
+                        </Select>
+                    </FormControl>
                 </div>
                 <div className="mb-3">
                     <TextField
@@ -399,7 +400,6 @@ export default function PedidosFerias() {
                         fullWidth
                         value={formData.comentarios}
                         onChange={handleChange}
-                        disabled
                     />
                 </div>
 

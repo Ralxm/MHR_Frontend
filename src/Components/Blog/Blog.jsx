@@ -184,6 +184,8 @@ export default function Blog() {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: { xs: 500, sm: 700 },
+                        maxHeight: '90svh',
+                        overflowY: 'auto',
                         borderRadius: 4,
                         p: 4,
                     }}

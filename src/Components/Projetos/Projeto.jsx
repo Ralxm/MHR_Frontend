@@ -169,7 +169,8 @@ export default function Projeto() {
         handleServices.apagarPontoLinhaTemporalProjeto(selectedLinhaTemporal.id_registo)
             .then(res => {
                 alert(res);
-                navigate(0);
+                carregarLinhaTemporalProjeto(id);
+                closeApgarModalLinhaTemporal();
             })
             .catch(err => {
                 console.log(err)
@@ -658,7 +659,8 @@ export default function Projeto() {
             handleServices.criarLinhaTemporal(datapost)
                 .then(res => {
                     alert(res)
-                    navigate(0)
+                    carregarLinhaTemporalProjeto(id);
+                    handleCloseLinhaTemporalModal();
                 })
                 .catch(err => {
                     console.log(err)
@@ -721,7 +723,7 @@ export default function Projeto() {
             handleServices.criarComentarioProjeto(formData)
                 .then(res => {
                     alert(res);
-                    navigate(0)
+                    carregarComentarios(id);
                 })
                 .catch(err => {
                     console.log(err);

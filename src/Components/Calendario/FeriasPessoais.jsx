@@ -66,6 +66,16 @@ export default function FeriasPessoais() {
         }
     }, [id_perfil])
 
+    function carregarFerias() {
+        handleServices.listFerias(id_perfil)
+            .then(res => {
+                setFerias(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar as faltas: " + err)
+            })
+    }
+
     const handleCloseVerDetalhes = () => {
         setSelectedFeria(null)
     }
@@ -97,22 +107,23 @@ export default function FeriasPessoais() {
         return formattedDate
     }
 
-    function handleApagarFeria(event){
+    function handleApagarFeria(event) {
         event.preventDefault();
         handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
             .then(res => {
                 alert("Pedido de ferias apagado com sucesso")
-                navigate(0)
+                carregarFerias();
+                handleCloseApagar();
             })
             .catch(err => {
                 console.log("Erro a apagar a despesa: " + err);
             });
     }
 
-    function getQuantidadeFerias(tipo, ferias){
+    function getQuantidadeFerias(tipo, ferias) {
         let count = 0;
         ferias.map((feria) => {
-            if(feria.estado == tipo){
+            if (feria.estado == tipo) {
                 count++;
             }
         })
@@ -141,7 +152,7 @@ export default function FeriasPessoais() {
             <div className="app-container" style={{ position: 'relative', zIndex: 1000 }}>
                 <NavBar />
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
-                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0  }}>
+                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
                         <SidebarItems tipo_user={tipo_user}></SidebarItems>
                     </div>
 
@@ -219,7 +230,7 @@ export default function FeriasPessoais() {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: { xs: 300, sm: 500 },
-                        height: { xs: 500, sm: 850 },
+                        maxHeight: { xs: 500, sm: 850 },
                         borderRadius: 4,
                         p: 4,
                         overflowY: 'scroll'
@@ -339,21 +350,21 @@ export default function FeriasPessoais() {
 
             const formDataToSend = new FormData();
 
-            formDataToSend.append('id_falta', formData.id_falta);
-            formDataToSend.append('id_calendario', formData.id_calendario);
-            formDataToSend.append('id_perfil', formData.id_perfil);
-            formDataToSend.append('id_tipofalta', formData.id_tipofalta);
+            const datapost = {
+                id_solicitacao: formData.id_solicitacao,
+                data_inicio: formData.data_inicio,
+                data_conclusao: formData.data_conclusao,
+                duracao: formData.duracao,
+                estado: formData.estado,
+                validador: formData.validador,
+                comentarios: formData.comentarios
+            }
 
-            formDataToSend.append('comentarios', formData.comentarios);
-            formDataToSend.append('motivo', formData.motivo);
-            formDataToSend.append('validador', formData.validador);
-            formDataToSend.append('data_falta', formData.data_falta);
-            formDataToSend.append('estado', "Em análise");
-
-            handleServices.atualizarFalta(formDataToSend)
+            handleServices.atualizarFeria(datapost)
                 .then(res => {
-                    alert("Despesa atualizada com sucesso")
-                    navigate(0);
+                    alert(res.message)
+                    carregarFerias();
+                    handleCloseVerDetalhes();
                 })
                 .catch(err => {
                     console.log(err);
@@ -388,6 +399,7 @@ export default function FeriasPessoais() {
                         fullWidth
                         value={formData.data_inicio}
                         onChange={handleChange}
+                        disabled
                     />
                 </div>
                 <div className="my-3">
@@ -399,6 +411,7 @@ export default function FeriasPessoais() {
                         fullWidth
                         value={formData.data_conclusao}
                         onChange={handleChange}
+                        disabled
                     />
                 </div>
                 <div className="mb-3">
@@ -408,7 +421,7 @@ export default function FeriasPessoais() {
                         name="validador"
                         InputLabelProps={{ shrink: true }}
                         fullWidth
-                        value={formData.validador}
+                        value={formData.validador ? formData.validador : "Sem validador"}
                         onChange={handleChange}
                         disabled
                     />

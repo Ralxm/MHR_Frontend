@@ -124,7 +124,8 @@ export default function Projetos() {
         handleServices.apagarIdeia(selectedIdeiaApagar.id_ideia, id_perfil)
             .then(res => {
                 alert(res);
-                navigate(0)
+                carregarIdeias();
+                setSelectedIdeiaApagar(null);
             })
             .catch(err => {
                 console.log(err)
@@ -135,7 +136,8 @@ export default function Projetos() {
         handleServices.apagarProjeto(selectedProjetoApagar.id_projeto)
             .then(res => {
                 alert(res);
-                navigate(0)
+                carregarProjetos();
+                setSelectedProjetoApagar(null);
             })
             .catch(err => {
                 console.log(err)
@@ -408,7 +410,7 @@ export default function Projetos() {
                                 onClick={() => { handleApagarIdeia(); setSelectedIdeiaApagar(null) }}
                                 sx={{ width: '50%' }}
                             >
-                                Apagar
+                                Rejeitar
                             </Button>
                         </Stack>
                     </Box>
@@ -673,7 +675,8 @@ export default function Projetos() {
             handleServices.criarIdeia(formData)
                 .then(res => {
                     alert(res)
-                    navigate(0)
+                    carregarIdeias();
+                    handleCloseCreateIdeiaModal();
                 })
                 .catch(err => {
                     alert(err)
@@ -750,7 +753,8 @@ export default function Projetos() {
             handleServices.atualizarIdeia(formData)
                 .then(res => {
                     alert(res)
-                    navigate(0)
+                    carregarIdeias();
+                    setSelectedIdeia(null);
                 })
                 .catch(err => {
                     console.log(err)

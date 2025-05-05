@@ -66,6 +66,16 @@ export default function FaltasPessoais() {
         }
     }, [id_perfil])
 
+    function carregarFaltasPessoais(){
+        handleServices.carregarFaltasPessoais(id_perfil)
+            .then(res => {
+                setFaltas(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar as faltas: " + err)
+            })
+    }
+
     const handleCloseVerDetalhes = () => {
         setSelectedFalta(null)
     }
@@ -93,10 +103,10 @@ export default function FaltasPessoais() {
         return formattedDate
     }
 
-    function getQuantidadeFaltas(tipo, faltas){
+    function getQuantidadeFaltas(tipo, faltas) {
         let count = 0;
         faltas.map((falta) => {
-            if(falta.estado == tipo){
+            if (falta.estado == tipo) {
                 count++;
             }
         })
@@ -125,7 +135,7 @@ export default function FaltasPessoais() {
             <div className="app-container" style={{ position: 'relative', zIndex: 1000 }}>
                 <NavBar />
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
-                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0  }}>
+                    <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
                         <SidebarItems tipo_user={tipo_user}></SidebarItems>
                     </div>
 
@@ -260,8 +270,6 @@ export default function FaltasPessoais() {
             data_falta: convertDateToInputFormat(falta.data_falta),
         });
 
-        console.log(formData)
-
         const handleChange = (e) => {
             const { name, value } = e.target;
             setFormData((prevData) => ({
@@ -292,8 +300,9 @@ export default function FaltasPessoais() {
 
             handleServices.atualizarFalta(formDataToSend)
                 .then(res => {
-                    alert("Despesa atualizada com sucesso")
-                    navigate(0);
+                    alert(res);
+                    carregarFaltasPessoais();
+                    handleCloseVerDetalhes();
                 })
                 .catch(err => {
                     console.log(err);

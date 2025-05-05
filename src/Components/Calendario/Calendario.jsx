@@ -151,6 +151,26 @@ export default function Calendario() {
         }
     }, [id_perfil])
 
+    function carregarFerias(){
+        handleServices.listFerias(id_perfil)
+        .then(res => {
+            setFerias(res);
+        })
+        .catch(err => {
+            console.log("Não foi possivel encontrar as férias do utilizador: " + err)
+        })
+    }
+
+    function carregarFaltas(){
+        handleServices.listFaltas(id_perfil)
+        .then(res => {
+            setFaltas(res);
+        })
+        .catch(err => {
+            console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+        })
+    }
+
     useEffect(() => {
         if (data_conclusao && data_inicio) {
             const startDate = new Date(data_inicio);
@@ -246,7 +266,8 @@ export default function Calendario() {
         handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
             .then(res => {
                 alert("Pedido de ferias apagado com sucesso")
-                navigate(0)
+                carregarFerias();
+                handleCloseApagarFeria();
             })
             .catch(err => {
                 console.log("Erro a apagar a despesa: " + err);
@@ -278,7 +299,8 @@ export default function Calendario() {
         handleServices.createFerias(datapost)
             .then(res => {
                 alert(res)
-                navigate(0)
+                carregarFerias();
+                handleCloseCriarFeria();
             })
             .catch(err => {
                 console.log(err)
@@ -781,8 +803,8 @@ export default function Calendario() {
 
             handleServices.atualizarFalta(formDataToSend)
                 .then(res => {
-                    alert("Despesa atualizada com sucesso")
-                    navigate(0);
+                    alert("Falta atualizada com sucesso")
+                    carregarFaltas();
                 })
                 .catch(err => {
                     console.log(err);
@@ -1008,7 +1030,7 @@ export default function Calendario() {
             handleServices.atualizarFeria(datapost)
                 .then(res => {
                     alert(res)
-                    navigate(0);
+                    carregarFerias();
                 })
                 .catch(err => {
                     console.log(err);
@@ -1192,7 +1214,8 @@ export default function Calendario() {
             handleServices.createFalta(formData)
                 .then(res => {
                     alert(res)
-                    navigate(0)
+                    carregarFaltas();
+                    handleCloseCriarFalta();
                 })
                 .catch(err => {
                     console.log(err)

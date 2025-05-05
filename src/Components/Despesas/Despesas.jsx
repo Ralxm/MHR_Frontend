@@ -152,6 +152,36 @@ export default function Despesas() {
         }
     }, tipo_user)
 
+    function carregarDespesas() {
+        handleServices.listDespesas(id_perfil)
+            .then(res => {
+                setDespesas(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar as despesas do utilizador: " + err)
+            })
+    }
+
+    function carregarDespesasGestao() {
+        if (tipo_user && (tipo_user == 1 || tipo_user == 2)) {
+            handleServices.listDespesasGestao()
+                .then(res => {
+                    setDespesasGestao(res);
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+            handleServices.listDespesasHistorico()
+                .then(res => {
+                    setDespesasHistorico(res);
+                })
+                .catch(err => {
+                    console.log(err)
+                })
+        }
+    }
+
+
     useEffect(() => {
         setDespesasChart(despesas)
     }, [despesas])
@@ -206,7 +236,9 @@ export default function Despesas() {
         handleServices.createDespesa(formData)
             .then(res => {
                 alert("Despesa criada com sucesso");
-                navigate(0)
+                carregarDespesas();
+                carregarDespesasGestao();
+                toggleCreateDespesa();
             })
             .catch(err => {
                 console.log(err);
@@ -218,7 +250,9 @@ export default function Despesas() {
         handleServices.apagarDespesa(despesaApagar.id_despesa)
             .then(res => {
                 alert("Despesa apagada com sucesso")
-                navigate(0)
+                carregarDespesas();
+                carregarDespesasGestao();
+                toggleApagarDespesa();
             })
             .catch(err => {
                 console.log("Erro a apagar a despesa: " + err);
@@ -346,7 +380,7 @@ export default function Despesas() {
                                                 <Table data={despesas} onVerDetalhes={handleVerDetalhes} onApagar={handleApagar} tipo={'Todas'} action={action}></Table>
                                             </TabPanel>
                                             <TabPanel value="2">
-                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} tipo={'Por Aprovar'} action={action}></Table>
+                                                <Table data={despesas} onVerDetalhes={handleVerDetalhes} onApagar={handleApagar} tipo={'Por Aprovar'} action={action}></Table>
                                             </TabPanel>
                                             <TabPanel value="3">
                                                 <Table data={despesasGestao} onVerDetalhes={handleVerDetalhesEAnalisar} tipo={'Analisar'} action={action}></Table>
@@ -590,7 +624,9 @@ export default function Despesas() {
                 .then(res => {
                     alert("Despesa atualizada com sucesso")
                     setAcao(null)
-                    navigate(0);
+                    carregarDespesas();
+                    carregarDespesasGestao();
+                    handleCloseDetalhes();
                 })
                 .catch(err => {
                     console.log(err);

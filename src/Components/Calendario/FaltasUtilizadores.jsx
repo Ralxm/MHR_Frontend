@@ -30,6 +30,9 @@ export default function FaltasUtilizadores() {
 
     const [selectedFaltas, setSelectedFaltas] = useState([]);
 
+    const [importedFaltas, setImportedFaltas] = useState([]);
+    const [showImportModal, setShowImportModal] = useState(false);
+
     useEffect(() => {
         if (!authService.getCurrentUser()) {
             navigate('/login')
@@ -108,10 +111,15 @@ export default function FaltasUtilizadores() {
             alert("Nenhuma falta selecionada para exportar!");
             return;
         }
-    
+
+        console.log(selectedFaltas)
+
         const data = selectedFaltas.map((falta) => ({
-            "ID da Falta": falta.id_falta,
+            "ID Perfil": falta.id_perfil,
             "Nome do utilizador": falta.perfil.nome,
+            "ID Tipo de falta": falta.id_tipofalta,
+            "Tipo de Falta": falta.tipo_falta.tipo,
+            "Descrição do tipo de falta": falta.tipo_falta.descricao,
             "Data da Falta": convertDate(falta.data_falta),
             "Estado": falta.estado,
             "Justificação": falta.justificacao ? "Com anexo" : "Sem justificação",
@@ -122,13 +130,95 @@ export default function FaltasUtilizadores() {
             "Data de criação da falta": falta.created_at || "N/A",
             "Data de última edição da falta": falta.updated_at || "N/A",
         }));
-    
+
         const worksheet = XLSX.utils.json_to_sheet(data);
-        
+
         const workbook = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(workbook, worksheet, "Faltas");
-    
+
         XLSX.writeFile(workbook, `faltas_${new Date().toISOString().split('T')[0]}.xlsx`);
+    };
+
+    const parseDateField = (dateValue) => {
+        if (dateValue instanceof Date) {
+            return dateValue.toISOString();
+        }
+
+        if (typeof dateValue === 'string') {
+            const separator = dateValue.includes('-') ? '-' : '/';
+            const parts = dateValue.split(separator);
+
+            if (parts.length === 3) {
+                let day, month, year;
+
+                if (parts[0].length === 4) { // YYYY-MM-DD
+                    year = parts[0];
+                    month = parts[1];
+                    day = parts[2];
+                } else { // DD-MM-YYYY ou MM-DD-YYYY
+                    day = parts[0];
+                    month = parts[1];
+                    year = parts[2];
+                }
+
+                const dateObj = new Date(year, month - 1, day);
+                return dateObj.toISOString();
+            }
+        }
+
+        console.warn('Could not parse date, using current date instead');
+        return new Date().toISOString();
+    };
+
+    const handleFileImport = async (file) => {
+        if (!file) return;
+
+        try {
+            const data = await file.arrayBuffer();
+            const workbook = XLSX.read(data);
+            const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+            const jsonData = XLSX.utils.sheet_to_json(worksheet);
+
+            const parsedFaltas = jsonData.map(item => {
+                return {
+                    id_perfil: item["ID Perfil"],
+                    id_tipofalta: item["ID Tipo de falta"],
+                    data_falta: parseDateField(item["Data da Falta"]),
+                    estado: item["Estado"] || "Pendente",
+                    motivo: item["Motivo"] === "N/A" ? null : item["Motivo"],
+                    comentarios: item["Comentários"] === "N/A" ? null : item["Comentários"],
+                };
+            });
+
+            setImportedFaltas(parsedFaltas);
+            setShowImportModal(true);
+        } catch (error) {
+            console.error("Import error:", error);
+            alert("Failed to import file. Please check the format and required fields.");
+        }
+    };
+
+    const handleCreateImportedFaltas = () => {
+        const faltasToCreate = importedFaltas.map(falta => ({
+            id_perfil: falta.id_perfil,
+            id_tipofalta: falta.id_tipofalta,
+            data_falta: falta.data_falta,
+            estado: falta.estado,
+            motivo: falta.motivo,
+            comentarios: falta.comentarios
+        }));
+
+        handleServices.CriarManyFaltas(faltasToCreate)
+            .then(res => {
+                alert(`${res.length} faltas criadas com sucesso!`);
+                setShowImportModal(false);
+                setImportedFaltas([]);
+                carregarFaltas();
+            })
+            .catch(err => {
+                console.error("Error creating faltas:", err);
+                alert(`Ocorreu um erro ao criar as faltas: ${err.message}`);
+            });
     };
 
     function carregarFaltas() {
@@ -237,7 +327,7 @@ export default function FaltasUtilizadores() {
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: { xs: 300, sm: 500 },
-                        height: { xs: 500, sm: 850 },
+                        maxHeight: { xs: 500, sm: 850 },
                         borderRadius: 4,
                         p: 4,
                         overflowY: 'scroll'
@@ -250,6 +340,74 @@ export default function FaltasUtilizadores() {
                         {selectedFalta && <DetalhesFalta falta={selectedFalta} />}
                     </Typography>
                     <Button onClick={handleCloseVerDetalhes} className='col-md-12'>Fechar</Button>
+                </Paper>
+            </Modal>
+
+            {/* Modal para ver todas as faltas importadas através de um ficheiro excel */}
+            <Modal
+                open={showImportModal}
+                onClose={() => setShowImportModal(false)}
+                aria-labelledby="import-modal-title"
+                aria-describedby="import-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: '90%', sm: '80%', md: '70%' },
+                        maxHeight: '80vh',
+                        overflowY: 'auto',
+                        p: 4,
+                    }}
+                >
+                    <Typography id="import-modal-title" variant="h6" component="h2">
+                        Pré-visualização de Importação ({importedFaltas.length} faltas)
+                    </Typography>
+
+                    <TableContainer sx={{ mt: 2, mb: 4 }}>
+                        <Table>
+                            <TableHead>
+                                <TableRow>
+                                    <TableCell>ID Perfil</TableCell>
+                                    <TableCell>ID Tipo de Falta</TableCell>
+                                    <TableCell>Data</TableCell>
+                                    <TableCell>Estado</TableCell>
+                                    <TableCell>Motivo</TableCell>
+                                    <TableCell>Comentários</TableCell>
+                                </TableRow>
+                            </TableHead>
+                            <TableBody>
+                                {importedFaltas.map((falta, index) => (
+                                    <TableRow key={index}>
+                                        <TableCell>{falta.id_perfil}</TableCell>
+                                        <TableCell>{falta.id_tipofalta}</TableCell>
+                                        <TableCell>{convertDate(falta.data_falta)}</TableCell>
+                                        <TableCell>{falta.estado}</TableCell>
+                                        <TableCell>{falta.motivo || "N/A"}</TableCell>
+                                        <TableCell>{falta.comentarios || "N/A"}</TableCell>
+                                    </TableRow>
+                                ))}
+                            </TableBody>
+                        </Table>
+                    </TableContainer>
+
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
+                        <Button
+                            onClick={() => setShowImportModal(false)}
+                            sx={{ mr: 2 }}
+                        >
+                            Cancelar
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleCreateImportedFaltas}
+                        >
+                            Criar Faltas
+                        </Button>
+                    </Box>
                 </Paper>
             </Modal>
         </div>
@@ -316,9 +474,21 @@ export default function FaltasUtilizadores() {
                     <button className='btn btn-outline-primary mx-2' onClick={() => exportToExcel(selectedFaltas)} disabled={selectedFaltas.length == 0}>
                         Exportar faltas selecionadas
                     </button>
-                    <button className='btn btn-outline-primary'>
+
+                    <button
+                        className='btn btn-outline-primary'
+                        onClick={() => document.getElementById('fileInput').click()}
+                    >
                         Importar faltas
                     </button>
+                    <input
+                        type="file"
+                        id="fileInput"
+                        style={{ display: 'none' }}
+                        accept=".xlsx, .xls"
+                        onChange={(e) => handleFileImport(e.target.files[0])}
+                    >
+                    </input>
                 </div>
                 <Table sx={{ minWidth: 750 }} aria-label="simple table" className="disable-edge-padding">
                     <TableHead>
@@ -396,8 +566,9 @@ export default function FaltasUtilizadores() {
 
             handleServices.atualizarFalta(formDataToSend)
                 .then(res => {
-                    alert("Despesa atualizada com sucesso")
-                    navigate(0);
+                    alert("Falta atualizada com sucesso")
+                    carregarFaltas();
+                    handleCloseVerDetalhes();
                 })
                 .catch(err => {
                     console.log(err);
