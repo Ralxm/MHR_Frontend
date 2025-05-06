@@ -224,6 +224,56 @@ class HandleServices {
                 }
             }, reason => { throw new Error('Utilizador Inválido'); });
     }
+
+    carregarFeriados(){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "feriados/list", authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a listar todas as faltas'); });
+    }
+
+    apagarFeriado(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.put(url + "feriados/delete/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a apagar o feriado'); });
+    }
+
+    criarFeriado(datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json',
+        };
+
+        return axios.post(url + "feriados/create", datapost, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a criar o feriado: ' + reason); });
+    }
+
+    atualizarFeriado(id, datapost){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        const headers = {
+            ...authHeader().headers,
+            'Content-Type': 'application/json',
+        };
+
+        return axios.post(url + "feriados/update/" + id, datapost, { headers })
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a criar o feriado: ' + reason); });
+    }
 }
 
 export default new HandleServices();

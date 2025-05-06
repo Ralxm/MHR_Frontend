@@ -21,6 +21,7 @@ export default function MarcarFerias() {
     const [id_perfil, setPerfil] = useState()
 
     const [ferias, setFerias] = useState([])
+    const [feriados, setFeriados] = useState([])
     const [calendario, setCalendario] = useState()
     const [dias_restantes_ferias, setDias_Restantes_Ferias] = useState();
 
@@ -68,67 +69,91 @@ export default function MarcarFerias() {
                     setCalendario(res[0]);
                 })
                 .catch(err => {
-                    console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+                    console.log(err)
                 })
             handleServices.getFeriasUser(id_perfil)
                 .then(res => {
-                    console.log(res)
                     setFerias(res)
                 })
                 .catch(err => {
-                    console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+                    console.log(err)
+                })
+            handleServices.carregarFeriados()
+                .then(res => {
+                    setFeriados(res)
+                })
+                .catch(err => {
+                    console.log(err)
                 })
 
         }
     }, [id_perfil])
 
     useEffect(() => {
-        if (data_conclusao && data_inicio) {
+        if (data_conclusao && data_inicio && feriados) {
             const startDate = new Date(data_inicio);
             const endDate = new Date(data_conclusao);
-
+    
             const calculateBusinessDays = (start, end) => {
                 let count = 0;
                 const current = new Date(start);
-
+                
+                const holidays = new Set(
+                    feriados.map(feriado => {
+                        const date = new Date(feriado.data_feriado);
+                        return `${date.getMonth()}-${date.getDate()}`;
+                    })
+                );
+    
                 while (current <= end) {
                     const dayOfWeek = current.getDay();
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    const currentMonthDay = `${current.getMonth()}-${current.getDate()}`;
+                    
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.has(currentMonthDay)) {
                         count++;
                     }
                     current.setDate(current.getDate() + 1);
                 }
                 return count;
             };
-
+    
             const businessDays = calculateBusinessDays(startDate, endDate);
             setDuracao(businessDays);
         }
-    }, [data_conclusao])
+    }, [data_conclusao, data_inicio, feriados]);
 
     useEffect(() => {
-        if (data_conclusao && data_inicio) {
+        if (data_conclusao && data_inicio && feriados) {
             const startDate = new Date(data_inicio);
             const endDate = new Date(data_conclusao);
-
+    
             const calculateBusinessDays = (start, end) => {
                 let count = 0;
                 const current = new Date(start);
-
+                
+                const holidays = new Set(
+                    feriados.map(feriado => {
+                        const date = new Date(feriado.data_feriado);
+                        return `${date.getMonth()}-${date.getDate()}`;
+                    })
+                );
+    
                 while (current <= end) {
                     const dayOfWeek = current.getDay();
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    const currentMonthDay = `${current.getMonth()}-${current.getDate()}`;
+                    
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.has(currentMonthDay)) {
                         count++;
                     }
                     current.setDate(current.getDate() + 1);
                 }
                 return count;
             };
-
+    
             const businessDays = calculateBusinessDays(startDate, endDate);
             setDuracao(businessDays);
         }
-    }, [data_inicio])
+    }, [data_inicio, data_conclusao, feriados]);
 
     useEffect(() => {
         if (calendario && ferias) {

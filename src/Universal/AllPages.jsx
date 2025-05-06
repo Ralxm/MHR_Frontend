@@ -16,6 +16,7 @@ import FeriasPessoais from "../Components/Calendario/FeriasPessoais";
 import MapaFerias from "../Components/Calendario/MapaFerias";
 import PedidosFerias from "../Components/Calendario/PedidoFerias";
 import TiposFalta from "../Components/Calendario/TiposFalta";
+import Feriados from "../Components/Calendario/Feriados";
 
 import Projetos from "../Components/Projetos/Projetos";
 import Projeto from "../Components/Projetos/Projeto";
@@ -73,7 +74,7 @@ export default function MainPage(){
                 </Route>
                 <Route path='/calendario/tipos_faltas' element={<TiposFalta></TiposFalta>}>
                 </Route>
-                <Route path='/calendario/feriados' element={<TiposFalta></TiposFalta>}>
+                <Route path='/calendario/feriados' element={<Feriados></Feriados>}>
                 </Route>
 
                 <Route path='/projetos' element={<Projetos></Projetos>}>

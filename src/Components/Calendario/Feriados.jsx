@@ -1,32 +1,30 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { data, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import NavBar from "../../Universal/NavBar";
 import './Calendario.css';
 import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Box, Modal, Paper, Typography, Button, TableCell, Table, TableContainer, TableHead, TableRow, TableBody, MenuItem, IconButton, Chip, TextField, Stack, FormControl, Label, Select, InputLabel } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Delete, Close } from '@mui/icons-material'
-import FileDropZone from '../../Universal/FileDropZoneSingle';
+import { Box, Modal, Paper, Typography, Button, TableCell, Table, TableContainer, TableHead, TableRow, TableBody, IconButton, TextField, Stack, Tooltip } from '@mui/material';
+import { Close } from '@mui/icons-material'
 import SidebarItems from './SidebarItems';
 
-export default function TiposFalta() {
+export default function Feriados() {
     const navigate = useNavigate();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
 
-    const [tipos_faltas, setTipos_Faltas] = useState([]);
-    const [selectedTipo, setSelectedTipo] = useState(null);
+    const [feriados, setFeriados] = useState([]);
+    const [selectedFeriado, setSelectedFeriado] = useState(null);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-    const [selectedTipoApagar, setSelectedTipoApagar] = useState();
+    const [selectedFeriadoApagar, setSelectedFeriadoApagar] = useState();
 
     useEffect(() => {
-        document.title = "Tipos de falta";
+        document.title = "Feriados";
 
         if (!authService.getCurrentUser()) {
             navigate('/login')
@@ -42,13 +40,13 @@ export default function TiposFalta() {
             setUtilizador(user)
             setTipoUser(localStorage.getItem("tipo"))
         }
-        carregarTiposFaltas();
+        carregarFeriados();
     }, []);
 
-    function carregarTiposFaltas() {
-        handleServices.listTipoFaltas()
+    function carregarFeriados() {
+        handleServices.carregarFeriados()
             .then(res => {
-                setTipos_Faltas(res);
+                setFeriados(res);
             })
             .catch(err => {
                 console.log(err);
@@ -56,16 +54,32 @@ export default function TiposFalta() {
     }
 
     const handleDelete = (id) => {
-        handleServices.apagarTipoFalta(id)
+        handleServices.apagarFeriado(id)
             .then(res => {
                 alert(res);
-                carregarTiposFaltas();
+                carregarFeriados();
             })
             .catch(err => {
                 console.log(err);
             });
-
     };
+
+    function formatDateToPortuguese(dateString) {
+        if (!dateString) return '';
+        
+        const monthsPT = [
+            'Janeiro', 'Fevereiro', 'Março', 'Abril', 
+            'Maio', 'Junho', 'Julho', 'Agosto', 
+            'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+        ];
+        
+        const date = new Date(dateString);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const monthName = monthsPT[date.getMonth()];
+        
+        return `${day}-${month} (${day} de ${monthName})`;
+    }
 
     return (
         <div id="root">
@@ -93,13 +107,37 @@ export default function TiposFalta() {
 
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
                         <div className='d-flex justify-content-between align-items-center mb-4'>
-                            <h2 style={{ color: '#333', fontWeight: '600', margin: 0 }}>Tipos de Falta</h2>
+                            <div className='d-flex align-items-center'>
+                                <h2 style={{ color: '#333', fontWeight: '600', margin: 0 }}>Feriados</h2>
+                                <Tooltip
+                                    title="A criação de um feriado inclui a escolha de um ano. Este, no entanto, é irrelevante para o funcionamento da aplicação. Poderá escolher qualquer ano."
+                                    placement="right"
+                                    arrow
+                                    className='mx-2 mt-2'
+                                >
+                                    <div style={{
+                                        width: '20px',
+                                        height: '20px',
+                                        borderRadius: '50%',
+                                        backgroundColor: '#1976d2',
+                                        color: 'white',
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        justifyContent: 'center',
+                                        fontSize: '12px',
+                                        cursor: 'pointer'
+                                    }}>
+                                        !
+                                    </div>
+                                </Tooltip>
+                            </div>
+
                             <Button
                                 variant="contained"
                                 color="primary"
                                 onClick={() => setIsCreateModalOpen(true)}
                             >
-                                Criar tipo de falta
+                                Criar feriado
                             </Button>
                         </div>
 
@@ -107,22 +145,22 @@ export default function TiposFalta() {
                             <Table sx={{ minWidth: 650 }} aria-label="departamentos table">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Tipo</TableCell>
-                                        <TableCell>Descrição</TableCell>
+                                        <TableCell>Nome</TableCell>
+                                        <TableCell>Data</TableCell>
                                         <TableCell>Ações</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
-                                    {tipos_faltas.map((tipo) => (
-                                        <TableRow key={tipo.id_tipofalta}>
-                                            <TableCell>{tipo.tipo}</TableCell>
-                                            <TableCell>{tipo.descricao}</TableCell>
+                                    {feriados.map((feriado) => (
+                                        <TableRow key={feriado.id_feriado}>
+                                            <TableCell>{feriado.nome}</TableCell>
+                                            <TableCell>{formatDateToPortuguese(feriado.data_feriado)}</TableCell>
                                             <TableCell>
                                                 <Button
                                                     variant="outlined"
                                                     size="small"
                                                     onClick={() => {
-                                                        setSelectedTipo(tipo);
+                                                        setSelectedFeriado(feriado);
                                                         setIsEditModalOpen(true);
                                                     }}
                                                 >
@@ -133,9 +171,9 @@ export default function TiposFalta() {
                                                     color="error"
                                                     size="small"
                                                     sx={{ ml: 1 }}
-                                                    onClick={() => setSelectedTipoApagar(tipo)}
+                                                    onClick={() => setSelectedFeriadoApagar(feriado)}
                                                 >
-                                                    Eliminar
+                                                    Apagar
                                                 </Button>
                                             </TableCell>
                                         </TableRow>
@@ -144,7 +182,7 @@ export default function TiposFalta() {
                             </Table>
                         </TableContainer>
 
-                        {/* Modal para editar um departamento */}
+                        {/* Modal para editar um feriado */}
                         <Modal
                             open={isEditModalOpen}
                             onClose={() => setIsEditModalOpen(false)}
@@ -165,7 +203,7 @@ export default function TiposFalta() {
                             >
                                 <div className='d-flex justify-content-between align-items-center mb-3'>
                                     <Typography variant="h6" component="h2">
-                                        Editar Tipo de Falta: {selectedTipo?.tipo}
+                                        Editar Feriado: {selectedFeriado?.nome}
                                     </Typography>
                                     <IconButton onClick={() => setIsEditModalOpen(false)}>
                                         <Close />
@@ -173,15 +211,15 @@ export default function TiposFalta() {
                                 </div>
 
                                 <TipoFaltaForm
-                                    tipo={selectedTipo}
+                                    tipo={selectedFeriado}
                                     onClose={() => setIsEditModalOpen(false)}
-                                    refresh={carregarTiposFaltas}
+                                    refresh={carregarFeriados}
                                     mode="edit"
                                 />
                             </Paper>
                         </Modal>
 
-                        {/* Modal para criar um departamento */}
+                        {/* Modal para criar um feriado */}
                         <Modal
                             open={isCreateModalOpen}
                             onClose={() => setIsCreateModalOpen(false)}
@@ -202,7 +240,7 @@ export default function TiposFalta() {
                             >
                                 <div className='d-flex justify-content-between align-items-center mb-3'>
                                     <Typography variant="h6" component="h2">
-                                        Criar Novo Departamento
+                                        Criar Novo Feriado
                                     </Typography>
                                     <IconButton onClick={() => setIsCreateModalOpen(false)}>
                                         <Close />
@@ -211,7 +249,7 @@ export default function TiposFalta() {
 
                                 <TipoFaltaForm
                                     onClose={() => setIsCreateModalOpen(false)}
-                                    refresh={carregarTiposFaltas}
+                                    refresh={carregarFeriados}
                                     mode="create"
                                 />
                             </Paper>
@@ -219,8 +257,8 @@ export default function TiposFalta() {
 
                         {/* Modal para apagar um departamento */}
                         <Modal
-                            open={selectedTipoApagar}
-                            onClose={() => setSelectedTipoApagar(null)}
+                            open={selectedFeriadoApagar}
+                            onClose={() => setSelectedFeriadoApagar(null)}
                             aria-labelledby="modal-modal-title"
                             aria-describedby="modal-modal-description"
                         >
@@ -239,13 +277,13 @@ export default function TiposFalta() {
                             >
                                 <Box className='col-md-12'>
                                     <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
-                                        Tem a certeza que pretende apagar o tipo de falta?
+                                        Tem a certeza que pretende apagar o feriado?
                                     </Typography>
                                     <Stack direction="row" spacing={2}>
                                         <Button
                                             variant="contained"
                                             color="primary"
-                                            onClick={() => { setSelectedTipoApagar(null) }}
+                                            onClick={() => { setSelectedFeriadoApagar(null) }}
                                             sx={{ width: '50%' }}
                                         >
                                             Fechar
@@ -253,7 +291,7 @@ export default function TiposFalta() {
                                         <Button
                                             variant="contained"
                                             color="error"
-                                            onClick={() => { handleDelete(selectedTipoApagar.id_tipofalta); setSelectedTipoApagar(null) }}
+                                            onClick={() => { handleDelete(selectedFeriadoApagar.id_feriado); setSelectedFeriadoApagar(null) }}
                                             sx={{ width: '50%' }}
                                         >
                                             Apagar
@@ -269,23 +307,22 @@ export default function TiposFalta() {
     );
 }
 
-function TipoFaltaForm({ tipo, onClose, refresh, mode }) {
+function TipoFaltaForm({ feriado, onClose, refresh, mode }) {
     const [formData, setFormData] = useState({
-        id_tipofalta: '',
-        tipo: '',
-        descricao: '',
+        id_feriado: '',
+        nome: '',
+        data_feriado: '',
     });
 
     useEffect(() => {
-
-        if (mode == 'edit' && tipo) {
+        if (mode == 'edit' && feriado) {
             setFormData({
-                id_tipofalta: tipo.id_tipofalta,
-                tipo: tipo.tipo,
-                descricao: (tipo.descricao).trim(),
+                id_feriado: feriado.id_feriado,
+                nome: feriado.nome,
+                data_feriado: feriado.data_feriado,
             });
         }
-    }, [tipo, mode]);
+    }, [feriado, mode]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -301,9 +338,9 @@ function TipoFaltaForm({ tipo, onClose, refresh, mode }) {
         try {
             let response;
             if (mode === 'create') {
-                response = await handleServices.criarTipoFalta(formData);
+                response = await handleServices.criarFeriado(formData);
             } else {
-                response = await handleServices.atualizarTipoFalta(formData.id_tipofalta, formData);
+                response = await handleServices.atualizarFeriado(formData.id_feriado, formData);
             }
 
             alert(response);
@@ -311,7 +348,6 @@ function TipoFaltaForm({ tipo, onClose, refresh, mode }) {
             onClose();
         } catch (err) {
             console.error(err);
-
         }
     };
 
@@ -319,22 +355,22 @@ function TipoFaltaForm({ tipo, onClose, refresh, mode }) {
         <form onSubmit={handleSubmit}>
             <Stack spacing={3}>
                 <TextField
-                    name="tipo"
-                    label="Tipo de falta"
-                    value={formData.tipo}
+                    name="nome"
+                    label="Nome do feriado"
+                    value={formData.nome}
                     onChange={handleChange}
                     fullWidth
                     required
                 />
 
                 <TextField
-                    name="descricao"
-                    label="Descrição"
-                    value={formData.descricao}
+                    name="data_feriado"
+                    label="Data do feriado"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    value={formData.data_feriado}
                     onChange={handleChange}
                     fullWidth
-                    multiline
-                    rows={4}
                 />
 
                 <Stack direction="row" spacing={2} justifyContent="flex-end">

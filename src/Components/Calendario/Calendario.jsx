@@ -35,6 +35,8 @@ export default function Calendario() {
     const [faltas, setFaltas] = useState([])
     const [ferias, setFerias] = useState([])
 
+    const [feriados, setFeriados] = useState([]);
+
     const [calendario, setCalendario] = useState()
     const [dias_restantes_ferias, setDias_Restantes_Ferias] = useState();
 
@@ -118,28 +120,35 @@ export default function Calendario() {
                         setCalendario(res[0]);
                     })
                     .catch(err => {
-                        console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+                        console.log(err)
                     })
                 handleServices.listFerias(id_perfil)
                     .then(res => {
                         setFerias(res);
                     })
                     .catch(err => {
-                        console.log("Não foi possivel encontrar as férias do utilizador: " + err)
+                        console.log(err)
                     })
                 handleServices.listFaltas(id_perfil)
                     .then(res => {
                         setFaltas(res);
                     })
                     .catch(err => {
-                        console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+                        console.log(err)
                     })
                 handleServices.listTipoFaltas()
                     .then(res => {
                         setTipos_Falta(res);
                     })
                     .catch(err => {
-                        console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+                        console.log(err)
+                    })
+                handleServices.carregarFeriados()
+                    .then(res => {
+                        setFeriados(res);
+                    })
+                    .catch(err => {
+                        console.log(err)
                     })
             }
         }
@@ -151,24 +160,24 @@ export default function Calendario() {
         }
     }, [id_perfil])
 
-    function carregarFerias(){
+    function carregarFerias() {
         handleServices.listFerias(id_perfil)
-        .then(res => {
-            setFerias(res);
-        })
-        .catch(err => {
-            console.log("Não foi possivel encontrar as férias do utilizador: " + err)
-        })
+            .then(res => {
+                setFerias(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar as férias do utilizador: " + err)
+            })
     }
 
-    function carregarFaltas(){
+    function carregarFaltas() {
         handleServices.listFaltas(id_perfil)
-        .then(res => {
-            setFaltas(res);
-        })
-        .catch(err => {
-            console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
-        })
+            .then(res => {
+                setFaltas(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar as faltas do utilizador: " + err)
+            })
     }
 
     useEffect(() => {
@@ -459,7 +468,7 @@ export default function Calendario() {
                                                     <div style={{ flex: 1, minHeight: '60svh', background: "white" }}>
                                                         <div className="form-container">
                                                             <h3>Calendário</h3>
-                                                            {!isLoadingFaltasFerias && <CalendarComponent faltas={faltas} ferias={ferias} />}
+                                                            {!isLoadingFaltasFerias && <CalendarComponent faltas={faltas} ferias={ferias} feriados={feriados} />}
                                                         </div>
                                                     </div>
                                                 </TabPanel>
@@ -695,33 +704,42 @@ export default function Calendario() {
         </div>
     );
 
-    function CalendarComponent({ faltas, ferias }) {
+    function CalendarComponent({ faltas, ferias, feriados }) {
         if (faltas && ferias) {
             moment.locale("pt")
             const localizer = momentLocalizer(moment);
-            const events = transformFaltasAndFeriasToEvents(faltas, ferias);
+            const events = transformFaltasAndFeriasToEvents(faltas, ferias, feriados);
 
             const eventPropGetter = (event) => {
                 let backgroundColor = '';
-                switch (event.resource.estado) {
-                    case "Justificada":
-                        backgroundColor = '#28a745';
-                        break;
-                    case "Por Justificar":
-                        backgroundColor = '#ffc107';
-                        break;
-                    case "Rejeitada":
-                        backgroundColor = '#dc3545';
-                        break;
-                    case "Em análise":
-                        backgroundColor = 'orange';
-                        break;
-                    case "Aprovada":
-                        backgroundColor = '#28a745';
-                        break;
-                    default:
-                        backgroundColor = '#6c757d';
+                console.log(event)
+
+                if(event.type == 'falta_feria'){
+                    switch (event.resource.estado) {
+                        case "Justificada":
+                            backgroundColor = '#28a745';
+                            break;
+                        case "Por Justificar":
+                            backgroundColor = '#ffc107';
+                            break;
+                        case "Rejeitada":
+                            backgroundColor = '#dc3545';
+                            break;
+                        case "Em análise":
+                            backgroundColor = 'orange';
+                            break;
+                        case "Aprovada":
+                            backgroundColor = '#28a745';
+                            break;
+                        default:
+                            backgroundColor = '#6c757d';
+                    }
                 }
+                else{
+                    backgroundColor = '#ff9f89';
+                }
+                
+                
 
                 return {
                     style: {
@@ -1332,8 +1350,9 @@ export default function Calendario() {
     }
 }
 
-function transformFaltasAndFeriasToEvents(faltas, ferias) {
+function transformFaltasAndFeriasToEvents(faltas, ferias, feriados) {
     const eventos = [];
+    const currentYear = new Date().getFullYear();
 
     const faltasEvents = faltas.map((falta) => ({
         title: falta.motivo ? `Falta: ${falta.motivo}` : "Falta",
@@ -1341,6 +1360,7 @@ function transformFaltasAndFeriasToEvents(faltas, ferias) {
         end: new Date(moment(falta.data_falta, "YYYY-MM-DD").toDate()),
         allDay: true,
         resource: falta,
+        type: 'falta_feria'
     }));
 
     const feriasEvents = ferias.map((feria) => ({
@@ -1349,9 +1369,28 @@ function transformFaltasAndFeriasToEvents(faltas, ferias) {
         end: new Date(moment(feria.data_conclusao).toDate() + 1),
         allDay: true,
         resource: feria,
+        type: 'falta_feria'
     }));
 
-    eventos.push(...faltasEvents, ...feriasEvents);
+    const feriadosEvents = feriados.map((feriado) => {
+        const originalDate = new Date(feriado.data_feriado);
+        const currentYearDate = new Date(
+            currentYear,
+            originalDate.getMonth(),
+            originalDate.getDate()
+        );
+        
+        return {
+            title: `Feriado: ${feriado.nome}`,
+            start: currentYearDate,
+            end: currentYearDate,
+            allDay: true,
+            resource: feriado,
+            type: 'feriado'
+        };
+    });
+
+    eventos.push(...faltasEvents, ...feriasEvents, ...feriadosEvents);
 
     return eventos;
 };
