@@ -120,39 +120,6 @@ export default function MarcarFerias() {
             const businessDays = calculateBusinessDays(startDate, endDate);
             setDuracao(businessDays);
         }
-    }, [data_conclusao, data_inicio, feriados]);
-
-    useEffect(() => {
-        if (data_conclusao && data_inicio && feriados) {
-            const startDate = new Date(data_inicio);
-            const endDate = new Date(data_conclusao);
-    
-            const calculateBusinessDays = (start, end) => {
-                let count = 0;
-                const current = new Date(start);
-                
-                const holidays = new Set(
-                    feriados.map(feriado => {
-                        const date = new Date(feriado.data_feriado);
-                        return `${date.getMonth()}-${date.getDate()}`;
-                    })
-                );
-    
-                while (current <= end) {
-                    const dayOfWeek = current.getDay();
-                    const currentMonthDay = `${current.getMonth()}-${current.getDate()}`;
-                    
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.has(currentMonthDay)) {
-                        count++;
-                    }
-                    current.setDate(current.getDate() + 1);
-                }
-                return count;
-            };
-    
-            const businessDays = calculateBusinessDays(startDate, endDate);
-            setDuracao(businessDays);
-        }
     }, [data_inicio, data_conclusao, feriados]);
 
     useEffect(() => {

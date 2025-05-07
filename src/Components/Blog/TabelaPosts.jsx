@@ -10,7 +10,7 @@ import { Box, Modal, Paper, Typography, Button, Stack, Chip, Avatar, Divider } f
 import { CalendarToday, LocationOn, Schedule } from '@mui/icons-material'
 
 
-export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar, onApagar, user, loggedid, cols }) {
+export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar, onApagar, user, loggedid, cols, filtro, filtroTipo }) {
     const navigate = useNavigate();
 
     const filteredPosts = posts.filter(post => {
@@ -38,11 +38,35 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
             return post.tipo == "Notícia" && post.estado == "Aprovada";
         }
 
+        if (filtro && filtro.trim() !== '') {
+            const searchTerm = filtro.toLowerCase();
+            const title = post.titulo.toLowerCase();
+            if (!title.includes(searchTerm)) {
+              return true;
+            }
+          }
+
         return false;
     });
 
+    const secondFilteredPosts = filteredPosts.filter(post => {
+        if (filtro && filtro.trim() !== '') {
+            const searchTerm = filtro.toLowerCase();
+            const title = post.titulo.toLowerCase();
+            if (!title.includes(searchTerm)) {
+              return false;
+            }
+        }
+
+        if(filtroTipo != "Todos" && post.tipo != filtroTipo){
+            return false
+        }
+
+        return true
+    });
+
     return (
-        filteredPosts.map((post) => {
+        secondFilteredPosts.map((post) => {
             return (
                 <div className={`col-md-${cols} mb-3`}>
                     <Paper

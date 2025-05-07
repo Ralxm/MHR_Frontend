@@ -80,8 +80,8 @@ export default function EditarPublicacao() {
     }, [id_user])
 
     useEffect(() => {
-        if(post && perfil){
-            if(post.id_perfil != perfil.id_perfil){
+        if (post && perfil) {
+            if (post.id_perfil != perfil.id_perfil) {
                 navigate('/blog')
             }
         }
@@ -209,20 +209,6 @@ export default function EditarPublicacao() {
                                                                     fullWidth
                                                                 />
                                                             </div>
-                                                            <div className='col-md-6'>
-                                                                <FormControl fullWidth>
-                                                                    <InputLabel shrink>Tipo de publicação</InputLabel>
-                                                                    <Select
-                                                                        label="Tipo de publicação"
-                                                                        value={tipo}
-                                                                        InputLabelProps={{ shrink: true }}
-                                                                        onChange={(value) => { setTipo(value.target.value) }}
-                                                                    >
-                                                                        <MenuItem value={"Notícia"}>Notícia</MenuItem>
-                                                                        <MenuItem value={"Visita"}>Visita</MenuItem>
-                                                                    </Select>
-                                                                </FormControl>
-                                                            </div>
                                                         </>
                                                     )
                                                     :
@@ -238,23 +224,23 @@ export default function EditarPublicacao() {
                                                                     fullWidth
                                                                 />
                                                             </div>
-                                                            <div className='col-md-6'>
-                                                                <FormControl fullWidth>
-                                                                    <InputLabel shrink>Tipo de publicação</InputLabel>
-                                                                    <Select
-                                                                        label="Tipo de publicação"
-                                                                        value={tipo}
-                                                                        InputLabelProps={{ shrink: true }}
-                                                                        onChange={(value) => { setTipo(value.target.value) }}
-                                                                    >
-                                                                        <MenuItem value={"Notícia"}>Notícia</MenuItem>
-                                                                        <MenuItem value={"Visita"}>Visita</MenuItem>
-                                                                    </Select>
-                                                                </FormControl>
-                                                            </div>
                                                         </>
                                                     )
                                                 }
+                                                <div className='col-md-6'>
+                                                    <FormControl fullWidth>
+                                                        <InputLabel shrink>Tipo de publicação</InputLabel>
+                                                        <Select
+                                                            label="Tipo de publicação"
+                                                            value={tipo || ''}
+                                                            InputLabelProps={{ shrink: true }}
+                                                            onChange={(value) => { setTipo(value.target.value) }}
+                                                        >
+                                                            <MenuItem value={"Notícia"}>Notícia</MenuItem>
+                                                            <MenuItem value={"Visita"}>Visita</MenuItem>
+                                                        </Select>
+                                                    </FormControl>
+                                                </div>
                                             </div>
 
                                             {tipo == "Visita" &&

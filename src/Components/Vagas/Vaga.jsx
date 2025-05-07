@@ -38,6 +38,8 @@ export default function Vagas() {
     const [isDecidirCandidaturaModal, setIsDecidirCandidaturaModal] = useState(false)
     const [action, setAction] = useState('')
 
+    const [isApagarCandidaturaModalOpen, setIsApagarCandidaturaModalOpen] = useState(false)
+
     {/* Variável para criação de um comentário */ }
     const [comentario, setComentario] = useState('')
 
@@ -326,6 +328,19 @@ export default function Vagas() {
                 navigate(0)
             })
             .catch(err => {
+                console.log(err);
+            });
+    }
+
+    function handleApagarCandidatura(id) {
+        handleServices.apagarCandidatura(id)
+            .then(res => {
+                alert(res);
+                carregarCandidaturaUser(id_user);
+                setSelectedCandidaturaUser(null);
+            })
+            .catch(err => {
+                alert(err)
                 console.log(err);
             });
     }
@@ -1182,7 +1197,7 @@ export default function Vagas() {
                         transform: 'translate(-50%, -50%)',
                         width: { xs: '90%', sm: '80%', md: '70%' },
                         maxWidth: '800px',
-                        minHeight: '80vh',
+                        maxHeight: '80vh',
                         borderRadius: 4,
                         p: 0,
                         display: 'flex',
@@ -1210,6 +1225,48 @@ export default function Vagas() {
                             </Typography>
                         }
                     </Box>
+                </Paper>
+            </Modal>
+
+            {/*Modal para o utilizador apagar a própria candidatura */}
+            <Modal
+                open={isApagarCandidaturaModalOpen}
+                onClose={() => setIsApagarCandidaturaModalOpen(false)}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 550 },
+                        borderRadius: 4,
+                        p: 4,
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                        Tem a certeza que pretende elimnar a candidatura?
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => setIsApagarCandidaturaModalOpen(false) }
+                            sx={{ width: '50%' }}
+                        >
+                            Fechar
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={() => { handleApagarCandidatura(selectedCandidaturaUser.id_candidatura); setIsApagarCandidaturaModalOpen(false) }}
+                            sx={{ width: '50%' }}
+                        >
+                            Eliminar
+                        </Button>
+                    </Stack>
                 </Paper>
             </Modal>
         </div >
@@ -1403,13 +1460,11 @@ export default function Vagas() {
                             </Button>
                             <div>
                                 {selectedCandidaturaUser && selectedCandidaturaUser.status.includes("Pendente") &&
-                                    <button className='btn btn-danger' onClick={() => {  }}>Apagar candidatura</button>
+                                    <button className='btn btn-danger' onClick={() => { setIsApagarCandidaturaModalOpen(true) }}>Apagar candidatura</button>
                                 }
-                                <button className='btn btn-primary mx-1' onClick={handleSubmit}>Guardar</button>
+                                <button className='btn btn-success mx-1' onClick={handleSubmit}>Guardar</button>
                             </div>
-
                         </div>
-
                     </Box>
                 </Box>
             </>

@@ -147,7 +147,7 @@ export default function Feriados() {
                                     <TableRow>
                                         <TableCell>Nome</TableCell>
                                         <TableCell>Data</TableCell>
-                                        <TableCell>Ações</TableCell>
+                                        <TableCell align='right'>Ações</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -155,7 +155,7 @@ export default function Feriados() {
                                         <TableRow key={feriado.id_feriado}>
                                             <TableCell>{feriado.nome}</TableCell>
                                             <TableCell>{formatDateToPortuguese(feriado.data_feriado)}</TableCell>
-                                            <TableCell>
+                                            <TableCell align='right'>
                                                 <Button
                                                     variant="outlined"
                                                     size="small"

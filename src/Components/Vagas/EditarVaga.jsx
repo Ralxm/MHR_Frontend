@@ -119,6 +119,8 @@ export default function EditarVaga() {
             estado: estado,
             data_inicio: data_inicio,
             data_fecho: data_fecho,
+            tipo: tipo,
+            local: local
         }
 
         handleServices.updateVaga(datapost)

@@ -45,7 +45,7 @@ export default function SidebarItems({ tipo_user }) {
     useEffect(() => {
         faltas.map((falta) => {
             if (falta.estado == "Em análise") {
-                setFaltas_Por_Justificar(faltas_por_justificar + 1);
+                setFaltas_Por_Justificar(faltas => faltas + 1);
             }
         })
     }, [faltas])

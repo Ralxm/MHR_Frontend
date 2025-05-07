@@ -22,12 +22,16 @@ export default function Blog() {
 
     const [posts, setPosts] = useState([]);
     const [tab, setTab] = useState('1')
+    const [cols, setCols] = useState(3)
 
     const [selectedPostAprovar, setSelectedPostAprovar] = useState()
     const [selectedPostRejeitar, setSelectedPostRejeitar] = useState();
     const [selectedPostApagar, setSelectedPostApagar] = useState();
 
     const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
+
+    const [filtro, setFiltro] = useState('')
+    const [filtroTipo, setFiltroTipo] = useState('Todos')
 
     useEffect(() => {
         document.title = "Blog"
@@ -147,8 +151,48 @@ export default function Blog() {
                         }
                         <div className="col-md-12" style={{ zIndex: 1000 }}>
                             <div className="items-container mt-3" style={{ minHeight: '85vh', border: 'none' }}>
-                                <div className='d-flex justify-content-end mb-3'>
+                                <div className='d-flex justify-content-between mb-3' style={{ height: '55px' }}>
                                     <button className='btn btn-primary' onClick={() => setIsCreatePostModalOpen(true)}>Criar publicação</button>
+                                    <div>
+                                        <FormControl sx={{ minWidth: '70px', height: '100%' }}>
+                                            <InputLabel shrink>Colunas</InputLabel>
+                                            <Select
+                                                label="Estado"
+                                                name="estado"
+                                                InputLabelProps={{ shrink: true }}
+                                                onChange={(value) => setCols(value.target.value)}
+                                                value={cols}
+                                            >
+                                                <MenuItem value={"12"}>1</MenuItem>
+                                                <MenuItem value={"6"}>2</MenuItem>
+                                                <MenuItem value={"4"}>3</MenuItem>
+                                                <MenuItem value={"3"}>4</MenuItem>
+                                                <MenuItem value={"custom-5"}>5</MenuItem>
+                                                <MenuItem value={"2"}>6</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                        <FormControl sx={{ minWidth: '150px', height: '100%', mx: 2 }}>
+                                            <InputLabel shrink>Estado</InputLabel>
+                                            <Select
+                                                label="Estado"
+                                                name="estado"
+                                                InputLabelProps={{ shrink: true }}
+                                                onChange={(value) => setFiltroTipo(value.target.value)}
+                                                value={filtroTipo}
+                                            >
+                                                <MenuItem value={"Todos"} selected>Todos</MenuItem>
+                                                <MenuItem value={"Notícia"}>Notícia</MenuItem>
+                                                <MenuItem value={"Visita"}>Visita</MenuItem>
+                                            </Select>
+                                        </FormControl>
+                                        <TextField
+                                            label="Título"
+                                            value={filtro}
+                                            onChange={(e) => setFiltro(e.target.value)}
+                                        />
+                                    </div>
+
+
                                 </div>
                                 <div className='row mb-3'>
                                     <div className='container-fluid'>
@@ -160,8 +204,10 @@ export default function Blog() {
                                                 tipo={'User'}
                                                 onAceitar={setSelectedPostAprovar}
                                                 onRejeitar={setSelectedPostRejeitar}
-                                                cols={3}
+                                                cols={cols}
                                                 onApagar={setSelectedPostApagar}
+                                                filtro={filtro}
+                                                filtroTipo={filtroTipo}
                                             >
 
                                             </TabelaPosts>

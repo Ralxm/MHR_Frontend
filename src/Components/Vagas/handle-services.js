@@ -232,6 +232,19 @@ class HandleServices {
                 }
             }, reason => { throw new Error('Utilizador Inválido'); });
     }
+
+    apagarCandidatura(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+
+        return axios.put(url + "candidaturas/delete/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => {
+                throw new Error('Erro a apagar a candidatura');
+            });
+    }
 }
 
 export default new HandleServices();

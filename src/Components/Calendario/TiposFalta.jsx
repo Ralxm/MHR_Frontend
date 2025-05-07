@@ -108,16 +108,16 @@ export default function TiposFalta() {
                                 <TableHead>
                                     <TableRow>
                                         <TableCell>Tipo</TableCell>
-                                        <TableCell>Descrição</TableCell>
-                                        <TableCell>Ações</TableCell>
+                                        <TableCell align='left'>Descrição</TableCell>
+                                        <TableCell align="right">Ações</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
                                     {tipos_faltas.map((tipo) => (
                                         <TableRow key={tipo.id_tipofalta}>
                                             <TableCell>{tipo.tipo}</TableCell>
-                                            <TableCell>{tipo.descricao}</TableCell>
-                                            <TableCell>
+                                            <TableCell align='left'>{tipo.descricao}</TableCell>
+                                            <TableCell align="right">
                                                 <Button
                                                     variant="outlined"
                                                     size="small"
