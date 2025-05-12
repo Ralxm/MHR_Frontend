@@ -189,6 +189,7 @@ export default function BlogPotUtilizador() {
                                 loggedid={id_perfil}
                                 cols={3}
                                 onApagar={setSelectedPostApagar}
+                                to={"Admin"}
                             />
                         </div>
                     </div>

@@ -35,6 +35,8 @@ export default function Projetos() {
     const [selectedIdeiaApagar, setSelectedIdeiaApagar] = useState();
     const [selectedProjetoApagar, setSelectedProjetoApagar] = useState();
 
+    const [filtroEstado, setFiltroEstado] = useState("Todos")
+
     {/* Variáveis para a criação de um projeto */ }
     const [perfis, setPerfis] = useState([]);
     const [titulo_projeto, setTitulo_Projeto] = useState()
@@ -140,6 +142,7 @@ export default function Projetos() {
                 setSelectedProjetoApagar(null);
             })
             .catch(err => {
+                alert("Não foi possível apagar o projeto. Verifique se este tem algum utilizador, ponto na linha temporal ou comentario associado.")
                 console.log(err)
             })
     }
@@ -166,7 +169,7 @@ export default function Projetos() {
                     <div className="row" >
                         {/* Coluna da esquerda */}
                         <div className="col-md-3" style={{ zIndex: 1000 }}>
-                            <div className='row items-container' style={{position: 'sticky', top: 10}}>
+                            <div className='row items-container' style={{ position: 'sticky', top: 10 }}>
                                 {tab == 1 ?
                                     <span><strong>Projetos</strong></span>
                                     :
@@ -205,9 +208,26 @@ export default function Projetos() {
                                                     </TabList>
 
                                                     {tab == 1 && (tipo_user == 1 || tipo_user == 2) &&
-                                                        <button className='btn btn-outline-primary mb-2' onClick={() => setIsCreateProjetoModalOpen(true)}>
-                                                            Criar projeto
-                                                        </button>
+                                                        <>
+                                                            <FormControl sx={{ minWidth: '210px', mx: 2, marginBottom: '10px' }}>
+                                                                <InputLabel shrink>Estado</InputLabel>
+                                                                <Select
+                                                                    label="Estado"
+                                                                    name="estado"
+                                                                    InputLabelProps={{ shrink: true }}
+                                                                    onChange={(value) => setFiltroEstado(value.target.value)}
+                                                                    value={filtroEstado}
+                                                                >
+                                                                    <MenuItem value={"Todos"} selected>Todos</MenuItem>
+                                                                    <MenuItem value={"Em desenvolvimento"}>Em desenvolvimento</MenuItem>
+                                                                    <MenuItem value={"Concluído"}>Concluído</MenuItem>
+                                                                    <MenuItem value={"Parado"}>Parado</MenuItem>
+                                                                </Select>
+                                                            </FormControl>
+                                                            <button className='btn btn-outline-primary mb-2' onClick={() => setIsCreateProjetoModalOpen(true)}>
+                                                                Criar projeto
+                                                            </button>
+                                                        </>
                                                     }
                                                     {tab == 2 &&
                                                         <button className='btn btn-outline-secondary mb-2' onClick={() => setIsCreateIdeiaModalOpen(true)}>
@@ -220,7 +240,7 @@ export default function Projetos() {
                                             <TabPanel value="1">
                                                 <div className='container-fluid'>
                                                     <div className='row g-3'>
-                                                        <TabelaProjetos projetos={projetos} onApagar={setSelectedProjetoApagar}></TabelaProjetos>
+                                                        <TabelaProjetos projetos={projetos} onApagar={setSelectedProjetoApagar} filtro={filtroEstado}></TabelaProjetos>
                                                     </div>
                                                 </div>
                                             </TabPanel>

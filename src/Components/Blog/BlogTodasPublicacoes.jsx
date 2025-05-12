@@ -26,6 +26,8 @@ export default function BlogTodasPublicacoes() {
     const [selectedPostRejeitar, setSelectedPostRejeitar] = useState();
     const [selectedPostApagar, setSelectedPostApagar] = useState();
 
+    const [filtro, setFiltro] = useState('')
+
     const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
 
     useEffect(() => {
@@ -131,7 +133,18 @@ export default function BlogTodasPublicacoes() {
                         </div>
                     }
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
-                        <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Todas as publicações</h2>
+                        <div className='row'>
+                            <div className='col d-flex justify-content-between'>
+                                <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Todas as publicações</h2>
+                                <TextField
+                                    label="Título"
+                                    value={filtro}
+                                    onChange={(e) => setFiltro(e.target.value)}
+                                />
+                            </div>
+
+                        </div>
+
                         <div className='row d-flex'>
                             <TabelaPosts
                                 posts={posts}
@@ -143,6 +156,8 @@ export default function BlogTodasPublicacoes() {
                                 loggedid={id_perfil}
                                 cols={3}
                                 onApagar={setSelectedPostApagar}
+                                filtro={filtro}
+                                to={"Admin"}
                             />
                         </div>
                     </div>

@@ -78,7 +78,25 @@ export default function Blog() {
     function carregarBlog() {
         handleServices.carregarBlog()
             .then(res => {
-                setPosts(res);
+                const sortedPosts = res.sort((a, b) => {
+
+                const getSortDate = (post) => {
+                    if (post.tipo === 'Notícia' && post.data_noticia) {
+                        return new Date(post.data_noticia);
+                    }
+                    if (post.tipo === 'Visita' && post.data_visita) {
+                        return new Date(post.data_visita);
+                    }
+                    return new Date(post.created_at);
+                };
+
+                const dateA = getSortDate(a);
+                const dateB = getSortDate(b);
+                
+                return dateB - dateA;
+            });
+            
+            setPosts(sortedPosts);
             })
             .catch(err => {
                 console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
@@ -157,7 +175,7 @@ export default function Blog() {
                                         <FormControl sx={{ minWidth: '70px', height: '100%' }}>
                                             <InputLabel shrink>Colunas</InputLabel>
                                             <Select
-                                                label="Estado"
+                                                label="Colunas"
                                                 name="estado"
                                                 InputLabelProps={{ shrink: true }}
                                                 onChange={(value) => setCols(value.target.value)}
@@ -208,6 +226,7 @@ export default function Blog() {
                                                 onApagar={setSelectedPostApagar}
                                                 filtro={filtro}
                                                 filtroTipo={filtroTipo}
+                                                to={"User"}
                                             >
 
                                             </TabelaPosts>

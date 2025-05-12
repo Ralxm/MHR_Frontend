@@ -193,8 +193,7 @@ export default function FaltasUtilizadores() {
             setImportedFaltas(parsedFaltas);
             setShowImportModal(true);
         } catch (error) {
-            console.error("Import error:", error);
-            alert("Failed to import file. Please check the format and required fields.");
+            alert("Erro a importar o ficheiro excel");
         }
     };
 
@@ -632,6 +631,7 @@ export default function FaltasUtilizadores() {
                             onChange={handleChange}
                             InputLabelProps={{ shrink: true }}
                         >
+                            <MenuItem value={"Em análise"}>Em análise</MenuItem>
                             <MenuItem value={"Rejeitada"}>Rejeitada</MenuItem>
                             <MenuItem value={"Aprovada"}>Aprovada</MenuItem>
                             {formData.estado == "Pendente" && <MenuItem value={"Pendente"}>Pendente</MenuItem>}

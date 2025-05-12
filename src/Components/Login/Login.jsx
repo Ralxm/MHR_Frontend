@@ -28,7 +28,7 @@ export default function Login() {
                 alert("Erro na autenticação")
             }
             else{
-                if(res.estado == "Ativa"){
+                if(res.estado == "Ativa" || res.estado == "Restrita"){
                     navigate('/calendario');
                 }
                 else{

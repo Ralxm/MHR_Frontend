@@ -5,7 +5,7 @@ import { Box, Chip, Stack, Card, Typography, Divider, CardContent, Button } from
 import { LockOpen, Lock, People, Business, CalendarToday, ArrowForward } from '@mui/icons-material'
 
 
-export default function TabelaProjetos({ projetos, onApagar }) {
+export default function TabelaProjetos({ projetos, onApagar, filtro }) {
   let tipo_user = localStorage.getItem("tipo")
   const navigate = useNavigate();
 
@@ -22,6 +22,14 @@ export default function TabelaProjetos({ projetos, onApagar }) {
 
     return formattedDate
   }
+
+  const filteredProjetos = projetos.filter(projeto => {
+    if (projeto.estado != filtro && filtro != "Todos") {
+      return false
+    }
+
+    return true;
+  })
 
   /*const filteredVagas = vagas.filter(vaga => {
     if (selectedDepartamento && vaga.id_departamento !== selectedDepartamento.id_departamento) {
@@ -41,9 +49,9 @@ export default function TabelaProjetos({ projetos, onApagar }) {
 
   return (
     <>
-      {projetos.map((projeto) => {
+      {filteredProjetos.map((projeto) => {
         return (
-          <div className="col-md-3" key={projeto.id_projeto} style={{zIndex: 1001}}>
+          <div className="col-md-3" key={projeto.id_projeto} style={{ zIndex: 1001 }}>
             <Card
               sx={{
                 height: '100%',
@@ -73,7 +81,7 @@ export default function TabelaProjetos({ projetos, onApagar }) {
                   <Chip
                     label={projeto.estado}
                     size="small"
-                    color={ projeto.estado === 'Em desenvolvimento' ? 'warning' : projeto.estado === 'Concluído' ? 'success' : 'error' }
+                    color={projeto.estado === 'Em desenvolvimento' ? 'warning' : projeto.estado === 'Concluído' ? 'success' : 'error'}
                     sx={{ fontWeight: 500 }}
                   />
                 </Stack>
@@ -127,7 +135,7 @@ export default function TabelaProjetos({ projetos, onApagar }) {
                           variant="outlined"
                           color="error"
                           size="small"
-                          onClick={() => {onApagar(projeto)}}
+                          onClick={() => { onApagar(projeto) }}
                           disabled={projeto.estado != "Em desenvolvimento"}
                         >
                           Apagar
@@ -135,7 +143,7 @@ export default function TabelaProjetos({ projetos, onApagar }) {
                         <Button
                           variant="contained"
                           size="small"
-                          onClick={() => {navigate(`/projeto/editar/${projeto.id_projeto}`)}}
+                          onClick={() => { navigate(`/projeto/editar/${projeto.id_projeto}`) }}
                         >
                           Editar
                         </Button>

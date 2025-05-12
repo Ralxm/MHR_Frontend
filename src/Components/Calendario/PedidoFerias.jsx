@@ -40,6 +40,7 @@ export default function PedidosFerias() {
         }
 
         document.title = "Calendário";
+        carregarFerias();
     }, []);
 
 
@@ -55,17 +56,15 @@ export default function PedidosFerias() {
         }
     }, [id_user])
 
-    useEffect(() => {
-        if (id_perfil) {
-            handleServices.carregarFerias()
-                .then(res => {
-                    setFerias(res);
-                })
-                .catch(err => {
-                    console.log("Não foi possivel encontrar as faltas: " + err)
-                })
-        }
-    }, [id_perfil])
+    function carregarFerias() {
+        handleServices.carregarFerias()
+            .then(res => {
+                setFerias(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel encontrar as faltas: " + err)
+            })
+    }
 
     const handleCloseVerDetalhes = () => {
         setSelectedFeria(null)
@@ -103,7 +102,8 @@ export default function PedidosFerias() {
         handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
             .then(res => {
                 alert("Pedido de ferias apagado com sucesso")
-                navigate(0)
+                carregarFerias();
+                handleCloseApagar();
             })
             .catch(err => {
                 console.log("Erro a apagar a despesa: " + err);
@@ -304,14 +304,15 @@ export default function PedidosFerias() {
                 data_conclusao: formData.data_conclusao,
                 duracao: formData.duracao,
                 estado: formData.estado,
-                validador: formData.validador,
-                comentario: formData.comentario,
+                validador: id_perfil,
+                comentarios: formData.comentarios,
             }
 
             handleServices.atualizarFeria(datapost)
                 .then(res => {
                     alert("Pedido de férias atualizado com sucesso")
-                    navigate(0);
+                    carregarFerias();
+                    handleCloseVerDetalhes();
                 })
                 .catch(err => {
                     console.log(err);

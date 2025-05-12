@@ -181,7 +181,7 @@ export default function Calendario() {
     }
 
     useEffect(() => {
-        if (data_conclusao && data_inicio) {
+        if (data_conclusao && data_inicio && feriados) {
             const startDate = new Date(data_inicio);
             const endDate = new Date(data_conclusao);
 
@@ -189,9 +189,18 @@ export default function Calendario() {
                 let count = 0;
                 const current = new Date(start);
 
+                const holidays = new Set(
+                    feriados.map(feriado => {
+                        const date = new Date(feriado.data_feriado);
+                        return `${date.getMonth()}-${date.getDate()}`;
+                    })
+                );
+
                 while (current <= end) {
                     const dayOfWeek = current.getDay();
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+                    const currentMonthDay = `${current.getMonth()}-${current.getDate()}`;
+
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.has(currentMonthDay)) {
                         count++;
                     }
                     current.setDate(current.getDate() + 1);
@@ -202,31 +211,7 @@ export default function Calendario() {
             const businessDays = calculateBusinessDays(startDate, endDate);
             setDuracao(businessDays);
         }
-    }, [data_conclusao])
-
-    useEffect(() => {
-        if (data_conclusao && data_inicio) {
-            const startDate = new Date(data_inicio);
-            const endDate = new Date(data_conclusao);
-
-            const calculateBusinessDays = (start, end) => {
-                let count = 0;
-                const current = new Date(start);
-
-                while (current <= end) {
-                    const dayOfWeek = current.getDay();
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6) {
-                        count++;
-                    }
-                    current.setDate(current.getDate() + 1);
-                }
-                return count;
-            };
-
-            const businessDays = calculateBusinessDays(startDate, endDate);
-            setDuracao(businessDays);
-        }
-    }, [data_inicio])
+    }, [data_inicio, data_conclusao, feriados]);
 
     useEffect(() => {
         if (calendario && ferias) {
@@ -714,7 +699,7 @@ export default function Calendario() {
                 let backgroundColor = '';
                 console.log(event)
 
-                if(event.type == 'falta_feria'){
+                if (event.type == 'falta_feria') {
                     switch (event.resource.estado) {
                         case "Justificada":
                             backgroundColor = '#28a745';
@@ -735,11 +720,11 @@ export default function Calendario() {
                             backgroundColor = '#6c757d';
                     }
                 }
-                else{
+                else {
                     backgroundColor = '#ff9f89';
                 }
-                
-                
+
+
 
                 return {
                     style: {
@@ -1206,16 +1191,16 @@ export default function Calendario() {
         );
     }
 
-    function CriarFalta({ tipo_falta, data_falta, motivo }) {
-        const [_motivo, set_Motivo] = useState(motivo);
-        const [newFile, setNewFile] = useState()
+    function CriarFalta() {
+        const [_motivo, set_Motivo] = useState('');
+        const [newFile, setNewFile] = useState('')
+        const [tipo_falta, setTipo_Falta] = useState('')
+        const [data_falta, setData_Falta] = useState('')
 
         function handleCriarFalta(event) {
             event.preventDefault()
 
             const formData = new FormData()
-
-            console.log(formData)
 
             formData.append('id_calendario', calendario.id_calendario);
             formData.append('id_perfil', id_perfil);
@@ -1231,7 +1216,7 @@ export default function Calendario() {
 
             handleServices.createFalta(formData)
                 .then(res => {
-                    alert(res)
+                    alert(res.message)
                     carregarFaltas();
                     handleCloseCriarFalta();
                 })
@@ -1379,7 +1364,7 @@ function transformFaltasAndFeriasToEvents(faltas, ferias, feriados) {
             originalDate.getMonth(),
             originalDate.getDate()
         );
-        
+
         return {
             title: `Feriado: ${feriado.nome}`,
             start: currentYearDate,

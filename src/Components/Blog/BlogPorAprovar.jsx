@@ -142,6 +142,7 @@ export default function BlogPorAprovar() {
                                 onRejeitar={setSelectedPostRejeitar}
                                 cols={3}
                                 onApagar={setSelectedPostApagar}
+                                to={"Admin"}
                             />
                         </div>
                     </div>

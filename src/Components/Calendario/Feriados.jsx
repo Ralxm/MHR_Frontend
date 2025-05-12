@@ -6,7 +6,7 @@ import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Box, Modal, Paper, Typography, Button, TableCell, Table, TableContainer, TableHead, TableRow, TableBody, IconButton, TextField, Stack, Tooltip } from '@mui/material';
+import { Box, Modal, Paper, Typography, Button, TableCell, Table, TableContainer, TableHead, TableRow, TableBody, IconButton, TextField, Stack, Tooltip, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Close } from '@mui/icons-material'
 import SidebarItems from './SidebarItems';
 
@@ -66,18 +66,18 @@ export default function Feriados() {
 
     function formatDateToPortuguese(dateString) {
         if (!dateString) return '';
-        
+
         const monthsPT = [
-            'Janeiro', 'Fevereiro', 'Março', 'Abril', 
-            'Maio', 'Junho', 'Julho', 'Agosto', 
+            'Janeiro', 'Fevereiro', 'Março', 'Abril',
+            'Maio', 'Junho', 'Julho', 'Agosto',
             'Setembro', 'Outubro', 'Novembro', 'Dezembro'
         ];
-        
+
         const date = new Date(dateString);
         const day = date.getDate().toString().padStart(2, '0');
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const monthName = monthsPT[date.getMonth()];
-        
+
         return `${day}-${month} (${day} de ${monthName})`;
     }
 
@@ -147,6 +147,7 @@ export default function Feriados() {
                                     <TableRow>
                                         <TableCell>Nome</TableCell>
                                         <TableCell>Data</TableCell>
+                                        <TableCell>Tipo</TableCell>
                                         <TableCell align='right'>Ações</TableCell>
                                     </TableRow>
                                 </TableHead>
@@ -155,6 +156,7 @@ export default function Feriados() {
                                         <TableRow key={feriado.id_feriado}>
                                             <TableCell>{feriado.nome}</TableCell>
                                             <TableCell>{formatDateToPortuguese(feriado.data_feriado)}</TableCell>
+                                            <TableCell>{feriado.tipo}</TableCell>
                                             <TableCell align='right'>
                                                 <Button
                                                     variant="outlined"
@@ -210,8 +212,8 @@ export default function Feriados() {
                                     </IconButton>
                                 </div>
 
-                                <TipoFaltaForm
-                                    tipo={selectedFeriado}
+                                <FeriadoForm
+                                    feriado={selectedFeriado}
                                     onClose={() => setIsEditModalOpen(false)}
                                     refresh={carregarFeriados}
                                     mode="edit"
@@ -247,7 +249,7 @@ export default function Feriados() {
                                     </IconButton>
                                 </div>
 
-                                <TipoFaltaForm
+                                <FeriadoForm
                                     onClose={() => setIsCreateModalOpen(false)}
                                     refresh={carregarFeriados}
                                     mode="create"
@@ -307,12 +309,15 @@ export default function Feriados() {
     );
 }
 
-function TipoFaltaForm({ feriado, onClose, refresh, mode }) {
+function FeriadoForm({ feriado, onClose, refresh, mode }) {
     const [formData, setFormData] = useState({
         id_feriado: '',
         nome: '',
         data_feriado: '',
+        tipo: ""
     });
+
+    console.log(feriado)
 
     useEffect(() => {
         if (mode == 'edit' && feriado) {
@@ -320,6 +325,7 @@ function TipoFaltaForm({ feriado, onClose, refresh, mode }) {
                 id_feriado: feriado.id_feriado,
                 nome: feriado.nome,
                 data_feriado: feriado.data_feriado,
+                tipo: feriado.tipo
             });
         }
     }, [feriado, mode]);
@@ -372,6 +378,19 @@ function TipoFaltaForm({ feriado, onClose, refresh, mode }) {
                     onChange={handleChange}
                     fullWidth
                 />
+
+                <FormControl fullWidth>
+                    <InputLabel id="absence-type-label">Tipo de feriado</InputLabel>
+                    <Select
+                        name="tipo"
+                        label="Tipo de feriado"
+                        value={formData.tipo}
+                        onChange={handleChange}
+                    >
+                        <MenuItem value={"Fixo"}>Fixo</MenuItem>
+                        <MenuItem value={"Móvel"}>Móvel</MenuItem>
+                    </Select>
+                </FormControl>
 
                 <Stack direction="row" spacing={2} justifyContent="flex-end">
                     <Button

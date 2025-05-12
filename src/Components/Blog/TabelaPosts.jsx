@@ -10,10 +10,10 @@ import { Box, Modal, Paper, Typography, Button, Stack, Chip, Avatar, Divider } f
 import { CalendarToday, LocationOn, Schedule } from '@mui/icons-material'
 
 
-export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar, onApagar, user, loggedid, cols, filtro, filtroTipo }) {
+export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar, onApagar, user, loggedid, cols, filtro, filtroTipo, to }) {
     const navigate = useNavigate();
 
-    const filteredPosts = posts.filter(post => {
+    let filteredPosts = posts.filter(post => {
         if (tipo === "Por_User") {
             return post.id_perfil === user?.id_perfil;
         }
@@ -38,35 +38,30 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
             return post.tipo == "Notícia" && post.estado == "Aprovada";
         }
 
-        if (filtro && filtro.trim() !== '') {
-            const searchTerm = filtro.toLowerCase();
-            const title = post.titulo.toLowerCase();
-            if (!title.includes(searchTerm)) {
-              return true;
-            }
-          }
-
         return false;
     });
 
-    const secondFilteredPosts = filteredPosts.filter(post => {
+
+    filteredPosts = filteredPosts.filter(post => {
         if (filtro && filtro.trim() !== '') {
             const searchTerm = filtro.toLowerCase();
             const title = post.titulo.toLowerCase();
             if (!title.includes(searchTerm)) {
-              return false;
+                return false;
             }
         }
 
-        if(filtroTipo != "Todos" && post.tipo != filtroTipo){
-            return false
+        if (to == "User") {
+            if (filtroTipo != "Todos" && post.tipo != filtroTipo) {
+                return false
+            }
         }
 
         return true
     });
 
     return (
-        secondFilteredPosts.map((post) => {
+        filteredPosts.map((post) => {
             return (
                 <div className={`col-md-${cols} mb-3`}>
                     <Paper
@@ -145,6 +140,10 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
                                     </div>
                                 ) : (
                                     <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                                        <CalendarToday fontSize="small" color="action" />
+                                        <Typography variant="body2" color="text.secondary">
+                                            {post.data_visita}
+                                        </Typography>
                                     </div>
                                 )}
 

@@ -421,7 +421,7 @@ export default function FeriasPessoais() {
                         name="validador"
                         InputLabelProps={{ shrink: true }}
                         fullWidth
-                        value={formData.validador ? formData.validador : "Sem validador"}
+                        value={formData.validador ? formData.perfilValidador.nome : "Sem validador"}
                         onChange={handleChange}
                         disabled
                     />

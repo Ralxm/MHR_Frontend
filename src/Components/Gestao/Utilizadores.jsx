@@ -6,7 +6,7 @@ import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Box, Modal, Paper, Typography, Button, TableCell, Table, TableContainer, TableHead, TableRow, TableBody, MenuItem, IconButton, Chip, TextField, Stack, FormControl, Label, Select, InputLabel } from '@mui/material';
+import { Box, Modal, Paper, Typography, Button, TableCell, Table, TableContainer, TableHead, TableRow, TableBody, MenuItem, IconButton, Chip, TextField, Stack, FormControl, Select, InputLabel, FormControlLabel, Checkbox } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Delete, Close } from '@mui/icons-material'
 import FileDropZone from '../../Universal/FileDropZoneSingle';
@@ -31,6 +31,7 @@ export default function Utilizadores() {
     const [isCreatePerfilModalOpen, setIsCreatePerfilModalOpen] = useState(false);
     const [userCandidaturas, setUserCandidaturas] = useState([]);
     const [selectedUserEditar, setSelectedUserEditar] = useState(null);
+    const [selectedUtilizador, setSelectedUtilizador] = useState(null);
 
     const filteredUtilizadores = utilizadores.filter(user => {
         if (filtro === 'todos') return true;
@@ -234,7 +235,7 @@ export default function Utilizadores() {
                                                 <TableCell>
                                                     <Chip
                                                         label={utilizador.estado}
-                                                        color={utilizador.estado === 'Ativa' ? 'success' : 'error'}
+                                                        color={utilizador.estado === 'Ativa' ? 'success' : utilizador.estado == 'Desativada' ? 'error' : 'warning'}
                                                         size="small"
                                                     />
                                                 </TableCell>
@@ -276,7 +277,7 @@ export default function Utilizadores() {
                                                             variant="outlined"
                                                             size="small"
                                                             color='secondary'
-                                                            onClick={() => setSelectedUserEditar(perfil)}
+                                                            onClick={() => {setSelectedUserEditar(perfil); setSelectedUtilizador(utilizador)}}
                                                         >
                                                             Editar
                                                         </Button>
@@ -465,7 +466,7 @@ export default function Utilizadores() {
                                                         label={candidatura.status}
                                                         color={
                                                             candidatura.status.includes('Aceite') ? 'success' :
-                                                                candidatura.status.includes('Rejeitada') ? 'error' : 'warning'
+                                                                candidatura.status.includes('Rejeitada') ? 'error' : 'warning' 
                                                         }
                                                         size="small"
                                                     />
@@ -498,8 +499,33 @@ export default function Utilizadores() {
             telemovel: '',
             data_nascimento: '',
             distrito: '',
-            id_departamento: ''
+            id_departamento: '',
+            dias_ferias_ano_atual: '',
+            estado: 'Restrita'
         });
+
+        useEffect(() => {
+            setPerfilForm(prev => ({
+                ...prev,
+                dias_ferias_ano_atual: calcularDiasFerias()
+            }))
+        }, [])
+
+        const calcularDiasFerias = () => {
+            const hoje = new Date();
+            const anoAtual = hoje.getFullYear();
+            const mesAtual = hoje.getMonth();
+            const mesesRestantes = 11 - mesAtual;
+
+            const diasNoMes = new Date(anoAtual, mesAtual + 1, 0).getDate();
+            const diasRestantesNoMes = diasNoMes - hoje.getDate();
+
+            const mesesProporcionais = mesesRestantes + (diasRestantesNoMes / diasNoMes);
+
+            const diasFeriasFuturos = mesesProporcionais * (22 / 12);
+
+            return Math.round(diasFeriasFuturos);
+        }
 
         const handlePerfilFormChange = (e) => {
             const { name, value } = e.target;
@@ -530,7 +556,9 @@ export default function Utilizadores() {
                         telemovel: '',
                         data_nascimento: '',
                         distrito: '',
-                        id_departamento: ''
+                        id_departamento: '',
+                        dias_ferias_ano_atual: '',
+                        estado: ''
                     });
                 })
                 .catch(err => {
@@ -539,7 +567,7 @@ export default function Utilizadores() {
         };
 
         return (
-            <form onSubmit={handleCriarPerfil}>
+            <form>
                 <Stack spacing={3}>
                     <TextField
                         name="nome"
@@ -621,6 +649,30 @@ export default function Utilizadores() {
                         </Select>
                     </FormControl>
 
+                    <TextField
+                        name="dias_ferias_ano_atual"
+                        label="Dia de férias do ano atual"
+                        value={perfilForm.dias_ferias_ano_atual}
+                        type="number"
+                        onChange={handlePerfilFormChange}
+                        fullWidth
+                    />
+
+                    <FormControlLabel
+                        control={
+                            <Checkbox
+                                checked={perfilForm.estado === "Ativa"}
+                                onChange={(e) => setPerfilForm({
+                                    ...perfilForm,
+                                    estado: e.target.checked ? "Ativa" : "Restrita"
+                                })}
+                                color="primary"
+                            />
+                        }
+                        label="Perfil com permissões para aceder a todo o website"
+                        labelPlacement="end"
+                    />
+
                     <Stack direction="row" spacing={2} justifyContent="flex-end">
                         <Button
                             variant="outlined"
@@ -632,6 +684,7 @@ export default function Utilizadores() {
                             type="submit"
                             variant="contained"
                             color="primary"
+                            onClick={() => { handleCriarPerfil() }}
                         >
                             Criar Perfil
                         </Button>
@@ -650,7 +703,8 @@ export default function Utilizadores() {
             telemovel: '',
             data_nascimento: '',
             distrito: '',
-            id_departamento: ''
+            id_departamento: '',
+            estado: ''
         });
 
         useEffect(() => {
@@ -658,6 +712,7 @@ export default function Utilizadores() {
                 const userPerfil = perfis.find(p => p.id_utilizador === selectedUserEditar.id_utilizador);
                 if (userPerfil) {
                     setPerfilData({
+                        id_utilizador: selectedUtilizador.id_utilizador || '',
                         nome: userPerfil.nome || '',
                         email: userPerfil.email || '',
                         numero_mecanografico: userPerfil.numero_mecanografico || '',
@@ -665,7 +720,8 @@ export default function Utilizadores() {
                         telemovel: userPerfil.telemovel || '',
                         data_nascimento: userPerfil.data_nascimento || '',
                         distrito: userPerfil.distrito || '',
-                        id_departamento: userPerfil.id_departamento || ''
+                        id_departamento: userPerfil.id_departamento || '',
+                        estado: selectedUtilizador.estado || ''
                     });
                 }
             }
@@ -693,106 +749,120 @@ export default function Utilizadores() {
         };
 
         return (
-            <form onSubmit={handleSubmit}>
-                <Stack spacing={3}>
-                    <TextField
-                        name="nome"
-                        label="Nome Completo"
-                        value={perfilData.nome}
+
+            <Stack spacing={3}>
+                <TextField
+                    name="nome"
+                    label="Nome Completo"
+                    value={perfilData.nome}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                />
+
+                <TextField
+                    name="email"
+                    label="Email"
+                    type="email"
+                    value={perfilData.email}
+                    onChange={handleChange}
+                    fullWidth
+                    required
+                />
+
+                <TextField
+                    name="numero_mecanografico"
+                    label="Número Mecanográfico"
+                    value={perfilData.numero_mecanografico}
+                    onChange={handleChange}
+                    fullWidth
+                />
+
+                <TextField
+                    name="morada"
+                    label="Morada"
+                    value={perfilData.morada}
+                    onChange={handleChange}
+                    fullWidth
+                    rows={2}
+                />
+
+                <TextField
+                    name="telemovel"
+                    label="Telemóvel"
+                    value={perfilData.telemovel}
+                    onChange={handleChange}
+                    fullWidth
+                />
+
+                <TextField
+                    name="data_nascimento"
+                    label="Data de Nascimento"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    value={perfilData.data_nascimento}
+                    onChange={handleChange}
+                    fullWidth
+                />
+
+                <TextField
+                    name="distrito"
+                    label="Distrito"
+                    value={perfilData.distrito}
+                    onChange={handleChange}
+                    fullWidth
+                />
+
+                <FormControl fullWidth>
+                    <InputLabel>Departamento</InputLabel>
+                    <Select
+                        name="id_departamento"
+                        value={perfilData.id_departamento}
+                        label="Departamento"
                         onChange={handleChange}
-                        fullWidth
-                        required
-                    />
+                    >
+                        {departamentos.map((departamento) => {
+                            if (departamento.id_departamento != 1) {
+                                return (
+                                    <MenuItem value={departamento.id_departamento}>{departamento.nome_departamento}</MenuItem>
+                                )
+                            }
 
-                    <TextField
-                        name="email"
-                        label="Email"
-                        type="email"
-                        value={perfilData.email}
+                        })}
+                    </Select>
+                </FormControl>
+
+                <FormControl fullWidth>
+                    <InputLabel>Estado</InputLabel>
+                    <Select
+                        name="estado"
+                        value={perfilData.estado}
+                        label="Estado"
                         onChange={handleChange}
-                        fullWidth
-                        required
-                    />
+                    >
+                        <MenuItem value={"Ativa"}>Ativa</MenuItem>
+                        <MenuItem value={"Desativada"}>Desativada</MenuItem>
+                        <MenuItem value={"Restrita"}>Restrita</MenuItem>
+                    </Select>
+                </FormControl>
 
-                    <TextField
-                        name="numero_mecanografico"
-                        label="Número Mecanográfico"
-                        value={perfilData.numero_mecanografico}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        name="morada"
-                        label="Morada"
-                        value={perfilData.morada}
-                        onChange={handleChange}
-                        fullWidth
-                        rows={2}
-                    />
-
-                    <TextField
-                        name="telemovel"
-                        label="Telemóvel"
-                        value={perfilData.telemovel}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        name="data_nascimento"
-                        label="Data de Nascimento"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        value={perfilData.data_nascimento}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        name="distrito"
-                        label="Distrito"
-                        value={perfilData.distrito}
-                        onChange={handleChange}
-                        fullWidth
-                    />
-
-                    <FormControl fullWidth>
-                        <InputLabel>Departamento</InputLabel>
-                        <Select
-                            name="id_departamento"
-                            value={perfilData.id_departamento}
-                            label="Departamento"
-                            onChange={handleChange}
-                        >
-                            {departamentos.map((departamento) => {
-                                if (departamento.id_departamento != 1) {
-                                    return (
-                                        <MenuItem value={departamento.id_departamento}>{departamento.nome_departamento}</MenuItem>
-                                    )
-                                }
-
-                            })}
-                        </Select>
-                    </FormControl>
-
-                    <Stack direction="row" spacing={2} justifyContent="flex-end">
-                        <Button
-                            variant="outlined"
-                            onClick={() => setSelectedUserEditar(null)}
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="contained"
-                            color="primary"
-                        >
-                            Guardar Alterações
-                        </Button>
-                    </Stack>
+                <Stack direction="row" spacing={2} justifyContent="flex-end">
+                    <Button
+                        variant="outlined"
+                        onClick={() => setSelectedUserEditar(null)}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        onClick={handleSubmit}
+                    >
+                        Guardar Alterações
+                    </Button>
                 </Stack>
-            </form>
+            </Stack>
         );
     }
 }
