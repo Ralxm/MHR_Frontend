@@ -10,9 +10,11 @@ import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableConta
 import SidebarItems from './SidebarItems';
 import moment from 'moment';
 import { Calendar, momentLocalizer } from 'react-big-calendar';
+import { useSnackbar } from 'notistack';
 
 export default function PedidosFerias() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -101,12 +103,12 @@ export default function PedidosFerias() {
         event.preventDefault();
         handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
             .then(res => {
-                alert("Pedido de ferias apagado com sucesso")
+                enqueueSnackbar("Pedido de férias apagado com sucesso", { variant: 'success' });
                 carregarFerias();
                 handleCloseApagar();
             })
             .catch(err => {
-                console.log("Erro a apagar a despesa: " + err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     }
 
@@ -310,12 +312,12 @@ export default function PedidosFerias() {
 
             handleServices.atualizarFeria(datapost)
                 .then(res => {
-                    alert("Pedido de férias atualizado com sucesso")
+                    enqueueSnackbar("Pedido de férias atualizado com sucesso", { variant: 'success' });
                     carregarFerias();
                     handleCloseVerDetalhes();
                 })
                 .catch(err => {
-                    console.log(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 

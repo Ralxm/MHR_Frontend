@@ -13,6 +13,10 @@ import { CalendarToday, LocationOn, Schedule } from '@mui/icons-material'
 export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceitar, onRejeitar, onApagar, user, loggedid, cols, filtro, filtroTipo, to }) {
     const navigate = useNavigate();
 
+    function formatDateTime(isoString) {
+        return isoString.replace('T', ' ').split('.')[0];
+    }
+
     let filteredPosts = posts.filter(post => {
         if (tipo === "Por_User") {
             return post.id_perfil === user?.id_perfil;
@@ -127,7 +131,7 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
                                         {post.perfil?.nome?.charAt(0) || 'U'}
                                     </Avatar>
                                     <Typography variant="body2" color="text.secondary">
-                                        {post.perfil?.nome || 'Utilizador'} • {post.created_at}
+                                        {post.perfil?.nome || 'Utilizador'} • {formatDateTime(post.created_at)}
                                     </Typography>
                                 </div>
 
@@ -135,14 +139,14 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
                                     <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
                                         <CalendarToday fontSize="small" color="action" />
                                         <Typography variant="body2" color="text.secondary">
-                                            {post.data_noticia}
+                                            {formatDateTime(post.data_noticia)}
                                         </Typography>
                                     </div>
                                 ) : (
                                     <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                                         <CalendarToday fontSize="small" color="action" />
                                         <Typography variant="body2" color="text.secondary">
-                                            {post.data_visita}
+                                            {formatDateTime(post.data_visita)}
                                         </Typography>
                                     </div>
                                 )}
@@ -161,7 +165,7 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
                             </Stack>
                         </Box>
 
-                        {(tipo == "Admin" || post.id_perfil == loggedid) &&
+                        {(tipo == "Admin" || post.id_perfil == id_perfil) &&
                             <Divider></Divider>
                         }
 
@@ -201,7 +205,7 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
                             </div>
                         }
 
-                        {loggedid == post.id_perfil &&
+                        {id_perfil == post.id_perfil && (tipo != "Admin") &&
                             <div
                                 style={{
                                     display: 'flex',

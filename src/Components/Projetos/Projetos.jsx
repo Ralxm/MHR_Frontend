@@ -16,9 +16,11 @@ import IdeiasPieChart from './IdeiasPieChart'
 import TabelaIdeias from './TabelaIdeias';
 import TabelaSumarioProjetos from './TabelaSumarioProjetos';
 import TabelaSumarioIdeias from './TabelaSumarioIdeias';
+import { useSnackbar } from 'notistack';
 
 export default function Projetos() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -125,7 +127,7 @@ export default function Projetos() {
     function handleApagarIdeia() {
         handleServices.apagarIdeia(selectedIdeiaApagar.id_ideia, id_perfil)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarIdeias();
                 setSelectedIdeiaApagar(null);
             })
@@ -137,12 +139,12 @@ export default function Projetos() {
     function handleApagarProjeto() {
         handleServices.apagarProjeto(selectedProjetoApagar.id_projeto)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarProjetos();
                 setSelectedProjetoApagar(null);
             })
             .catch(err => {
-                alert("Não foi possível apagar o projeto. Verifique se este tem algum utilizador, ponto na linha temporal ou comentario associado.")
+                enqueueSnackbar("Não foi possível apagar o projeto. Verifique se este tem algum utilizador, ponto na linha temporal ou comentario associado.", { variant: 'error' });
                 console.log(err)
             })
     }
@@ -527,18 +529,18 @@ export default function Projetos() {
 
                         handleServices.criarPerfisProjetos(perfisSelecionados, res.id_projeto)
                             .then(res => {
-                                alert("Projeto e perfis associados com sucesso!");
+                                enqueueSnackbar("Projeto e perfis associados com sucesso!", { variant: 'success' });
                             })
                             .catch(err => {
-                                alert(err)
+                                enqueueSnackbar(err, { variant: 'error' });
                             })
                     } else {
-                        alert(res.message || "Projeto criado com sucesso!");
+                        enqueueSnackbar(res.message || "Projeto criado com sucesso", { variant: 'success' });
                     }
                     navigate('/projeto/' + res.id_projeto)
                 })
                 .catch(err => {
-                    alert(err)
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         }
 
@@ -694,12 +696,12 @@ export default function Projetos() {
 
             handleServices.criarIdeia(formData)
                 .then(res => {
-                    alert(res)
+                    enqueueSnackbar(res, { variant: 'success' });
                     carregarIdeias();
                     handleCloseCreateIdeiaModal();
                 })
                 .catch(err => {
-                    alert(err)
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         }
 
@@ -772,7 +774,7 @@ export default function Projetos() {
 
             handleServices.atualizarIdeia(formData)
                 .then(res => {
-                    alert(res)
+                    enqueueSnackbar(res, { variant: 'success' });
                     carregarIdeias();
                     setSelectedIdeia(null);
                 })
@@ -922,22 +924,22 @@ export default function Projetos() {
 
                                 handleServices.criarPerfisProjetos(perfisSelecionados, res.id_projeto)
                                     .then(res => {
-                                        alert("Ideia transformada em projeto com sucesso e utilizadores foram associados ao projeto!");
+                                        enqueueSnackbar("Ideia transformada em projeto com sucesso e utilizadores foram associados ao projeto!", { variant: 'success' });
                                     })
                                     .catch(err => {
-                                        alert(err)
+                                        enqueueSnackbar(err, { variant: 'error' });
                                     })
                             } else {
-                                alert(res.message || "Ideia transformada em projeto com sucesso!");
+                                enqueueSnackbar(res.message || "Ideia transformada em projeto com sucesso!", { variant: 'success' });
                             }
                             navigate('/projeto/' + res.id_projeto)
                         })
                         .catch(err => {
-                            alert(err)
+                            enqueueSnackbar(err, { variant: 'error' });
                         })
                 })
                 .catch(err => {
-                    console.log(err)
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         }
 

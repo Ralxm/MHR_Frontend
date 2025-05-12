@@ -38,6 +38,7 @@ import Perfil from "../Components/Perfil/Perfil";
 import Empresa from "../Components/Gestao/Empresa";
 import Utilizadores from "../Components/Gestao/Utilizadores";
 import Departamentos from "../Components/Gestao/Departamentos";
+import AuditLog from "../Components/Gestao/AuditLog";
 
 
 export default function MainPage(){
@@ -114,6 +115,8 @@ export default function MainPage(){
                 <Route path='/utilizadores' element={<Utilizadores></Utilizadores>}>
                 </Route>
                 <Route path='/departamentos' element={<Departamentos></Departamentos>}>
+                </Route>
+                <Route path='/auditlog' element={<AuditLog></AuditLog>}>
                 </Route>
             </Routes>
         </div>

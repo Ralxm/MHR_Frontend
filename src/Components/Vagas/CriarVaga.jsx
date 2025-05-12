@@ -11,9 +11,11 @@ import DoughnutPieChart from './DoughnutPieChart';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import CandidaturaCard from './CandidaturaCard';
+import { useSnackbar } from 'notistack';
 
 export default function CriarVaga() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -87,7 +89,7 @@ export default function CriarVaga() {
 
         handleServices.createVaga(datapost)
             .then(res => {
-                alert("Vaga criada com sucesso");
+                enqueueSnackbar("Vaga criada com sucesso", { variant: 'success' });
                 navigate('/vagas/' + res.id_vaga)
             })
             .catch(err => {

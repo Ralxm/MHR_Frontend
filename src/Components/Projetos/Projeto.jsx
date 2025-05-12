@@ -5,16 +5,19 @@ import './Projetos.css';
 import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Card, CardContent, Avatar, FormControl, InputLabel, Select, MenuItem, IconButton } from '@mui/material';
-import { LockOpen, Lock, Person, ArrowBack, Close, Phone, LocationOn, Attachment } from '@mui/icons-material'
+import { LockOpen, Lock, Person, ArrowBack, Close, Phone, LocationOn, Attachment, Delete } from '@mui/icons-material'
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import FileDropZoneSingle from '../../Universal/FileDropZoneSingle';
+import { useSnackbar } from 'notistack';
+// enqueueSnackbar(res, { variant: 'success' });
 
 export default function Projeto() {
     const { id } = useParams();
     const { state } = useLocation();
     const [projeto, setProjeto] = useState(state?.vaga);
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isProjetoLoading, setIsProjetoLoading] = useState(true);
@@ -32,6 +35,8 @@ export default function Projeto() {
     const [utilizadores, setUtilizadores] = useState([])
     const [linha_temporal, setLinha_Temporal] = useState([])
     const [comentarios, setComentarios] = useState([])
+
+    const [selectedComentario, setSelectedComentario] = useState();
 
     useEffect(() => {
         if (!authService.getCurrentUser()) {
@@ -168,45 +173,32 @@ export default function Projeto() {
 
         handleServices.apagarPontoLinhaTemporalProjeto(selectedLinhaTemporal.id_registo)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarLinhaTemporalProjeto(id);
                 closeApgarModalLinhaTemporal();
             })
             .catch(err => {
                 console.log(err)
             })
-
     }
 
-    /*function handleCriarCandidatura(event) {
-        event.preventDefault();
-
-        const formData = new FormData();
-
-        formData.append('id_vaga', vaga.id_vaga);
-        formData.append('id_utilizador', id_user);
-        formData.append('telemovel', telemovel);
-        formData.append('email', email);
-        formData.append('status', "Pendente");
-
-        console.log("a")
-        console.log(curriculo)
-        if (curriculo) {
-            console.log("tenho um curriculo")
-            console.log(curriculo)
-            formData.append('curriculo', curriculo)
-        }
-
-
-        handleServices.createCandidatura(formData)
+    function handleApagarComentario(id_comentario) {
+        handleServices.apagarComentario(id_comentario)
             .then(res => {
-                alert("Candidatura criada com sucesso");
-                navigate(0)
+                enqueueSnackbar(res, { variant: 'success' });
+                carregarComentarios(id);
             })
             .catch(err => {
-                console.log(err);
-            });
-    }*/
+                enqueueSnackbar(err, { variant: 'error' });
+            })
+    }
+
+
+
+    function formatDateTime(isoString) {
+        return isoString.replace('T', ' ').split('.')[0];
+    }
+
 
     if (isProjetoLoading) {
         return <div>Loading...</div>;
@@ -446,9 +438,22 @@ export default function Projeto() {
                                                                             <Typography variant="subtitle2" fontWeight="bold">
                                                                                 {comentario.perfil.nome}
                                                                             </Typography>
-                                                                            <Typography variant="caption" color="text.secondary">
-                                                                                {new Date(comentario.created_at).toLocaleString()}
-                                                                            </Typography>
+                                                                            <div>
+                                                                                <Typography variant="caption" color="text.secondary">
+                                                                                    {formatDateTime(comentario.created_at)}
+                                                                                </Typography>
+                                                                                {comentario.autor == id_perfil &&
+                                                                                    <IconButton
+                                                                                        size="small"
+                                                                                        color="error"
+                                                                                        onClick={() =>{ setSelectedComentario(comentario)}}
+                                                                                        aria-label="Delete comment"
+                                                                                    >
+                                                                                        <Delete fontSize="small" />
+                                                                                    </IconButton>
+                                                                                }
+                                                                            </div>
+
                                                                         </Stack>
                                                                         <Typography variant="body2" sx={{ mt: 1, mb: 2 }}>
                                                                             {comentario.comentario}
@@ -639,6 +644,52 @@ export default function Projeto() {
                     </Stack>
                 </Paper>
             </Modal>
+
+            {/* Modal para apagar um comentario */}
+            <Modal
+                open={selectedComentario}
+                onClose={() => {setSelectedComentario(null)}}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 530 },
+                        borderRadius: 4,
+                        p: 4,
+                    }}
+                >
+
+                    <div className='d-flex justify-content-between align-items-center'>
+                        <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                            Tem a certeza que quer eliminar o comentário?
+                        </Typography>
+                    </div>
+
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => { setSelectedComentario(null) }}
+                            sx={{ width: '50%' }}
+                        >
+                            Fechar
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={(event) => { handleApagarComentario(selectedComentario.id_comentario_projeto); setSelectedComentario(null) }}
+                            sx={{ width: '50%' }}
+                        >
+                            Apagar
+                        </Button>
+                    </Stack>
+                </Paper>
+            </Modal>
         </div >
     )
 
@@ -658,7 +709,7 @@ export default function Projeto() {
 
             handleServices.criarLinhaTemporal(datapost)
                 .then(res => {
-                    alert(res)
+                    enqueueSnackbar("Ponto na linha temporal criado com sucesso", { variant: 'success' });
                     carregarLinhaTemporalProjeto(id);
                     handleCloseLinhaTemporalModal();
                 })
@@ -722,7 +773,7 @@ export default function Projeto() {
 
             handleServices.criarComentarioProjeto(formData)
                 .then(res => {
-                    alert(res);
+                    enqueueSnackbar(res, { variant: 'success' });
                     carregarComentarios(id);
                 })
                 .catch(err => {

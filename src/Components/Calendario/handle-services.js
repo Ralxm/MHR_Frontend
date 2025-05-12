@@ -220,7 +220,7 @@ class HandleServices {
         return axios.post(url + "faltas/createMany", faltas, authHeader())
             .then(res => {
                 if (res.data.success) {
-                    return res.data.message;
+                    return res.data;
                 }
             }, reason => { throw new Error('Utilizador Inválido'); });
     }

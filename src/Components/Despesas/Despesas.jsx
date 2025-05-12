@@ -12,9 +12,12 @@ import TableSumarios from './TabelaSumario'
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
+import { useSnackbar } from 'notistack';
 
 export default function Despesas() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
+
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedDespesa, setSelectedDespesa] = useState(null);
     const [acao, setAcao] = useState(null);
@@ -221,6 +224,7 @@ export default function Despesas() {
     function handleCriar(event) {
         event.preventDefault();
         const formData = new FormData();
+        formData.append('id_utilizador', id_user)
         formData.append('id_perfil', id_perfil);
         formData.append('_data', date);
         formData.append('descricao', descricao);
@@ -235,13 +239,13 @@ export default function Despesas() {
 
         handleServices.createDespesa(formData)
             .then(res => {
-                alert("Despesa criada com sucesso");
+                enqueueSnackbar("Despesa criada com sucesso", { variant: 'success' });
                 carregarDespesas();
                 carregarDespesasGestao();
                 toggleCreateDespesa();
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     }
 
@@ -249,13 +253,13 @@ export default function Despesas() {
         event.preventDefault();
         handleServices.apagarDespesa(despesaApagar.id_despesa)
             .then(res => {
-                alert("Despesa apagada com sucesso")
+                enqueueSnackbar("Despesa apagada com sucesso", { variant: 'success' });
                 carregarDespesas();
                 carregarDespesasGestao();
                 toggleApagarDespesa();
             })
             .catch(err => {
-                console.log("Erro a apagar a despesa: " + err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     }
 
@@ -287,10 +291,11 @@ export default function Despesas() {
 
                 })
                 .catch(err => {
-                    alert(err)
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         }
     }
+    
 
     return (
         <div id="root">
@@ -622,14 +627,14 @@ export default function Despesas() {
 
             handleServices.atualizarDespesa(formDataToSend)
                 .then(res => {
-                    alert("Despesa atualizada com sucesso")
+                    enqueueSnackbar("Despesa atualizada com sucesso", { variant: 'success' });
                     setAcao(null)
                     carregarDespesas();
                     carregarDespesasGestao();
                     handleCloseDetalhes();
                 })
                 .catch(err => {
-                    console.log(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 

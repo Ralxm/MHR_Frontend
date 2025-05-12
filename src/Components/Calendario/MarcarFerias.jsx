@@ -3,16 +3,16 @@ import { useNavigate } from "react-router-dom";
 import NavBar from "../../Universal/NavBar";
 import './Calendario.css';
 import '../../index.css'
-import { Calendar, momentLocalizer } from 'react-big-calendar';
-import moment from 'moment';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import {Button, TextField } from '@mui/material';
 import SidebarItems from './SidebarItems';
+import { useSnackbar } from 'notistack';
 
 export default function MarcarFerias() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [isLoading, setIsLoading] = useState(true)
 
@@ -154,20 +154,20 @@ export default function MarcarFerias() {
         }
 
         if (new Date(data_inicio) > new Date(data_conclusao)) {
-            alert("O dia final não pode ser antes do dia de ínicio!!!")
+            enqueueSnackbar("O dia final não pode ser antes do dia de ínicio", { variant: 'error' });
             return;
         }
         else if (duracao >= dias_restantes_ferias) {
-            alert("Não tem dias de férias suficientes");
+            enqueueSnackbar("Não tem dias de férias suficientes", { variant: 'success' });
             return;
         }
 
         handleServices.createFerias(datapost)
             .then(res => {
-                alert(res)
+                enqueueSnackbar(res, { variant: 'success' });
             })
             .catch(err => {
-                console.log(err)
+                enqueueSnackbar(err, { variant: 'error' });
             })
     }
 

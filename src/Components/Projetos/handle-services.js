@@ -266,6 +266,17 @@ class HandleServices{
                 }
             }, reason => { throw new Error('Erro a apagar o projeto'); });
     }
+
+    apagarComentario(id){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+
+        return axios.put(url + "comentarios_projetos/delete/" + id, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a apagar o projeto'); });
+        }
 }
 
 export default new HandleServices();

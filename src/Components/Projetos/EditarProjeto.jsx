@@ -8,10 +8,12 @@ import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab, For
 import { LockOpen, Lock, Person, ArrowBack, Delete } from '@mui/icons-material'
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
+import { useSnackbar } from 'notistack';
 
 export default function EditarProjeto() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -126,15 +128,15 @@ export default function EditarProjeto() {
             .then(res => {
                 handleServices.atualizarPerfisProjeto(perfisSelecionadosInicial, perfisSelecionados, projeto.id_projeto)
                 .then(res => {
-                    alert("Projeto e perfis atualizados com sucesso")
+                    enqueueSnackbar("Projeto e perfis atualizados com sucesso", { variant: 'success' });
                 })
                 .catch(err => {
-                    alert("Projeto atualizado com sucesso mas os utilizadores não foram atualizados")
+                    enqueueSnackbar("Projeto atualizado com sucesso mas os utilizadores não foram atualizados", { variant: 'success' });
                 })
                 navigate('/projeto/' + projeto.id_projeto)
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     }
 

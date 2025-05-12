@@ -11,10 +11,12 @@ import DoughnutPieChart from './DoughnutPieChart';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import CandidaturaCard from './CandidaturaCard';
+import { useSnackbar } from 'notistack';
 
 export default function EditarVaga() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -125,7 +127,7 @@ export default function EditarVaga() {
 
         handleServices.updateVaga(datapost)
             .then(res => {
-                alert("Vaga atualizada com sucesso");
+                enqueueSnackbar("Vaga atualizada com sucesso", { variant: 'success' });
                 navigate('/vagas/' + vaga.id_vaga)
             })
             .catch(err => {

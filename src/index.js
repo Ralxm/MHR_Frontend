@@ -5,12 +5,18 @@ import AllPages from './Universal/AllPages';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.css';
+import { SnackbarProvider } from 'notistack';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 
 root.render(
   <BrowserRouter>
-    <AllPages />
+    <SnackbarProvider maxSnack={3} anchorOrigin={{
+        vertical: 'bottom',
+        horizontal: 'right',
+      }}>
+      <AllPages />
+    </SnackbarProvider>
   </BrowserRouter>
 );
 

@@ -7,13 +7,12 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import { Box, Modal, Paper, Typography, Button, TextField, Tab, Stack, FormControl, InputLabel, Select, MenuItem, IconButton, Chip } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Delete, Close } from '@mui/icons-material'
-import FileDropZone from '../../Universal/FileDropZoneSingle';
 import SidebarItems from './Sidebar';
+import { useSnackbar } from 'notistack';
 
 export default function Empresa() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -97,12 +96,12 @@ export default function Empresa() {
 
         handleServices.atualizarEmpresa(datapost)
             .then(res => {
-                alert(res)
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarEmpresa();
                 setAction('ver')
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar(err, { variant: 'error' });
             })
     }
 

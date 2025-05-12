@@ -9,9 +9,11 @@ import handleServices from './handle-services';
 import { Box, Modal, Paper, Typography, Button, TableCell, Table, TableContainer, TableHead, TableRow, TableBody, IconButton, TextField, Stack, Tooltip, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { Close } from '@mui/icons-material'
 import SidebarItems from './SidebarItems';
+import { useSnackbar } from 'notistack';
 
 export default function Feriados() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -56,11 +58,11 @@ export default function Feriados() {
     const handleDelete = (id) => {
         handleServices.apagarFeriado(id)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarFeriados();
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     };
 
@@ -217,6 +219,7 @@ export default function Feriados() {
                                     onClose={() => setIsEditModalOpen(false)}
                                     refresh={carregarFeriados}
                                     mode="edit"
+                                    enqueueSnackbar={enqueueSnackbar}
                                 />
                             </Paper>
                         </Modal>
@@ -253,6 +256,7 @@ export default function Feriados() {
                                     onClose={() => setIsCreateModalOpen(false)}
                                     refresh={carregarFeriados}
                                     mode="create"
+                                    enqueueSnackbar={enqueueSnackbar}
                                 />
                             </Paper>
                         </Modal>
@@ -309,7 +313,7 @@ export default function Feriados() {
     );
 }
 
-function FeriadoForm({ feriado, onClose, refresh, mode }) {
+function FeriadoForm({ feriado, onClose, refresh, mode, enqueueSnackbar }) {
     const [formData, setFormData] = useState({
         id_feriado: '',
         nome: '',
@@ -349,11 +353,11 @@ function FeriadoForm({ feriado, onClose, refresh, mode }) {
                 response = await handleServices.atualizarFeriado(formData.id_feriado, formData);
             }
 
-            alert(response);
+            enqueueSnackbar(response, { variant: 'success' });
             refresh();
             onClose();
         } catch (err) {
-            console.error(err);
+            enqueueSnackbar(err, { variant: 'error' });
         }
     };
 

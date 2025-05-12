@@ -32,6 +32,10 @@ export default function BasicTable({ data, onVerDetalhes, tipo, onApagar, action
         }
     };
 
+    function formatDateTime(isoString) {
+        return isoString.replace('T', ' ').split('.')[0];
+    }
+
     if (tipo == "Por Aprovar") {
         rows.map((despesa, index) => {
             if (!(despesa.estado === "Em análise" || despesa.estado === "Pendente")) {
@@ -58,7 +62,7 @@ export default function BasicTable({ data, onVerDetalhes, tipo, onApagar, action
                             <TableRow
                                 key={row.name}
                             >
-                                <TableCell align="left">{row._data}</TableCell>
+                                <TableCell align="left">{formatDateTime(row._data)}</TableCell>
                                 <TableCell align="left">{row.valor} €</TableCell>
                                 <TableCell align="left">
                                     {row.anexo && (

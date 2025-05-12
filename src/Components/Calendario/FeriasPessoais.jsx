@@ -9,9 +9,11 @@ import handleServices from './handle-services';
 import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableContainer, Modal, Paper, Typography, Button, TextField, Stack } from '@mui/material';
 import SidebarItems from './SidebarItems';
 import FeriasPieChart from './FeriasPieChart';
+import { useSnackbar } from 'notistack';
 
 export default function FeriasPessoais() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -107,16 +109,20 @@ export default function FeriasPessoais() {
         return formattedDate
     }
 
+    function formatDateTime(isoString) {
+        return isoString.replace('T', ' ').split('.')[0];
+    }
+
     function handleApagarFeria(event) {
         event.preventDefault();
         handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
             .then(res => {
-                alert("Pedido de ferias apagado com sucesso")
+                enqueueSnackbar("Pedido de férias apagado com sucesso", { variant: 'success' });
                 carregarFerias();
                 handleCloseApagar();
             })
             .catch(err => {
-                console.log("Erro a apagar a despesa: " + err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     }
 
@@ -306,7 +312,7 @@ export default function FeriasPessoais() {
                     <TableBody>
                         {ferias.map((feria) => (
                             <TableRow key={feria.id_falta} >
-                                <TableCell align="left">{convertDate(feria.data_pedido)}</TableCell>
+                                <TableCell align="left">{formatDateTime(feria.data_pedido)}</TableCell>
                                 <TableCell align="left">{convertDate(feria.data_inicio)}</TableCell>
                                 <TableCell align="left">{convertDate(feria.data_conclusao)}</TableCell>
                                 <TableCell align="left">{feria.duracao} {feria.duracao > 1 ? "dias" : "dia"} </TableCell>
@@ -362,12 +368,12 @@ export default function FeriasPessoais() {
 
             handleServices.atualizarFeria(datapost)
                 .then(res => {
-                    alert(res.message)
+                    enqueueSnackbar(res.message, { variant: 'success' });
                     carregarFerias();
                     handleCloseVerDetalhes();
                 })
                 .catch(err => {
-                    console.log(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 

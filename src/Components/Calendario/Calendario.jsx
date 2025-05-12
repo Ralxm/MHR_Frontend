@@ -14,9 +14,11 @@ import SidebarItems from './SidebarItems';
 import FaltasPieChart from './FaltasPieChart';
 import FeriasPieChart from './FeriasPieChart';
 import FileDropZone from '../../Universal/FileDropZoneSingle';
+import { useSnackbar } from 'notistack';
 
 export default function Calendario() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [isLoadingFaltasFerias, setLoadingFaltasFerias] = useState(false)
 
@@ -259,12 +261,12 @@ export default function Calendario() {
         event.preventDefault();
         handleServices.apagarFeria(selectedFeriaApagar.id_solicitacao)
             .then(res => {
-                alert("Pedido de ferias apagado com sucesso")
+                enqueueSnackbar("Pedido de férias apagado com sucesso", { variant: 'success' });
                 carregarFerias();
                 handleCloseApagarFeria();
             })
             .catch(err => {
-                console.log("Erro a apagar a despesa: " + err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     }
 
@@ -282,22 +284,22 @@ export default function Calendario() {
         console.log(datapost)
 
         if (new Date(data_inicio) > new Date(data_conclusao)) {
-            alert("O dia final não pode ser antes do dia de ínicio!!!")
+            enqueueSnackbar("O dia final não pode ser antes do dia de ínicio", { variant: 'error' });
             return;
         }
         else if (duracao >= dias_restantes_ferias) {
-            alert("Não tem dias de férias suficientes");
+            enqueueSnackbar("Não tem dias de férias suficientes", { variant: 'error' });
             return;
         }
 
         handleServices.createFerias(datapost)
             .then(res => {
-                alert(res)
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarFerias();
                 handleCloseCriarFeria();
             })
             .catch(err => {
-                console.log(err)
+                enqueueSnackbar(err, { variant: 'error' });
             })
     }
 
@@ -806,11 +808,11 @@ export default function Calendario() {
 
             handleServices.atualizarFalta(formDataToSend)
                 .then(res => {
-                    alert("Falta atualizada com sucesso")
+                    enqueueSnackbar("Falta atualizada com sucesso", { variant: 'success' });
                     carregarFaltas();
                 })
                 .catch(err => {
-                    console.log(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 
@@ -1032,11 +1034,11 @@ export default function Calendario() {
 
             handleServices.atualizarFeria(datapost)
                 .then(res => {
-                    alert(res)
+                    enqueueSnackbar(res, { variant: 'success' });
                     carregarFerias();
                 })
                 .catch(err => {
-                    console.log(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 
@@ -1216,12 +1218,12 @@ export default function Calendario() {
 
             handleServices.createFalta(formData)
                 .then(res => {
-                    alert(res.message)
+                    enqueueSnackbar(res.message, { variant: 'success' });
                     carregarFaltas();
                     handleCloseCriarFalta();
                 })
                 .catch(err => {
-                    console.log(err)
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         }
 

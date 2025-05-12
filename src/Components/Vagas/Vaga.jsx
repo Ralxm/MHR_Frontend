@@ -11,6 +11,7 @@ import DoughnutPieChart from './DoughnutPieChart';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import CandidaturaCard from './CandidaturaCard';
+import { useSnackbar } from 'notistack';
 
 export default function Vagas() {
     const { id } = useParams();
@@ -18,6 +19,7 @@ export default function Vagas() {
     const [vaga, setVaga] = useState(state?.vaga);
     const [departamento, setDepartamento] = useState(state?.dep)
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [isLoading, setIsLoading] = useState(false);
     const [isVagaLoading, setIsVagaLoading] = useState(true);
@@ -221,6 +223,10 @@ export default function Vagas() {
         return formattedDate
     }
 
+    function formatDateTime(isoString) {
+        return isoString.replace('T', ' ').split('.')[0];
+    }
+
     function handleCriarCandidatura(event) {
         event.preventDefault();
 
@@ -239,8 +245,9 @@ export default function Vagas() {
 
         handleServices.createCandidatura(formData)
             .then(res => {
-                alert("Candidatura criada com sucesso");
-                navigate(0)
+                enqueueSnackbar("Candidatura criada com sucesso", { variant: 'success' });
+                carregarCandidaturas(id);
+                handleCloseCandidatar();
             })
             .catch(err => {
                 console.log(err);
@@ -266,7 +273,7 @@ export default function Vagas() {
 
         handleServices.createComentario(datapost)
             .then(res => {
-                alert("Comentario criado com sucesso");
+                enqueueSnackbar("Comentário criado com sucesso", { variant: 'success' });
                 sessionStorage.setItem(
                     'shouldOpenDetalhesCandidaturaUser',
                     JSON.stringify(candidatura)
@@ -291,7 +298,7 @@ export default function Vagas() {
 
         handleServices.aceitarCandidatura(datapost)
             .then(res => {
-                alert("Candidatura aceite com sucesso");
+                enqueueSnackbar("Candidatura aceite com sucesso", { variant: 'success' });
                 sessionStorage.setItem('shouldOpenModal', 'true');
                 sessionStorage.setItem('checkState', 'true')
                 navigate(0)
@@ -304,7 +311,7 @@ export default function Vagas() {
     function analisarCandidatura(id_candidatura) {
         handleServices.analisarCandidatura(id_candidatura)
             .then(res => {
-                alert("Candidatura aceite com sucesso");
+                enqueueSnackbar("Candidatura alterada para em análise", { variant: 'success' });
                 sessionStorage.setItem('shouldOpenModal', 'true');
                 sessionStorage.setItem('checkState', 'true')
                 navigate(0)
@@ -323,25 +330,24 @@ export default function Vagas() {
 
         handleServices.rejeitarCandidatura(datapost)
             .then(res => {
-                alert("Cadidatura rejeitada com sucesso");
+                enqueueSnackbar("Candidatura rejeitada com sucesso", { variant: 'success' });
                 sessionStorage.setItem('shouldOpenModal', 'true');
                 navigate(0)
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     }
 
     function handleApagarCandidatura(id) {
         handleServices.apagarCandidatura(id)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarCandidaturaUser(id_user);
                 setSelectedCandidaturaUser(null);
             })
             .catch(err => {
-                alert(err)
-                console.log(err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     }
 
@@ -914,7 +920,7 @@ export default function Vagas() {
                                     <Grid container spacing={2}>
                                         <Grid item xs={12} sm={6}>
                                             <Typography variant="subtitle1">
-                                                <strong>Data de Submissão:</strong> {new Date(selectedCandidatura.data_submissao).toLocaleDateString()}
+                                                <strong>Data de Submissão:</strong> {formatDateTime(selectedCandidatura.data_submissao)}
                                             </Typography>
                                         </Grid>
                                         <Grid item xs={12} sm={6}>
@@ -1306,11 +1312,11 @@ export default function Vagas() {
 
             handleServices.atualizarCandidatura(formDataToSend)
                 .then(res => {
-                    alert("Candidatura atualizada com sucesso")
+                    enqueueSnackbar("Candidatura atualizada com sucesso", { variant: 'success' });
                     navigate(0);
                 })
                 .catch(err => {
-                    console.log(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 

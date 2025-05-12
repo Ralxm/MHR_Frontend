@@ -12,9 +12,11 @@ import { Delete, Close } from '@mui/icons-material'
 import TabelaPosts from './TabelaPosts';
 import FileDropZone from '../../Universal/FileDropZoneSingle';
 import SidebarItems from '../Blog/Sidebar';
+import { useSnackbar } from 'notistack';
 
 export default function BlogPotUtilizador() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -90,35 +92,35 @@ export default function BlogPotUtilizador() {
     function handleAceitarPublicacao(id) {
         handleServices.aceitarPublicacao(id, id_perfil)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarBlog();
                 setSelectedPostAprovar(null)
             })
             .catch(err => {
-                console.log(err)
+                enqueueSnackbar(err, { variant: 'error' });
             })
     }
 
     function handleRejeitarPublicacao(id) {
         handleServices.rejeitarPublicacao(id, id_perfil)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarBlog();
                 setSelectedPostRejeitar(null)
             })
             .catch(err => {
-                console.log(err)
+                enqueueSnackbar(err, { variant: 'error' });
             })
     }
 
     function handleApagarPublicacao(id) {
         handleServices.apagarPublicacao(id, id_perfil)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 setSelectedPostApagar(null);
             })
             .catch(err => {
-                console.log(err)
+                enqueueSnackbar(err, { variant: 'error' });
             })
     }
 
@@ -406,12 +408,12 @@ export default function BlogPotUtilizador() {
 
             handleServices.criarPublicacao(formData)
                 .then(res => {
-                    alert(res)
+                    enqueueSnackbar(res, { variant: 'success' });
                     carregarBlog();
                     setIsCreatePostModalOpen(false);
                 })
                 .catch(err => {
-                    console.log(err)
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 

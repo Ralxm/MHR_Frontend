@@ -11,9 +11,11 @@ import handleServices from './handle-services';
 import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import SidebarItems from './SidebarItems';
 import FileDropZone from '../../Universal/FileDropZoneSingle';
+import { useSnackbar } from 'notistack';
 
 export default function MarcarFalta() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [isLoadingPerfis, setLoadingPerfis] = useState(false)
 
@@ -148,12 +150,12 @@ export default function MarcarFalta() {
 
         handleServices.createFalta(formData)
             .then(res => {
-                alert(res.message)
+                enqueueSnackbar(res.message, { variant: 'success' });
                 sessionStorage.setItem('openFalta', res.data.id_falta);
                 navigate('/calendario/faltas_utilizadores')
             })
             .catch(err => {
-                console.log(err)
+                enqueueSnackbar(err, { variant: 'error' });
             })
     }
 

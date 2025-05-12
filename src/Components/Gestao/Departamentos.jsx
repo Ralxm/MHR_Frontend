@@ -7,13 +7,13 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import { Box, Modal, Paper, Typography, Button, TableCell, Table, TableContainer, TableHead, TableRow, TableBody, MenuItem, IconButton, Chip, TextField, Stack, FormControl, Label, Select, InputLabel } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Delete, Close } from '@mui/icons-material'
-import FileDropZone from '../../Universal/FileDropZoneSingle';
 import SidebarItems from './Sidebar';
+import { useSnackbar } from 'notistack';
 
 export default function Departamentos() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -58,11 +58,11 @@ export default function Departamentos() {
     const handleDelete = (id) => {
         handleServices.apagarDepartamento(id)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarDepartamentos();
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
 
     };
@@ -183,6 +183,7 @@ export default function Departamentos() {
                                     onClose={() => setIsEditModalOpen(false)}
                                     refresh={carregarDepartamentos}
                                     mode="edit"
+                                    enqueueSnackbar={enqueueSnackbar}
                                 />
                             </Paper>
                         </Modal>
@@ -219,6 +220,7 @@ export default function Departamentos() {
                                     onClose={() => setIsCreateModalOpen(false)}
                                     refresh={carregarDepartamentos}
                                     mode="create"
+                                    enqueueSnackbar={enqueueSnackbar}
                                 />
                             </Paper>
                         </Modal>
@@ -275,7 +277,7 @@ export default function Departamentos() {
     );
 }
 
-function DepartamentoForm({ departamento, onClose, refresh, mode }) {
+function DepartamentoForm({ departamento, onClose, refresh, mode, enqueueSnackbar}) {
     const [formData, setFormData] = useState({
         nome_departamento: '',
         descricao: '',
@@ -285,7 +287,7 @@ function DepartamentoForm({ departamento, onClose, refresh, mode }) {
     useEffect(() => {
         if (mode === 'edit' && departamento) {
             setFormData({
-                nome_departamento: departamento.nome_departamento,
+                nome_departamento: (departamento.nome_departamento).trim(),
                 descricao: (departamento.descricao).trim(),
                 responsavel_departamento: (departamento.responsavel_departamento).trim()
             });
@@ -319,12 +321,11 @@ function DepartamentoForm({ departamento, onClose, refresh, mode }) {
                 });
             }
 
-            alert(response);
+            enqueueSnackbar(response, { variant: 'success' });
             refresh();
             onClose();
         } catch (err) {
-            console.error(err);
-
+            enqueueSnackbar(err, { variant: 'error' });
         }
     };
 

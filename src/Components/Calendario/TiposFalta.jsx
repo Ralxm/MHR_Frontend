@@ -11,9 +11,11 @@ import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Delete, Close } from '@mui/icons-material'
 import FileDropZone from '../../Universal/FileDropZoneSingle';
 import SidebarItems from './SidebarItems';
+import { useSnackbar } from 'notistack';
 
 export default function TiposFalta() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -58,11 +60,11 @@ export default function TiposFalta() {
     const handleDelete = (id) => {
         handleServices.apagarTipoFalta(id)
             .then(res => {
-                alert(res);
+                enqueueSnackbar(res, { variant: 'success' });
                 carregarTiposFaltas();
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
 
     };
@@ -177,6 +179,7 @@ export default function TiposFalta() {
                                     onClose={() => setIsEditModalOpen(false)}
                                     refresh={carregarTiposFaltas}
                                     mode="edit"
+                                    enqueueSnackbar={enqueueSnackbar}
                                 />
                             </Paper>
                         </Modal>
@@ -213,6 +216,7 @@ export default function TiposFalta() {
                                     onClose={() => setIsCreateModalOpen(false)}
                                     refresh={carregarTiposFaltas}
                                     mode="create"
+                                    enqueueSnackbar={enqueueSnackbar}
                                 />
                             </Paper>
                         </Modal>
@@ -269,7 +273,7 @@ export default function TiposFalta() {
     );
 }
 
-function TipoFaltaForm({ tipo, onClose, refresh, mode }) {
+function TipoFaltaForm({ tipo, onClose, refresh, mode, enqueueSnackbar }) {
     const [formData, setFormData] = useState({
         id_tipofalta: '',
         tipo: '',
@@ -306,12 +310,11 @@ function TipoFaltaForm({ tipo, onClose, refresh, mode }) {
                 response = await handleServices.atualizarTipoFalta(formData.id_tipofalta, formData);
             }
 
-            alert(response);
+            enqueueSnackbar(response, { variant: 'success' });
             refresh();
             onClose();
         } catch (err) {
-            console.error(err);
-
+            enqueueSnackbar(err, { variant: 'error' });
         }
     };
 

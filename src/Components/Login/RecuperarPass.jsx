@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import './Login.css'
 import '../../index.css'
 import authService from './auth-service';
+import { useSnackbar } from 'notistack';
 
 export default function Recuperar() {
     const url = "http://localhost:8080/";
+    const { enqueueSnackbar } = useSnackbar();
 
     const [USERNAME, setUSERNAME] = useState('')
     const [tokenRecuperar, setTokenRecuperar] = useState('')
@@ -34,18 +36,17 @@ export default function Recuperar() {
         authService.recuperar(USERNAME)
         .then(res => {
             if(res.success){
-                alert("Foi enviado um token para o seu email")
+                enqueueSnackbar("Foi enviado um token para o seu email", { variant: 'error' });
                 setTokenRecuperar(res.token)
                 setRecuperar(false)
                 setTokenP(true)
             }
             else{
-                alert("Erro a criar o token")
+                enqueueSnackbar("Erro a criar o token", { variant: 'error' });
             }
         })
         .catch(err => {
-            alert('Tentativa falhada')
-            console.log(err)
+            enqueueSnackbar("Tentativa falhada", { variant: 'error' });
         })
     }
 
@@ -61,21 +62,21 @@ export default function Recuperar() {
         event.preventDefault();
 
         if(password != passwordD){
-            alert("As passwords não são iguais")
+            enqueueSnackbar("As passwords não são iguais", { variant: 'error' });
         }
         else{
             authService.alterar(USERNAME, password, tokenRecuperar)
             .then(res => {
                 if(res.success){
-                    alert("A password foi alterada com sucesso. Faça login.")
+                    enqueueSnackbar("A password foi alterada com sucesso. Faça login", { variant: 'success' });
                     navigate('/login')
                 }
                 else{
-                    alert(res.message)
+                    enqueueSnackbar(res.message, { variant: 'error' });
                 }
             })
             .catch(err => {
-                alert('Tentativa falhada')
+                enqueueSnackbar("Tentativa falhada", { variant: 'success' });
             })
         } 
     }

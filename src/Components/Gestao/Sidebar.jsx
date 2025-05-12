@@ -21,23 +21,29 @@ export default function SidebarItems() {
 
     return (
         <div className='sidebar-items'>
-            <a href="/calendario"
+            <a
                 className="sidebar-item"
                 onClick={handleNavigation('/empresa')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                 Empresa
             </a>
-            <a href="/calendario/marcar_ferias"
+            <a
                 className="sidebar-item"
                 onClick={handleNavigation('/utilizadores')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                 Utilizadores
             </a>
-            <a href="/calendario/marcar_ferias"
+            <a 
                 className="sidebar-item"
                 onClick={handleNavigation('/departamentos')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                 Departamentos
+            </a>
+            <a
+                className="sidebar-item"
+                onClick={handleNavigation('/auditlog')}
+                style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
+                Registos
             </a>
         </div>
     )

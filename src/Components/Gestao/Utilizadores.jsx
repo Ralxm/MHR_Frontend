@@ -7,13 +7,13 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import { Box, Modal, Paper, Typography, Button, TableCell, Table, TableContainer, TableHead, TableRow, TableBody, MenuItem, IconButton, Chip, TextField, Stack, FormControl, Select, InputLabel, FormControlLabel, Checkbox } from '@mui/material';
-import { TabContext, TabList, TabPanel } from '@mui/lab';
-import { Delete, Close } from '@mui/icons-material'
-import FileDropZone from '../../Universal/FileDropZoneSingle';
+import { Close } from '@mui/icons-material'
 import SidebarItems from './Sidebar';
+import { useSnackbar } from 'notistack';
 
 export default function Utilizadores() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -293,7 +293,7 @@ export default function Utilizadores() {
                 </div>
             </div>
 
-            {/* Modal para ver os detalhes de um utilizadore */}
+            {/* Modal para ver os detalhes de um utilizador */}
             <Modal
                 open={isUserDetailsModalOpen}
                 onClose={() => setIsUserDetailsModalOpen(false)}
@@ -545,7 +545,7 @@ export default function Utilizadores() {
 
             handleServices.criarPerfil(profileData)
                 .then(res => {
-                    alert("Perfil criado com sucesso!");
+                    enqueueSnackbar("Perfil criado com sucesso", { variant: 'success' });
                     setIsCreatePerfilModalOpen(false);
                     carregarPerfis();
                     setPerfilForm({
@@ -562,7 +562,7 @@ export default function Utilizadores() {
                     });
                 })
                 .catch(err => {
-                    console.error(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 });
         };
 
@@ -740,11 +740,11 @@ export default function Utilizadores() {
 
             handleServices.atualizarPerfil(perfilData, selectedUserEditar.id_perfil)
                 .then(res => {
-                    alert(res);
-                    navigate(0)
+                    enqueueSnackbar(res, { variant: 'success' });
+                    setSelectedUserEditar(null)
                 })
                 .catch(err => {
-                    console.log(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 

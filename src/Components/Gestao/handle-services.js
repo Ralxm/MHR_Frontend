@@ -138,6 +138,16 @@ class HandleServices{
                 }
             }, reason => { throw new Error('Erro a atualizar o departamento'); });
     }
+
+    carregarAuditLog(){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+        return axios.get(url + "auditlog/list", authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.data;
+                }
+            }, reason => { throw new Error('Erro a carregar os departamentos'); });
+    }
 }
 
 export default new HandleServices();

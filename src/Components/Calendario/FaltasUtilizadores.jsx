@@ -12,9 +12,11 @@ import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableConta
 import { ArrowForward } from '@mui/icons-material';
 import SidebarItems from './SidebarItems';
 import * as XLSX from 'xlsx';
+import { useSnackbar } from 'notistack';
 
 export default function FaltasUtilizadores() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -71,8 +73,6 @@ export default function FaltasUtilizadores() {
         const openFalta = sessionStorage.getItem('openFalta');
         if (openFalta) {
             faltas.map((falta) => {
-                console.log(falta.id_falta)
-                console.log(openFalta)
                 if (falta.id_falta == openFalta) {
                     setSelectedFalta(falta)
                 }
@@ -108,7 +108,7 @@ export default function FaltasUtilizadores() {
 
     const exportToExcel = (selectedFaltas) => {
         if (selectedFaltas.length === 0) {
-            alert("Nenhuma falta selecionada para exportar!");
+            enqueueSnackbar("Nenhuma falta selecionada para exportar", { variant: 'error' });
             return;
         }
 
@@ -140,30 +140,55 @@ export default function FaltasUtilizadores() {
     };
 
     const parseDateField = (dateValue) => {
+        // If it's already a Date object (from Excel)
         if (dateValue instanceof Date) {
-            return dateValue.toISOString();
+            // Excel dates sometimes come as serial numbers, we need to handle this case
+            // Create a new date in local time, then convert to ISO string
+            const date = new Date(dateValue);
+            const isoString = date.toISOString();
+
+            // If the date is completely wrong (like 12/05/2025), try parsing as Excel serial number
+            if (date.getFullYear() > new Date().getFullYear() + 5) { // If year is way in the future
+                const excelSerialNumber = dateValue;
+                const utcDays = Math.floor(excelSerialNumber - 25569); // 25569 = days from 1900 to 1970
+                const utcValue = utcDays * 86400 * 1000; // Convert to milliseconds
+                return new Date(utcValue).toISOString();
+            }
+            return isoString;
         }
 
+        // If it's a string (like "26-10-2025")
         if (typeof dateValue === 'string') {
-            const separator = dateValue.includes('-') ? '-' : '/';
-            const parts = dateValue.split(separator);
+            // Remove any time portion if present
+            const dateOnly = dateValue.split(' ')[0];
+
+            const separator = dateOnly.includes('-') ? '-' : '/';
+            const parts = dateOnly.split(separator);
 
             if (parts.length === 3) {
                 let day, month, year;
 
-                if (parts[0].length === 4) { // YYYY-MM-DD
+                if (parts[0].length === 4) { // YYYY-MM-DD format
                     year = parts[0];
                     month = parts[1];
                     day = parts[2];
-                } else { // DD-MM-YYYY ou MM-DD-YYYY
+                } else { // DD-MM-YYYY or MM-DD-YYYY format
                     day = parts[0];
                     month = parts[1];
                     year = parts[2];
                 }
 
+                // Create date in local time (Excel dates are timezone-less)
                 const dateObj = new Date(year, month - 1, day);
                 return dateObj.toISOString();
             }
+        }
+
+        // If it's a number (Excel serial number format)
+        if (typeof dateValue === 'number') {
+            const utcDays = Math.floor(dateValue - 25569); // 25569 = days from 1900 to 1970
+            const utcValue = utcDays * 86400 * 1000; // Convert to milliseconds
+            return new Date(utcValue).toISOString();
         }
 
         console.warn('Could not parse date, using current date instead');
@@ -182,7 +207,9 @@ export default function FaltasUtilizadores() {
             const parsedFaltas = jsonData.map(item => {
                 return {
                     id_perfil: item["ID Perfil"],
+                    nome_utilizador: item["Nome do utilizador"],
                     id_tipofalta: item["ID Tipo de falta"],
+                    tipo_falta: item["Descrição do tipo de falta"],
                     data_falta: parseDateField(item["Data da Falta"]),
                     estado: item["Estado"] || "Pendente",
                     motivo: item["Motivo"] === "N/A" ? null : item["Motivo"],
@@ -193,7 +220,7 @@ export default function FaltasUtilizadores() {
             setImportedFaltas(parsedFaltas);
             setShowImportModal(true);
         } catch (error) {
-            alert("Erro a importar o ficheiro excel");
+            enqueueSnackbar("Erro a importar o ficheiro excel", { variant: 'error' });
         }
     };
 
@@ -209,14 +236,13 @@ export default function FaltasUtilizadores() {
 
         handleServices.CriarManyFaltas(faltasToCreate)
             .then(res => {
-                alert(`${res.length} faltas criadas com sucesso!`);
+                enqueueSnackbar(`${res.data.length} faltas criadas com sucesso!`, { variant: 'success' });
                 setShowImportModal(false);
                 setImportedFaltas([]);
                 carregarFaltas();
             })
-            .catch(err => {
-                console.error("Error creating faltas:", err);
-                alert(`Ocorreu um erro ao criar as faltas: ${err.message}`);
+            .catch(err => { 
+                enqueueSnackbar(`Ocorreu um erro ao criar as faltas: ${err.message}`, { variant: 'success' });
             });
     };
 
@@ -238,6 +264,10 @@ export default function FaltasUtilizadores() {
         const formattedDate = `${day}-${month}-${year}`;
 
         return formattedDate
+    }
+
+    function formatDateTime(isoString) {
+        return isoString.replace('T', ' ').split('.')[0];
     }
 
     return (
@@ -369,8 +399,8 @@ export default function FaltasUtilizadores() {
                         <Table>
                             <TableHead>
                                 <TableRow>
-                                    <TableCell>ID Perfil</TableCell>
-                                    <TableCell>ID Tipo de Falta</TableCell>
+                                    <TableCell>Nome do Perfil</TableCell>
+                                    <TableCell>Tipo de Falta</TableCell>
                                     <TableCell>Data</TableCell>
                                     <TableCell>Estado</TableCell>
                                     <TableCell>Motivo</TableCell>
@@ -380,8 +410,8 @@ export default function FaltasUtilizadores() {
                             <TableBody>
                                 {importedFaltas.map((falta, index) => (
                                     <TableRow key={index}>
-                                        <TableCell>{falta.id_perfil}</TableCell>
-                                        <TableCell>{falta.id_tipofalta}</TableCell>
+                                        <TableCell>{falta.nome_utilizador}</TableCell>
+                                        <TableCell>{falta.tipo_falta}</TableCell>
                                         <TableCell>{convertDate(falta.data_falta)}</TableCell>
                                         <TableCell>{falta.estado}</TableCell>
                                         <TableCell>{falta.motivo || "N/A"}</TableCell>
@@ -565,12 +595,12 @@ export default function FaltasUtilizadores() {
 
             handleServices.atualizarFalta(formDataToSend)
                 .then(res => {
-                    alert("Falta atualizada com sucesso")
+                    enqueueSnackbar("Falta atualizada com sucesso", { variant: 'success' });
                     carregarFaltas();
                     handleCloseVerDetalhes();
                 })
                 .catch(err => {
-                    console.log(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 

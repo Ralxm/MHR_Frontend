@@ -11,11 +11,13 @@ import authService from '../Login/auth-service';
 import handleServices from './handle-services';
 import TableVagas from './TabelaVagas'
 import SumarioVagas from './SumarioVagas';
+import { useSnackbar } from 'notistack';
 
 export default function Vagas() {
     const navigate = useNavigate();
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [isCreateVagaModalOpen, setIsCreateVagaModalOpen] = useState(false)
     const [isCreateCandidaturaModalOpen, setIsCreateCandidaturaModalOpen] = useState(false)
@@ -178,12 +180,12 @@ export default function Vagas() {
 
         handleServices.deleteVaga(selectedVagaApagar)
             .then(res => {
-                alert("Vaga apagada com sucesso");
+                enqueueSnackbar("Vaga apagada com sucesso", { variant: 'success' });
                 carregarVagas();
                 closeApagar();
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar(err, { variant: 'error' });
             });
     }
 

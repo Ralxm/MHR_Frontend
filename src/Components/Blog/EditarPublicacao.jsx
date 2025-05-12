@@ -4,14 +4,16 @@ import NavBar from "../../Universal/NavBar";
 import './Blog.css';
 import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab, FormControl, InputLabel, Select, MenuItem, Autocomplete, List, ListItem, IconButton, ListItemText } from '@mui/material';
-import { LockOpen, Lock, Person, ArrowBack, Delete } from '@mui/icons-material'
+import { Button, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { ArrowBack } from '@mui/icons-material'
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
+import { useSnackbar } from 'notistack';
 
 export default function EditarPublicacao() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -125,12 +127,11 @@ export default function EditarPublicacao() {
 
         handleServices.editarPublicacao(datapost)
             .then(res => {
-                console.log(res)
-                alert(res.message)
+                enqueueSnackbar(res.message, { variant: 'success' });
                 navigate('/blog/' + res.data)
             })
             .catch(err => {
-                console.log(err)
+                enqueueSnackbar(err, { variant: 'error' });
             })
 
     }

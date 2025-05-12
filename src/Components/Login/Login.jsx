@@ -3,9 +3,11 @@ import React, { useState, useEffect } from 'react';
 import './Login.css'
 import '../../index.css'
 import authService from './auth-service';
+import { useSnackbar } from 'notistack';
 
 export default function Login() {
     const url = "http://localhost:8080/";
+    const { enqueueSnackbar } = useSnackbar();
 
     const [USERNAME, setUSERNAME] = useState('')
     const [PASSWORD, setPASSWORD] = useState('')
@@ -25,19 +27,19 @@ export default function Login() {
         authService.login(USERNAME, PASSWORD)
         .then(res => {
             if(res === "" || res === false){
-                alert("Erro na autenticação")
+                enqueueSnackbar("Erro na autenticação", { variant: 'error' });
             }
             else{
                 if(res.estado == "Ativa" || res.estado == "Restrita"){
                     navigate('/calendario');
                 }
                 else{
-                    alert('A sua conta não está ativa!')
+                    enqueueSnackbar("A sua conta não está ativa", { variant: 'error' });
                 }
             }
         })
         .catch(err => {
-            alert('Autenticação falhou')
+            enqueueSnackbar("Autenticação falhou", { variant: 'success' });
             console.log(err)
         })
     }

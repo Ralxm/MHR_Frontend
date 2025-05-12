@@ -8,10 +8,12 @@ import { Stack, Button, Modal, Paper, Typography, TextField, Chip, Box, Tab, For
 import { LockOpen, Lock, Person, ArrowBack, Delete } from '@mui/icons-material'
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
+import { useSnackbar } from 'notistack';
 
 export default function Perfil() {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -90,11 +92,11 @@ export default function Perfil() {
 
         handleServices.atualizarPerfil(datapost)
         .then(res => {
-            alert(res)
+            enqueueSnackbar(res, { variant: 'success' });
             navigate(0)
         })
         .catch(err => {
-            console.log(err);
+            enqueueSnackbar(err, { variant: 'error' });
         })
     }
 

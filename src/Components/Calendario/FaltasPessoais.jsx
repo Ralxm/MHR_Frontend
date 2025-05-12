@@ -10,9 +10,11 @@ import { Chip, Box, TableCell, TableRow, TableBody, Table, TableHead, TableConta
 import FileDropZone from '../../Universal/FileDropZoneSingle'
 import SidebarItems from './SidebarItems';
 import FaltasPieChart from './FaltasPieChart';
+import { useSnackbar } from 'notistack';
 
 export default function FaltasPessoais() {
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
@@ -101,6 +103,10 @@ export default function FaltasPessoais() {
         const formattedDate = `${day}-${month}-${year}`;
 
         return formattedDate
+    }
+
+    function formatDateTime(isoString) {
+        return isoString.replace('T', ' ').split('.')[0];
     }
 
     function getQuantidadeFaltas(tipo, faltas) {
@@ -245,7 +251,7 @@ export default function FaltasPessoais() {
                     <TableBody>
                         {faltas.map((falta) => (
                             <TableRow key={falta.id_falta} >
-                                <TableCell align="left">{convertDate(falta.data_falta)}</TableCell>
+                                <TableCell align="left">{formatDateTime(falta.data_falta)}</TableCell>
                                 <TableCell align="left">{falta.justificacao && <a href={falta.justificacao} target="_blank"><button className='btn btn-outline-primary'>Abrir</button></a>}</TableCell>
                                 <TableCell align="left"><Chip label={falta.estado} size='10px' color={getShadowClass(falta.estado)}></Chip></TableCell>
                                 <TableCell align="right"><button className='btn btn-secondary' onClick={() => { setSelectedFalta(falta) }}>{falta.estado == "Pendente" ? "Justificar" : "Ver detalhes"}</button></TableCell>
@@ -300,12 +306,12 @@ export default function FaltasPessoais() {
 
             handleServices.atualizarFalta(formDataToSend)
                 .then(res => {
-                    alert(res);
+                    enqueueSnackbar(res, { variant: 'success' });
                     carregarFaltasPessoais();
                     handleCloseVerDetalhes();
                 })
                 .catch(err => {
-                    console.log(err);
+                    enqueueSnackbar(err, { variant: 'error' });
                 })
         };
 

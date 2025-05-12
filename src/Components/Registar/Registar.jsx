@@ -3,12 +3,13 @@ import React, { useState, useEffect } from 'react';
 import './Registar.css'
 import '../../index.css'
 import authService from "../Login/auth-service";
-
+import { useSnackbar } from 'notistack';
 
 export default function Registar() {
     const [USERNAME, setUSERNAME] = useState('')
     const [PASSWORD, setPASSWORD] = useState('')
     const navigate = useNavigate();
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         document.title = "Registar"
@@ -23,20 +24,20 @@ export default function Registar() {
         authService.registo(USERNAME, PASSWORD)
             .then(res => {
                 if (res === "" || res === false) {
-                    alert('Erro na conexão a tentar realizar o registo');
+                    enqueueSnackbar('Erro na conexão a tentar realizar o registo', { variant: 'success' });
                 }
                 else {
                     if (res.success) {
-                        alert("Registo feito com sucesso, faça login!");
+                        enqueueSnackbar("Registo feito com sucesso, faça login!", { variant: 'success' });
                         navigate('/login');
                     }
                     else {
-                        alert('Erro a realizar o registo');
+                        enqueueSnackbar('Erro a realizar o registo', { variant: 'success' });
                     }
                 }
             })
             .catch(err => {
-                alert('Registo falhou');
+                enqueueSnackbar('Registo falhou', { variant: 'success' });
                 console.log(err);
             })
     }
