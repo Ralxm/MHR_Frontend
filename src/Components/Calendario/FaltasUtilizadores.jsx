@@ -140,26 +140,20 @@ export default function FaltasUtilizadores() {
     };
 
     const parseDateField = (dateValue) => {
-        // If it's already a Date object (from Excel)
         if (dateValue instanceof Date) {
-            // Excel dates sometimes come as serial numbers, we need to handle this case
-            // Create a new date in local time, then convert to ISO string
             const date = new Date(dateValue);
             const isoString = date.toISOString();
 
-            // If the date is completely wrong (like 12/05/2025), try parsing as Excel serial number
-            if (date.getFullYear() > new Date().getFullYear() + 5) { // If year is way in the future
+            if (date.getFullYear() > new Date().getFullYear() + 5) {
                 const excelSerialNumber = dateValue;
-                const utcDays = Math.floor(excelSerialNumber - 25569); // 25569 = days from 1900 to 1970
-                const utcValue = utcDays * 86400 * 1000; // Convert to milliseconds
+                const utcDays = Math.floor(excelSerialNumber - 25569); // 25569 = dias de 1900 a 1970
+                const utcValue = utcDays * 86400 * 1000;
                 return new Date(utcValue).toISOString();
             }
             return isoString;
         }
 
-        // If it's a string (like "26-10-2025")
         if (typeof dateValue === 'string') {
-            // Remove any time portion if present
             const dateOnly = dateValue.split(' ')[0];
 
             const separator = dateOnly.includes('-') ? '-' : '/';
@@ -168,30 +162,27 @@ export default function FaltasUtilizadores() {
             if (parts.length === 3) {
                 let day, month, year;
 
-                if (parts[0].length === 4) { // YYYY-MM-DD format
+                if (parts[0].length === 4) { // YYYY-MM-DD
                     year = parts[0];
                     month = parts[1];
                     day = parts[2];
-                } else { // DD-MM-YYYY or MM-DD-YYYY format
+                } else { // DD-MM-YYYY ou MM-DD-YYYY
                     day = parts[0];
                     month = parts[1];
                     year = parts[2];
                 }
 
-                // Create date in local time (Excel dates are timezone-less)
                 const dateObj = new Date(year, month - 1, day);
                 return dateObj.toISOString();
             }
         }
 
-        // If it's a number (Excel serial number format)
         if (typeof dateValue === 'number') {
-            const utcDays = Math.floor(dateValue - 25569); // 25569 = days from 1900 to 1970
-            const utcValue = utcDays * 86400 * 1000; // Convert to milliseconds
+            const utcDays = Math.floor(dateValue - 25569); // 25569 = dias de 1900 a 1970
+            const utcValue = utcDays * 86400 * 1000;
             return new Date(utcValue).toISOString();
         }
 
-        console.warn('Could not parse date, using current date instead');
         return new Date().toISOString();
     };
 
@@ -241,7 +232,7 @@ export default function FaltasUtilizadores() {
                 setImportedFaltas([]);
                 carregarFaltas();
             })
-            .catch(err => { 
+            .catch(err => {
                 enqueueSnackbar(`Ocorreu um erro ao criar as faltas: ${err.message}`, { variant: 'success' });
             });
     };
@@ -463,11 +454,11 @@ export default function FaltasUtilizadores() {
         };
 
         const toggleSelectAll = () => {
-            const allFilteredSelected = filteredFaltas.every(falta =>
+            const anyFilteredSelected = filteredFaltas.some(falta =>
                 selectedFaltas.some(f => f.id_falta === falta.id_falta)
             );
 
-            if (allFilteredSelected) {
+            if (anyFilteredSelected) {
                 deselectAllFaltas();
             } else {
                 selectAllFaltas();
@@ -503,6 +494,7 @@ export default function FaltasUtilizadores() {
                     <button className='btn btn-outline-primary mx-2' onClick={() => exportToExcel(selectedFaltas)} disabled={selectedFaltas.length == 0}>
                         Exportar faltas selecionadas
                     </button>
+
 
                     <button
                         className='btn btn-outline-primary'

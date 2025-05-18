@@ -277,7 +277,7 @@ export default function Utilizadores() {
                                                             variant="outlined"
                                                             size="small"
                                                             color='secondary'
-                                                            onClick={() => {setSelectedUserEditar(perfil); setSelectedUtilizador(utilizador)}}
+                                                            onClick={() => { setSelectedUserEditar(perfil); setSelectedUtilizador(utilizador) }}
                                                         >
                                                             Editar
                                                         </Button>
@@ -466,7 +466,7 @@ export default function Utilizadores() {
                                                         label={candidatura.status}
                                                         color={
                                                             candidatura.status.includes('Aceite') ? 'success' :
-                                                                candidatura.status.includes('Rejeitada') ? 'error' : 'warning' 
+                                                                candidatura.status.includes('Rejeitada') ? 'error' : 'warning'
                                                         }
                                                         size="small"
                                                     />
@@ -548,6 +548,7 @@ export default function Utilizadores() {
                     enqueueSnackbar("Perfil criado com sucesso", { variant: 'success' });
                     setIsCreatePerfilModalOpen(false);
                     carregarPerfis();
+                    carregarUtilizadores();
                     setPerfilForm({
                         nome: '',
                         email: '',
@@ -567,130 +568,128 @@ export default function Utilizadores() {
         };
 
         return (
-            <form>
-                <Stack spacing={3}>
-                    <TextField
-                        name="nome"
-                        label="Nome Completo"
-                        value={perfilForm.nome}
+            <Stack spacing={3}>
+                <TextField
+                    name="nome"
+                    label="Nome Completo"
+                    value={perfilForm.nome}
+                    onChange={handlePerfilFormChange}
+                    fullWidth
+                    required
+                />
+
+                <TextField
+                    name="email"
+                    label="Email"
+                    type="email"
+                    value={perfilForm.email}
+                    onChange={handlePerfilFormChange}
+                    fullWidth
+                    required
+                />
+
+                <TextField
+                    name="numero_mecanografico"
+                    label="Número Mecanográfico"
+                    value={perfilForm.numero_mecanografico}
+                    onChange={handlePerfilFormChange}
+                    fullWidth
+                />
+
+                <TextField
+                    name="morada"
+                    label="Morada"
+                    value={perfilForm.morada}
+                    onChange={handlePerfilFormChange}
+                    fullWidth
+                />
+
+                <TextField
+                    name="telemovel"
+                    label="Telemóvel"
+                    value={perfilForm.telemovel}
+                    onChange={handlePerfilFormChange}
+                    fullWidth
+                />
+
+                <TextField
+                    name="data_nascimento"
+                    label="Data de Nascimento"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    value={perfilForm.data_nascimento}
+                    onChange={handlePerfilFormChange}
+                    fullWidth
+                />
+
+                <TextField
+                    name="distrito"
+                    label="Distrito"
+                    value={perfilForm.distrito}
+                    onChange={handlePerfilFormChange}
+                    fullWidth
+                />
+
+                <FormControl fullWidth>
+                    <InputLabel>Departamento</InputLabel>
+                    <Select
+                        name="id_departamento"
+                        value={perfilForm.id_departamento}
+                        label="Departamento"
                         onChange={handlePerfilFormChange}
-                        fullWidth
-                        required
-                    />
+                    >
+                        {departamentos.map((departamento) => {
+                            if (departamento.id_departamento != 1) {
+                                return (
+                                    <MenuItem value={departamento.id_departamento}>{departamento.nome_departamento}</MenuItem>
+                                )
+                            }
 
-                    <TextField
-                        name="email"
-                        label="Email"
-                        type="email"
-                        value={perfilForm.email}
-                        onChange={handlePerfilFormChange}
-                        fullWidth
-                        required
-                    />
+                        })}
+                    </Select>
+                </FormControl>
 
-                    <TextField
-                        name="numero_mecanografico"
-                        label="Número Mecanográfico"
-                        value={perfilForm.numero_mecanografico}
-                        onChange={handlePerfilFormChange}
-                        fullWidth
-                    />
+                <TextField
+                    name="dias_ferias_ano_atual"
+                    label="Dia de férias do ano atual"
+                    value={perfilForm.dias_ferias_ano_atual}
+                    type="number"
+                    onChange={handlePerfilFormChange}
+                    fullWidth
+                />
 
-                    <TextField
-                        name="morada"
-                        label="Morada"
-                        value={perfilForm.morada}
-                        onChange={handlePerfilFormChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        name="telemovel"
-                        label="Telemóvel"
-                        value={perfilForm.telemovel}
-                        onChange={handlePerfilFormChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        name="data_nascimento"
-                        label="Data de Nascimento"
-                        type="date"
-                        InputLabelProps={{ shrink: true }}
-                        value={perfilForm.data_nascimento}
-                        onChange={handlePerfilFormChange}
-                        fullWidth
-                    />
-
-                    <TextField
-                        name="distrito"
-                        label="Distrito"
-                        value={perfilForm.distrito}
-                        onChange={handlePerfilFormChange}
-                        fullWidth
-                    />
-
-                    <FormControl fullWidth>
-                        <InputLabel>Departamento</InputLabel>
-                        <Select
-                            name="id_departamento"
-                            value={perfilForm.id_departamento}
-                            label="Departamento"
-                            onChange={handlePerfilFormChange}
-                        >
-                            {departamentos.map((departamento) => {
-                                if (departamento.id_departamento != 1) {
-                                    return (
-                                        <MenuItem value={departamento.id_departamento}>{departamento.nome_departamento}</MenuItem>
-                                    )
-                                }
-
+                <FormControlLabel
+                    control={
+                        <Checkbox
+                            checked={perfilForm.estado === "Ativa"}
+                            onChange={(e) => setPerfilForm({
+                                ...perfilForm,
+                                estado: e.target.checked ? "Ativa" : "Restrita"
                             })}
-                        </Select>
-                    </FormControl>
-
-                    <TextField
-                        name="dias_ferias_ano_atual"
-                        label="Dia de férias do ano atual"
-                        value={perfilForm.dias_ferias_ano_atual}
-                        type="number"
-                        onChange={handlePerfilFormChange}
-                        fullWidth
-                    />
-
-                    <FormControlLabel
-                        control={
-                            <Checkbox
-                                checked={perfilForm.estado === "Ativa"}
-                                onChange={(e) => setPerfilForm({
-                                    ...perfilForm,
-                                    estado: e.target.checked ? "Ativa" : "Restrita"
-                                })}
-                                color="primary"
-                            />
-                        }
-                        label="Perfil com permissões para aceder a todo o website"
-                        labelPlacement="end"
-                    />
-
-                    <Stack direction="row" spacing={2} justifyContent="flex-end">
-                        <Button
-                            variant="outlined"
-                            onClick={() => setIsCreatePerfilModalOpen(false)}
-                        >
-                            Cancelar
-                        </Button>
-                        <Button
-                            type="submit"
-                            variant="contained"
                             color="primary"
-                            onClick={() => { handleCriarPerfil() }}
-                        >
-                            Criar Perfil
-                        </Button>
-                    </Stack>
+                        />
+                    }
+                    label="Perfil com permissões para aceder a todo o website"
+                    labelPlacement="end"
+                />
+
+                <Stack direction="row" spacing={2} justifyContent="flex-end">
+                    <Button
+                        variant="outlined"
+                        onClick={() => setIsCreatePerfilModalOpen(false)}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        onClick={handleCriarPerfil}
+                    >
+                        Criar Perfil
+                    </Button>
                 </Stack>
-            </form>
+            </Stack>
         )
     }
 
