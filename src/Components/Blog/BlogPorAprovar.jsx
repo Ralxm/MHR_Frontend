@@ -129,7 +129,7 @@ export default function BlogPorAprovar() {
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
                     {(tipo_user == 1 || tipo_user == 2) &&
                         <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
-                            <SidebarItems tipo_user={tipo_user} onCriar={setIsCreatePostModalOpen}></SidebarItems>
+                            <SidebarItems tipo_user={tipo_user} onCriar={setIsCreatePostModalOpen} tipo="por_aprovar"></SidebarItems>
                         </div>
                     }
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
@@ -144,6 +144,7 @@ export default function BlogPorAprovar() {
                                 onRejeitar={setSelectedPostRejeitar}
                                 cols={3}
                                 onApagar={setSelectedPostApagar}
+                                filtroTipo={"Todos"}
                                 to={"Admin"}
                             />
                         </div>

@@ -222,6 +222,10 @@ export default function Despesas() {
     }, [tab])
 
     function handleCriar(event) {
+        if(!date || !descricao || !valor){
+            enqueueSnackbar("Tem que preencher todos os campos", { variant: 'error' });
+            return
+        }
         event.preventDefault();
         const formData = new FormData();
         formData.append('id_utilizador', id_user)
@@ -259,7 +263,7 @@ export default function Despesas() {
                 toggleApagarDespesa();
             })
             .catch(err => {
-                enqueueSnackbar(err, { variant: 'error' });
+                enqueueSnackbar("Erro a criar a despesa", { variant: 'error' });
             });
     }
 
@@ -732,6 +736,7 @@ export default function Despesas() {
                         disabled={acao == "editar"}
                     >
                         {(despesa.estado == "Aprovada" || despesa.estado == "Reembolsada") && <option value="Reembolsada">Reembolsada</option>}
+                        {despesa.estado == "Pendente" && <option value="Pendente">Pendente</option>}
                         {despesa.estado != "Aprovada" && acao != "reembolsar" && <option value="Em análise">Em análise</option>}
                         {despesa.estado != "Aprovada" && acao != "reembolsar" && <option value="Aprovada">Aprovada</option>}
                         {despesa.estado != "Aprovada" && acao != "reembolsar" && <option value="Rejeitada">Rejeitada</option>}

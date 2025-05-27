@@ -2,7 +2,7 @@ import { useNavigate } from "react-router-dom";
 import React, { useEffect, useRef, useState } from 'react';
 import handleServices from '../Blog/handle-services';
 
-export default function SidebarItems({onCriar}) {
+export default function SidebarItems({onCriar, tipo}) {
     const navigate = useNavigate();
 
     const [id_user, setUtilizador] = useState();
@@ -24,19 +24,19 @@ export default function SidebarItems({onCriar}) {
             <a href="/calendario"
                 className="sidebar-item"
                 onClick={handleNavigation('/blog/todas')}
-                style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
+                style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: tipo === 'todos' ? 'darkblue' : '#333' }}>
                 Todos as publicações
             </a>
             <a href="/calendario/marcar_ferias"
                 className="sidebar-item"
                 onClick={handleNavigation('/blog/por_utilizador')}
-                style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
+                style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: tipo === 'por_user' ? 'darkblue' : '#333' }}>
                 Publicações criadas por um utilizador
             </a>
             <a href="/calendario/marcar_ferias"
                 className="sidebar-item"
                 onClick={handleNavigation('/blog/por_aprovar')}
-                style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
+                style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: tipo === 'por_aprovar' ? 'darkblue' : '#333' }}>
                 Publicações por aprovar
             </a>
             <a

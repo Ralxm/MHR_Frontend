@@ -29,6 +29,7 @@ export default function BlogTodasPublicacoes() {
     const [selectedPostApagar, setSelectedPostApagar] = useState();
 
     const [filtro, setFiltro] = useState('')
+    const [filtroTipo, setFiltroTipo] = useState('Todos')
 
     const [isCreatePostModalOpen, setIsCreatePostModalOpen] = useState(false);
 
@@ -131,18 +132,35 @@ export default function BlogTodasPublicacoes() {
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
                     {(tipo_user == 1 || tipo_user == 2) &&
                         <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
-                            <SidebarItems tipo_user={tipo_user} onCriar={setIsCreatePostModalOpen}></SidebarItems>
+                            <SidebarItems tipo_user={tipo_user} onCriar={setIsCreatePostModalOpen} tipo={"todos"}></SidebarItems>
                         </div>
                     }
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
                         <div className='row'>
                             <div className='col d-flex justify-content-between'>
                                 <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Todas as publicações</h2>
-                                <TextField
-                                    label="Título"
-                                    value={filtro}
-                                    onChange={(e) => setFiltro(e.target.value)}
-                                />
+                                <div>
+                                    <FormControl sx={{ minWidth: '150px', height: '100%', mx: 2 }}>
+                                        <InputLabel shrink>Tipo</InputLabel>
+                                        <Select
+                                            label="Estado"
+                                            name="estado"
+                                            InputLabelProps={{ shrink: true }}
+                                            onChange={(value) => setFiltroTipo(value.target.value)}
+                                            value={filtroTipo}
+                                        >
+                                            <MenuItem value={"Todos"} selected>Todos</MenuItem>
+                                            <MenuItem value={"Notícia"}>Notícia</MenuItem>
+                                            <MenuItem value={"Visita"}>Visita</MenuItem>
+                                        </Select>
+                                    </FormControl>
+                                    <TextField
+                                        label="Título"
+                                        value={filtro}
+                                        onChange={(e) => setFiltro(e.target.value)}
+                                    />
+                                </div>
+
                             </div>
 
                         </div>
@@ -159,6 +177,7 @@ export default function BlogTodasPublicacoes() {
                                 cols={3}
                                 onApagar={setSelectedPostApagar}
                                 filtro={filtro}
+                                filtroTipo={filtroTipo}
                                 to={"Admin"}
                             />
                         </div>

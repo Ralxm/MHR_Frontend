@@ -17,6 +17,7 @@ export default function Feriados() {
 
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
+    const [mes, setMes] = useState();
 
     const [feriados, setFeriados] = useState([]);
     const [selectedFeriado, setSelectedFeriado] = useState(null);
@@ -43,6 +44,7 @@ export default function Feriados() {
             setTipoUser(localStorage.getItem("tipo"))
         }
         carregarFeriados();
+        setMes(new Date().getMonth())
     }, []);
 
     function carregarFeriados() {
@@ -132,6 +134,29 @@ export default function Feriados() {
                                         !
                                     </div>
                                 </Tooltip>
+                                {mes == 11 &&
+                                    <Tooltip
+                                        title="Lembrete para verificar as datas dos feriados do próximo ano"
+                                        placement="right"
+                                        arrow
+                                        className='mx-2 mt-2'
+                                    >
+                                        <div style={{
+                                            width: '20px',
+                                            height: '20px',
+                                            borderRadius: '50%',
+                                            backgroundColor: 'red',
+                                            color: 'white',
+                                            display: 'flex',
+                                            alignItems: 'center',
+                                            justifyContent: 'center',
+                                            fontSize: '12px',
+                                            cursor: 'pointer'
+                                        }}>
+                                            !
+                                        </div>
+                                    </Tooltip>
+                                }
                             </div>
 
                             <Button

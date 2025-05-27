@@ -118,11 +118,11 @@ export default function EditarPublicacao() {
             titulo: titulo,
             texto: texto,
             estado: estado,
-            data_noticia: tipo === 'Notícia' ? data_noticia : null,
-            local_visita: tipo === 'Visita' ? local_visita : null,
-            data_visita: tipo === 'Visita' ? data_visita : null,
-            duracao_visita: tipo === 'Visita' ? duracao_visita : null,
-            motivo_visita: tipo === 'Visita' ? motivo_visita : null
+            data_noticia: tipo == 'Notícia' ? data_noticia : null,
+            local_visita: tipo == 'Visita' ? local_visita : null,
+            data_visita: tipo == 'Visita' ? data_visita : null,
+            duracao_visita: tipo == 'Visita' ? duracao_visita : null,
+            motivo_visita: tipo == 'Visita' ? motivo_visita : null
         };
 
         handleServices.editarPublicacao(datapost)
@@ -133,7 +133,6 @@ export default function EditarPublicacao() {
             .catch(err => {
                 enqueueSnackbar(err, { variant: 'error' });
             })
-
     }
 
     return (

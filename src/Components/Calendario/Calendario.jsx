@@ -46,6 +46,7 @@ export default function Calendario() {
 
     const [selectedFalta, setSelectedFalta] = useState(null)
     const [selectedFeria, setSelectedFeria] = useState(null)
+    const [selectedFaltaApagar, setSelectedFaltaApagar] = useState(null)
     const [selectedFeriaApagar, setSelectedFeriaApagar] = useState(null)
 
     const [isCriarFaltaModalOpen, setIsCriarFaltaModalOpen] = useState(false)
@@ -202,7 +203,7 @@ export default function Calendario() {
                     const dayOfWeek = current.getDay();
                     const currentMonthDay = `${current.getMonth()}-${current.getDate()}`;
 
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.has(currentMonthDay)) {
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.has(currentMonthDay)){
                         count++;
                     }
                     current.setDate(current.getDate() + 1);
@@ -270,6 +271,19 @@ export default function Calendario() {
             });
     }
 
+    function handleApagarFalta(event) {
+        event.preventDefault();
+        handleServices.apagarFalta(selectedFaltaApagar.id_falta)
+            .then(res => {
+                enqueueSnackbar("Falta apagada com sucesso", { variant: 'success' });
+                carregarFaltas();
+                setSelectedFaltaApagar(null)
+            })
+            .catch(err => {
+                enqueueSnackbar(err, { variant: 'error' });
+            });
+    }
+
     function handleCriarFerias(event) {
         event.preventDefault();
 
@@ -280,8 +294,6 @@ export default function Calendario() {
             data_conclusao: data_conclusao,
             duracao: duracao,
         }
-
-        console.log(datapost)
 
         if (new Date(data_inicio) > new Date(data_conclusao)) {
             enqueueSnackbar("O dia final não pode ser antes do dia de ínicio", { variant: 'error' });
@@ -403,7 +415,7 @@ export default function Calendario() {
                                                             <TableRow>
                                                                 <TableCell align="left">Data de ínicio</TableCell>
                                                                 <TableCell align="left">Data de fim</TableCell>
-                                                                <TableCell align="left">Duração</TableCell>
+                                                                {/*<TableCell align="left">Duração</TableCell>*/}
                                                                 <TableCell align="left">Estado</TableCell>
                                                                 <TableCell align="right"></TableCell>
                                                             </TableRow>
@@ -415,7 +427,7 @@ export default function Calendario() {
                                                                         <TableRow key={feria.id_falta} >
                                                                             <TableCell align="left">{convertDate(feria.data_inicio)}</TableCell>
                                                                             <TableCell align="left">{convertDate(feria.data_conclusao)}</TableCell>
-                                                                            <TableCell align="left">{feria.duracao} {feria.duracao > 1 ? "dias" : "dia"} </TableCell>
+                                                                            {/*<TableCell align="left">{feria.duracao} {feria.duracao > 1 ? "dias" : "dia"} </TableCell>*/}
                                                                             <TableCell align="left"><Chip label={feria.estado} size='10px' color={getShadowClass(feria.estado)}></Chip></TableCell>
                                                                             <TableCell align="right">
                                                                                 {feria.estado == "Pendente" && <button className='btn btn-outline-danger mx-2' onClick={() => { setSelectedFeriaApagar(feria) }}>Apagar</button>}
@@ -478,7 +490,10 @@ export default function Calendario() {
                                                                             <TableCell align="left">{convertDate(falta.data_falta)}</TableCell>
                                                                             <TableCell align="left">{falta.justificacao && <a href={falta.justificacao} target="_blank"><button className='btn btn-outline-primary'>Abrir</button></a>}</TableCell>
                                                                             <TableCell align="left"><Chip label={falta.estado} size='10px' color={getShadowClass(falta.estado)}></Chip></TableCell>
-                                                                            <TableCell align="right"><button className='btn btn-secondary' onClick={() => { setSelectedFalta(falta) }}>{falta.estado == "Pendente" ? "Justificar" : "Ver detalhes"}</button></TableCell>
+                                                                            <TableCell align="right">
+                                                                                {falta.estado == "Pendente" && <button className='btn btn-outline-danger mx-2' onClick={() => { setSelectedFaltaApagar(falta) }}>Apagar</button>}
+                                                                                <button className='btn btn-secondary' onClick={() => { setSelectedFalta(falta) }}>{falta.estado == "Pendente" ? "Justificar" : "Ver detalhes"}</button>
+                                                                            </TableCell>
                                                                         </TableRow>
                                                                     )
                                                                 })}
@@ -621,6 +636,47 @@ export default function Calendario() {
                             variant="contained"
                             color="error"
                             onClick={(event) => { handleApagarFeria(event); handleCloseApagarFeria() }}
+                            sx={{ width: '50%' }}
+                        >
+                            Apagar
+                        </Button>
+                    </Stack>
+                </Paper>
+            </Modal>
+
+            <Modal
+                open={selectedFaltaApagar}
+                onClose={() => {setSelectedFaltaApagar(null)}}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 570 },
+                        borderRadius: 4,
+                        p: 4,
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                        Tem a certeza que quer eliminar esta falta?
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => {setSelectedFaltaApagar(null)}}
+                            sx={{ width: '50%' }}
+                        >
+                            Fechar
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            onClick={(event) => { handleApagarFalta(event);  setSelectedFaltaApagar(null) }}
                             sx={{ width: '50%' }}
                         >
                             Apagar
@@ -1210,7 +1266,7 @@ export default function Calendario() {
 
             formData.append('motivo', _motivo);
             formData.append('data_falta', data_falta);
-            formData.append('estado', "Pendente");
+            formData.append('estado', "Em análise");
 
             if (newFile) {
                 formData.append('justificacao', newFile)

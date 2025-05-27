@@ -236,7 +236,7 @@ export default function Vagas() {
                         </div>
 
                         {/* Coluna da direita */}
-                        <div className="col-md-9">
+                        <div className="col-md-9" style={{ zIndex: 1000 }}>
                             <div className="items-container" style={{ minHeight: '85vh' }}>
                                 <div className='d-flex justify-content-between align-items-center mx-3 mb-3 mt-1'>
                                     <span>{selectedDepartamento ?
@@ -247,9 +247,16 @@ export default function Vagas() {
                                         :
                                         <strong style={{ zIndex: 1001 }}>Todas as vagas</strong>}</span>
                                     <div className='d-flex' style={{ zIndex: 1001 }}>
-                                        <input className='mx-2' onChange={(value) => { setFiltroTitulo(value.target.value) }}></input>
+                                        <TextField
+                                        sx={{mx: 2}}
+                                        label="Título"
+                                        onChange={(value) => { setFiltroTitulo(value.target.value)}}
+                                        
+                                        >
+
+                                        </TextField>
                                         {selectedDepartamento && <button className='btn btn-warning mx-2' onClick={() => { setSelectedDepartamento(null) }}>Remover Filtro</button>}
-                                        {(tipo_user == 1 || tipo_user == 2) && <a href='/vagas/criar'><button className='btn btn-outline-secondary'>Criar Vaga</button></a>}
+                                        {(tipo_user == 1 || tipo_user == 2) && <a href='/vagas/criar'><button className='btn btn-outline-secondary h-100'>Criar Vaga</button></a>}
                                     </div>
 
                                 </div>

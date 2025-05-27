@@ -134,7 +134,7 @@ export default function Empresa() {
                         <div className='d-flex justify-content-between'>
                             <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Informações da empresa</h2>
                             <button className='btn btn-primary' onClick={() => { setAction(action === 'ver' ? 'editar' : 'ver'); if (action == "editar") { setValues() } }}>
-                                {action === 'ver' ? 'Editar Perfil' : 'Cancelar Edição'}
+                                {action === 'ver' ? 'Editar Informações' : 'Cancelar Edição'}
                             </button>
                         </div>
 

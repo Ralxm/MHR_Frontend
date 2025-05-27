@@ -77,7 +77,7 @@ const FaltasPieChart = ({ faltas }) => {
                     label: {
                         show: true,
                         position: 'center',
-                        formatter: `{x|${total}}\n{y|Faltas}`,
+                        formatter: `{x|${faltas.length > 0 ? total : "0"}}\n{y|Faltas}`,
                         rich: {
                             x: {
                                 fontSize: 24,

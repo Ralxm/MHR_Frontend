@@ -109,7 +109,7 @@ class HandleServices{
                 if (res.data.success) {
                     return res.data.data[0];
                 }
-            }, reason => { throw new Error('Erro a criar a linha temporal'); });
+            }, reason => { throw new Error('Erro a criar o ponto na linha temporal'); });
     }
 
     carregarLinhaTemporalProjeto(id){

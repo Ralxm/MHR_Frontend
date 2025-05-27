@@ -5,7 +5,7 @@ import { Box, Chip, Stack, Card, Typography, Divider, CardContent, Button } from
 import { LockOpen, Lock, People, Business, CalendarToday, ArrowForward } from '@mui/icons-material'
 
 
-export default function TabelaIdeias({ ideias, onVerDetalhes, onAceitar, onApagar }) {
+export default function TabelaIdeias({ ideias, onVerDetalhes, onAceitar, onApagar, filtro }) {
   let tipo_user = localStorage.getItem("tipo")
   const navigate = useNavigate();
 
@@ -23,29 +23,21 @@ export default function TabelaIdeias({ ideias, onVerDetalhes, onAceitar, onApaga
     return formattedDate
   }
 
-  /*const filteredVagas = vagas.filter(vaga => {
-    if (selectedDepartamento && vaga.id_departamento !== selectedDepartamento.id_departamento) {
-      return false;
+  const filteredIdeias = ideias.filter(ideia => {
+    if (ideia.estado != filtro && filtro != "Todos") {
+      return false
     }
-    
-    if (filtro && filtro.trim() !== '') {
-      const searchTerm = filtro.toLowerCase();
-      const title = vaga.titulo_vaga.toLowerCase();
-      if (!title.includes(searchTerm)) {
-        return false;
-      }
-    }
-    
+
     return true;
-  });*/
+  })
 
   return (
     <>
-      {ideias.map((ideia) => (
+      {filteredIdeias.map((ideia) => (
         <div className="col-md-3" key={ideia.id_ideia} style={{ zIndex: 1001 }}>
           <Card
             sx={{
-              height: '25svh',
+              minHeight: '25svh',
               display: 'flex',
               flexDirection: 'column',
               transition: 'transform 0.2s, box-shadow 0.2s',
@@ -127,7 +119,7 @@ export default function TabelaIdeias({ ideias, onVerDetalhes, onAceitar, onApaga
                 {(tipo_user == 1 || tipo_user == 2) && ideia.estado == "Em análise" && (
                   <>
                     <Divider sx={{ my: 1 }} />
-                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'flex-end', gap: 1, marginBottom: '-10px'}}>
                       <Button
                         variant="outlined"
                         color="error"

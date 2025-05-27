@@ -137,7 +137,7 @@ export default function MarcarFalta() {
         console.log(formData)
 
         formData.append('id_calendario', calendario.id_calendario);
-        formData.append('id_perfil', id_perfil);
+        formData.append('id_perfil', perfil);
         formData.append('id_tipofalta', tipo_falta);
 
         formData.append('comentarios', comentario);

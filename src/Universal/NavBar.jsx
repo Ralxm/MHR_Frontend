@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import './NavBar.css';
 import { IconButton, Menu, MenuItem } from '@mui/material';
 import { Icon } from '@iconify/react';
@@ -13,6 +13,9 @@ export default function NavBar() {
   const [anchorEl, setAnchorEl] = useState(null);
   const [link, setLink] = useState(window.location.pathname)
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const path = location.pathname;
 
   useEffect(() => {
     const user = localStorage.getItem('user');
@@ -52,62 +55,71 @@ export default function NavBar() {
           <div className="navbar-items p-3">
             <div className="nav-item">
               <a
-                className={`nav-link ${link.includes("vagas") ? "active" : ""}`}
+                className={`nav-link ${path.startsWith("/vaga") ? "active" : ""}`}
                 href='/vagas'
               >
                 Vagas
               </a>
-              <div className={`underline ${link.includes("vagas") ? "active" : ""}`} />
+              <div className={`underline ${path.startsWith("/vaga") ? "active" : ""}`} />
             </div>
 
             <div className="nav-item">
               <a
-                className={`nav-link ${link === "calendario" ? "active" : ""}`}
+                className={`nav-link ${path.startsWith("/calendario") ? "active" : ""}`}
                 href='/calendario'
               >
                 Calendário
               </a>
-              <div className={`underline ${link === "calendario" ? "active" : ""}`} />
+              <div className={`underline ${path.startsWith("/calendario") ? "active" : ""}`} />
             </div>
+
             <div className="nav-item">
               <a
-                className={`nav-link ${link === "projetos" ? "active" : ""}`}
+                className={`nav-link ${path.startsWith("/projeto") ? "active" : ""}`}
                 href='/projetos'
               >
                 Projetos
               </a>
-              <div className={`underline ${link === "projetos" ? "active" : ""}`} />
+              <div className={`underline ${path.startsWith("/projeto") ? "active" : ""}`} />
             </div>
 
             <div className="nav-item">
               <a
-                className={`nav-link ${link === "despesas" ? "active" : ""}`}
+                className={`nav-link ${path.startsWith("/despesas") ? "active" : ""}`}
                 href='/despesas'
               >
                 Despesas
               </a>
-              <div className={`underline ${link === "despesas" ? "active" : ""}`} />
+              <div className={`underline ${path.startsWith("/despesas") ? "active" : ""}`} />
             </div>
 
             <div className="nav-item">
               <a
-                className={`nav-link ${link === "blog" ? "active" : ""}`}
+                className={`nav-link ${path.startsWith("/blog") ? "active" : ""}`}
                 href='/blog'
               >
                 Blog
               </a>
-              <div className={`underline ${link === "blog" ? "active" : ""}`} />
+              <div className={`underline ${path.startsWith("/blog") ? "active" : ""}`} />
             </div>
 
             {(tipo == 1 || tipo == 2) &&
               <div className="nav-item">
                 <a
-                  className={`nav-link ${link === "gestao" ? "active" : ""}`}
+                  className={`nav-link ${(path.startsWith("/utilizadores") || 
+                    path.startsWith("/empresa") ||
+                    path.startsWith("/departamentos") ||
+                    path.startsWith("/auditlog")
+                    )  ? "active" : ""}`}
                   href='/empresa'
                 >
                   Empresa
                 </a>
-                <div className={`underline ${link === "gestao" ? "active" : ""}`} />
+                <div className={`underline ${(path.startsWith("/utilizadores") || 
+                    path.startsWith("/empresa") ||
+                    path.startsWith("/departamentos") ||
+                    path.startsWith("/auditlog")
+                    ) ? "active" : ""}`} />
               </div>
             }
           </div>

@@ -174,25 +174,8 @@ export default function Blog() {
                                 <div className='d-flex justify-content-between mb-3' style={{ height: '55px' }}>
                                     <button className='btn btn-primary' onClick={() => setIsCreatePostModalOpen(true)}>Criar publicação</button>
                                     <div>
-                                        <FormControl sx={{ minWidth: '70px', height: '100%' }}>
-                                            <InputLabel shrink>Colunas</InputLabel>
-                                            <Select
-                                                label="Colunas"
-                                                name="estado"
-                                                InputLabelProps={{ shrink: true }}
-                                                onChange={(value) => setCols(value.target.value)}
-                                                value={cols}
-                                            >
-                                                <MenuItem value={"12"}>1</MenuItem>
-                                                <MenuItem value={"6"}>2</MenuItem>
-                                                <MenuItem value={"4"}>3</MenuItem>
-                                                <MenuItem value={"3"}>4</MenuItem>
-                                                <MenuItem value={"custom-5"}>5</MenuItem>
-                                                <MenuItem value={"2"}>6</MenuItem>
-                                            </Select>
-                                        </FormControl>
                                         <FormControl sx={{ minWidth: '150px', height: '100%', mx: 2 }}>
-                                            <InputLabel shrink>Estado</InputLabel>
+                                            <InputLabel shrink>Tipo</InputLabel>
                                             <Select
                                                 label="Estado"
                                                 name="estado"

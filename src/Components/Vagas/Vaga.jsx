@@ -242,19 +242,18 @@ export default function Vagas() {
             formData.append('curriculo', curriculo)
         }
 
-
         handleServices.createCandidatura(formData)
             .then(res => {
                 enqueueSnackbar("Candidatura criada com sucesso", { variant: 'success' });
-                carregarCandidaturas(id);
+                carregarCandidaturaUser(id_user);
                 handleCloseCandidatar();
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar("Erro acriar a candidatura: " + err, { variant: 'error' });
             });
     }
 
-    function handleComentar(comentario, type) {
+    function handleComentar(comentario) {
         let candidatura;
 
         const datapost = {
@@ -274,18 +273,12 @@ export default function Vagas() {
         handleServices.createComentario(datapost)
             .then(res => {
                 enqueueSnackbar("Comentário criado com sucesso", { variant: 'success' });
-                sessionStorage.setItem(
-                    'shouldOpenDetalhesCandidaturaUser',
-                    JSON.stringify(candidatura)
-                );
-                sessionStorage.setItem(
-                    'type',
-                    type
-                );
+                sessionStorage.setItem('shouldOpenDetalhesCandidaturaUser', JSON.stringify(candidatura));
+                sessionStorage.setItem('type', 'admin')
                 navigate(0)
             })
             .catch(err => {
-                console.log(err);
+                enqueueSnackbar("Erro a criar o comentário: " + err, { variant: 'error' });
             });
     }
 
@@ -299,8 +292,8 @@ export default function Vagas() {
         handleServices.aceitarCandidatura(datapost)
             .then(res => {
                 enqueueSnackbar("Candidatura aceite com sucesso", { variant: 'success' });
-                sessionStorage.setItem('shouldOpenModal', 'true');
-                sessionStorage.setItem('checkState', 'true')
+                //sessionStorage.setItem('shouldOpenModal', 'true');
+                //sessionStorage.setItem('checkState', 'true')
                 navigate(0)
             })
             .catch(err => {
@@ -344,7 +337,6 @@ export default function Vagas() {
             .then(res => {
                 enqueueSnackbar(res, { variant: 'success' });
                 carregarCandidaturaUser(id_user);
-                setSelectedCandidaturaUser(null);
             })
             .catch(err => {
                 enqueueSnackbar(err, { variant: 'error' });
@@ -1267,7 +1259,7 @@ export default function Vagas() {
                         <Button
                             variant="contained"
                             color="error"
-                            onClick={() => { handleApagarCandidatura(selectedCandidaturaUser.id_candidatura); setIsApagarCandidaturaModalOpen(false) }}
+                            onClick={() => { handleApagarCandidatura(selectedCandidaturaUser.id_candidatura); setIsApagarCandidaturaModalOpen(false); handleCloseSelectedCandidaturaUser() }}
                             sx={{ width: '50%' }}
                         >
                             Eliminar
@@ -1327,7 +1319,7 @@ export default function Vagas() {
                     <Typography variant="h5" gutterBottom>
                         <div className='d-flex justify-content-between align-items-center'>
                             Detalhes da Candidatura
-                            <IconButton onClick={handleCloseVerCandidaturas} color="error">
+                            <IconButton onClick={() => setSelectedCandidaturaUser(null)} color="error">
                                 <Close />
                             </IconButton>
                         </div>

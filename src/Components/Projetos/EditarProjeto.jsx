@@ -122,8 +122,6 @@ export default function EditarProjeto() {
             data_final_prevista: data_final_prevista
         }
 
-        console.log(datapost)
-
         handleServices.updateProjeto(datapost)
             .then(res => {
                 handleServices.atualizarPerfisProjeto(perfisSelecionadosInicial, perfisSelecionados, projeto.id_projeto)

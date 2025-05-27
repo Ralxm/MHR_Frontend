@@ -23,6 +23,7 @@ export default function Utilizadores() {
     const [candidaturas, setCandidaturas] = useState([])
     const [perfis, setPerfis] = useState([])
     const [departamentos, setDepartamentos] = useState([])
+    const [tipos_utilizadores, setTipos_Utilizadores] = useState([])
 
     const [filtro, setFiltro] = useState('todos');
 
@@ -60,6 +61,7 @@ export default function Utilizadores() {
         carregarCandidaturas();
         carregarPerfis();
         carregarDepartamentos();
+        carregarTiposUtilizadores();
     }, [])
 
     useEffect(() => {
@@ -106,8 +108,8 @@ export default function Utilizadores() {
         const types = {
             1: 'Admin',
             2: 'Manager',
-            3: 'Utilizador Interno',
-            4: 'Utilizador Externo',
+            3: 'Colaborador Interno',
+            4: 'Colaborador Externo',
             5: 'Visitante'
         };
         return types[idTipo] || 'Desconhecido';
@@ -149,7 +151,17 @@ export default function Utilizadores() {
                 setDepartamentos(res);
             })
             .catch(err => {
-                console.log("Não foi possivel encontrar o perfil do utilizador: " + err)
+                console.log("Não foi possivel carregar os departamentos: " + err)
+            })
+    }
+
+    function carregarTiposUtilizadores() {
+        handleServices.carregarTiposUtilizadores()
+            .then(res => {
+                setTipos_Utilizadores(res);
+            })
+            .catch(err => {
+                console.log("Não foi possivel carregar os tipos de utilizadores: " + err)
             })
     }
 
@@ -180,7 +192,6 @@ export default function Utilizadores() {
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
                         <div className='d-flex justify-content-between'>
                             <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Utilizadores</h2>
-
                             <FormControl sx={{ minWidth: 200 }} size="small">
                                 <InputLabel id="user-type-filter-label">Filtrar por tipo</InputLabel>
                                 <Select
@@ -190,10 +201,10 @@ export default function Utilizadores() {
                                     onChange={(e) => setFiltro(e.target.value)}
                                 >
                                     <MenuItem value="todos">Todos</MenuItem>
-                                    <MenuItem value="1">Administradores</MenuItem>
+                                    <MenuItem value="1">Admin</MenuItem>
                                     <MenuItem value="2">Manager</MenuItem>
-                                    <MenuItem value="3">Utilizador Interno</MenuItem>
-                                    <MenuItem value="4">Utilizador Externo</MenuItem>
+                                    <MenuItem value="3">Colaborador Interno</MenuItem>
+                                    <MenuItem value="4">Colaborador Externo</MenuItem>
                                     <MenuItem value="5">Visitante</MenuItem>
                                 </Select>
                             </FormControl>
@@ -383,7 +394,7 @@ export default function Utilizadores() {
                 >
                     <div className='d-flex justify-content-between align-items-center mb-3'>
                         <Typography variant="h6" component="h2">
-                            Editar perfil de para {selectedUserEditar?.nome_utilizador}
+                            Editar perfil de {selectedUserEditar?.nome_utilizador || ''}
                         </Typography>
                         <IconButton onClick={() => setSelectedUserEditar(null)}>
                             <Close />
@@ -450,18 +461,17 @@ export default function Utilizadores() {
                             <Table size="small">
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>ID</TableCell>
-                                        <TableCell>Status</TableCell>
-                                        <TableCell>Data Submissão</TableCell>
+                                        <TableCell align='left'>ID</TableCell>
+                                        <TableCell align='left'>Status</TableCell>
+                                        <TableCell align='left'>Data Submissão</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
 
                                     {userCandidaturas.map((candidatura) => (
-                                        <a href={`http://localhost:3000/vagas/${candidatura.id_vaga}`} target="_blank">
-                                            <TableRow key={candidatura.id_candidatura}>
-                                                <TableCell>{candidatura.id_candidatura}</TableCell>
-                                                <TableCell>
+                                            <TableRow key={candidatura.id_candidatura} sx={{cursor: 'pointer'}} onClick={() => {window.open(`/vagas/${candidatura.id_vaga}`, '_blank')}}>
+                                                <TableCell align='left'>{candidatura.id_candidatura}</TableCell>
+                                                <TableCell align='left'>
                                                     <Chip
                                                         label={candidatura.status}
                                                         color={
@@ -476,7 +486,6 @@ export default function Utilizadores() {
                                                 </TableCell>
 
                                             </TableRow>
-                                        </a>
                                     ))}
                                 </TableBody>
                             </Table>
@@ -549,6 +558,8 @@ export default function Utilizadores() {
                     setIsCreatePerfilModalOpen(false);
                     carregarPerfis();
                     carregarUtilizadores();
+                    carregarCandidaturas();
+                    carregarTiposUtilizadores();
                     setPerfilForm({
                         nome: '',
                         email: '',
@@ -720,7 +731,8 @@ export default function Utilizadores() {
                         data_nascimento: userPerfil.data_nascimento || '',
                         distrito: userPerfil.distrito || '',
                         id_departamento: userPerfil.id_departamento || '',
-                        estado: selectedUtilizador.estado || ''
+                        estado: selectedUtilizador.estado || '',
+                        id_tipo: selectedUtilizador.id_tipo || ''
                     });
                 }
             }
@@ -741,6 +753,8 @@ export default function Utilizadores() {
                 .then(res => {
                     enqueueSnackbar(res, { variant: 'success' });
                     setSelectedUserEditar(null)
+                    carregarPerfis();
+                    carregarUtilizadores();
                 })
                 .catch(err => {
                     enqueueSnackbar(err, { variant: 'error' });
@@ -821,12 +835,25 @@ export default function Utilizadores() {
                         onChange={handleChange}
                     >
                         {departamentos.map((departamento) => {
-                            if (departamento.id_departamento != 1) {
-                                return (
-                                    <MenuItem value={departamento.id_departamento}>{departamento.nome_departamento}</MenuItem>
-                                )
-                            }
+                            return (
+                                <MenuItem value={departamento.id_departamento}>{departamento.nome_departamento}</MenuItem>
+                            )
+                        })}
+                    </Select>
+                </FormControl>
 
+                <FormControl fullWidth>
+                    <InputLabel>Tipo de utilizador</InputLabel>
+                    <Select
+                        name="id_tipo"
+                        value={perfilData.id_tipo || ''}
+                        label="Tipo de utilizador"
+                        onChange={handleChange}
+                    >
+                        {tipos_utilizadores.map((tipo) => {
+                            return (
+                                <MenuItem value={tipo.id_tipo}>{tipo.nome}</MenuItem>
+                            )
                         })}
                     </Select>
                 </FormControl>

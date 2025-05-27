@@ -33,6 +33,8 @@ export default function BlogPotUtilizador() {
     const [perfis, setPerfis] = useState([]);
     const [selectedPerfil, setSelectedPerfil] = useState();
 
+    const [filtroTipo, setFiltroTipo] = useState('Todos')
+
     useEffect(() => {
         document.title = "Blog"
 
@@ -67,6 +69,18 @@ export default function BlogPotUtilizador() {
                 })
         }
     }, [id_user])
+
+    useEffect(() => {
+        if (id_perfil) {
+            if (perfis && perfis.length > 0) {
+                perfis.map((perfil) => {
+                    if (perfil.id_perfil == id_perfil) {
+                        setSelectedPerfil(perfil)
+                    }
+                })
+            }
+        }
+    }, [id_perfil])
 
 
     function carregarPerfis() {
@@ -145,38 +159,56 @@ export default function BlogPotUtilizador() {
                 <div style={{ display: 'flex', height: 'calc(100vh - [navbar-height])' }}>
                     {(tipo_user == 1 || tipo_user == 2) &&
                         <div className="sidebar col-md-2" style={{ backgroundColor: '#f8f9fa', padding: '20px', minHeight: '90vh', overflowY: 'auto', position: 'sticky', top: 0 }}>
-                            <SidebarItems tipo_user={tipo_user} onCriar={setIsCreatePostModalOpen}></SidebarItems>
+                            <SidebarItems tipo_user={tipo_user} onCriar={setIsCreatePostModalOpen} tipo={"por_user"}></SidebarItems>
                         </div>
                     }
                     <div className='m-4 p-4 rounded' style={{ flex: 1, minHeight: '85svh', background: "white" }}>
                         <div className='d-flex justify-content-between align-items-center mb-3'>
                             <h2 className='mb-4' style={{ color: '#333', fontWeight: '600' }}>Filtrar publicações por utilizador</h2>
-                            <FormControl sx={{ width: '200px' }}>
-                                <Autocomplete
-                                    options={perfis.filter(perfil => perfil.nome)}
-                                    getOptionLabel={(option) => option.nome}
-                                    renderOption={(props, option) => (
-                                        <MenuItem {...props} key={option.id_perfil}>
-                                            <div>
-                                                <div style={{ fontWeight: 500 }}>{option.nome}</div>
-                                                <div style={{ fontSize: '0.8rem', color: '#666' }}>{option.email}</div>
-                                            </div>
-                                        </MenuItem>
-                                    )}
-                                    onChange={(event, newValue) => {
-                                        setSelectedPerfil(newValue);
-                                    }}
-                                    value={selectedPerfil}
-                                    renderInput={(params) => (
-                                        <TextField
-                                            {...params}
-                                            label="Utilizador"
-                                            variant="outlined"
-                                        />
-                                    )}
-                                    fullWidth
-                                />
-                            </FormControl>
+                            <div>
+                                <FormControl sx={{ minWidth: '150px', height: '100%', mx: 2 }}>
+                                    <InputLabel shrink>Tipo</InputLabel>
+                                    <Select
+                                        label="Estado"
+                                        name="estado"
+                                        InputLabelProps={{ shrink: true }}
+                                        onChange={(value) => setFiltroTipo(value.target.value)}
+                                        value={filtroTipo}
+                                    >
+                                        <MenuItem value={"Todos"} selected>Todos</MenuItem>
+                                        <MenuItem value={"Notícia"}>Notícia</MenuItem>
+                                        <MenuItem value={"Visita"}>Visita</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <FormControl sx={{ width: '200px' }}>
+                                    <Autocomplete
+                                        options={perfis.filter(perfil => perfil.nome)}
+                                        getOptionLabel={(option) => option.nome}
+                                        renderOption={(props, option) => (
+                                            <MenuItem {...props} key={option.id_perfil}>
+                                                <div>
+                                                    <div style={{ fontWeight: 500 }}>{option.nome}</div>
+                                                    <div style={{ fontSize: '0.8rem', color: '#666' }}>{option.email}</div>
+                                                </div>
+                                            </MenuItem>
+                                        )}
+                                        onChange={(event, newValue) => {
+                                            setSelectedPerfil(newValue);
+                                        }}
+                                        value={selectedPerfil || ''}
+                                        renderInput={(params) => (
+                                            <TextField
+                                                {...params}
+                                                label="Utilizador"
+                                                variant="outlined"
+                                            />
+                                        )}
+                                        fullWidth
+                                    />
+                                </FormControl>
+                            </div>
+
+
                         </div>
 
                         <div className='row d-flex'>
@@ -190,6 +222,7 @@ export default function BlogPotUtilizador() {
                                 user={selectedPerfil}
                                 loggedid={id_perfil}
                                 cols={3}
+                                filtroTipo={filtroTipo}
                                 onApagar={setSelectedPostApagar}
                                 to={"Admin"}
                             />

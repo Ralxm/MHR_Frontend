@@ -11,6 +11,7 @@ export default function CandidaturaCard({ candidatura, handleVerCandidaturas, se
 
         return formattedDate
     }
+    console.log(candidatura)
 
     return (
         <Card
@@ -28,7 +29,7 @@ export default function CandidaturaCard({ candidatura, handleVerCandidaturas, se
                     <Typography component="div">
                         <div className='d-flex justify-content-between align-items-center'>
                             <div>
-                                <strong>Data:</strong> {convertDate(candidatura.data_submissao)}
+                                <strong>Data:</strong> {candidatura.data_submissao.includes("Z") ? convertDate(candidatura.data_submissao) : candidatura.data_submissao}
                             </div>
                             <Chip
                                 label={candidatura.status || "Status não disponível"}

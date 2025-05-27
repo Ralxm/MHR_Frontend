@@ -18,9 +18,11 @@ export default function Perfil() {
     const [id_user, setUtilizador] = useState();
     const [tipo_user, setTipoUser] = useState();
     const [perfil, setPerfil] = useState();
+    const [user, setUser] = useState();
 
     const [action, setAction] = useState('ver'); //ver, editar
 
+    const [nome_utilizador, setNomeUtilizador] = useState();
     const [nome, setNome] = useState();
     const [email, setEmail] = useState();
     const [numero_mecanografico, setNumeroMecanografico] = useState();
@@ -40,18 +42,31 @@ export default function Perfil() {
             setTipoUser(localStorage.getItem("tipo"))
         }
 
-        document.title = "Editar Publicação";
+        document.title = "Editar Perfil";
+
+        carregarInfo();
     }, []);
+
+    function carregarInfo() {
+        handleServices.find_perfil(id_user)
+            .then(res => {
+                setPerfil(res)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+        handleServices.find_user(id_user)
+            .then(res => {
+                setUser(res)
+            })
+            .catch(err => {
+                console.log(err)
+            })
+    }
 
     useEffect(() => {
         if (id_user) {
-            handleServices.find_perfil(id_user)
-                .then(res => {
-                    setPerfil(res)
-                })
-                .catch(err => {
-                    console.log(err)
-                })
+            carregarInfo();
         }
     }, [id_user])
 
@@ -66,6 +81,12 @@ export default function Perfil() {
             setDistrito(perfil.distrito);
         }
     }, [perfil])
+
+    useEffect(() => {
+        if (user) {
+            setNomeUtilizador(user.nome_utilizador)
+        }
+    }, [user])
 
     function convertDateToInputFormat(dateString) {
         if (!dateString) return '';
@@ -82,6 +103,8 @@ export default function Perfil() {
         const datapost = {
             id_perfil: perfil.id_perfil,
             id_departamento: perfil.id_departamento,
+            id_utilizador: id_user,
+            nome_utilizador: nome_utilizador,
             nome: nome,
             email: email,
             morada: morada,
@@ -91,13 +114,14 @@ export default function Perfil() {
         };
 
         handleServices.atualizarPerfil(datapost)
-        .then(res => {
-            enqueueSnackbar(res, { variant: 'success' });
-            navigate(0)
-        })
-        .catch(err => {
-            enqueueSnackbar(err, { variant: 'error' });
-        })
+            .then(res => {
+                enqueueSnackbar(res, { variant: 'success' });
+                carregarInfo();
+                setAction('ver')
+            })
+            .catch(err => {
+                enqueueSnackbar(err, { variant: 'error' });
+            })
     }
 
     return (
@@ -150,6 +174,24 @@ export default function Perfil() {
                                                         {action === 'ver' ? 'Editar Perfil' : 'Cancelar Edição'}
                                                     </button>
                                                 </div>
+                                            </div>
+
+                                            {/* Nome de utilizador */}
+                                            <div className='row p-3'>
+                                                {action === 'ver' ? (
+                                                    <Typography variant="body1">
+                                                        <strong>Nickname:</strong> {nome_utilizador || 'Não disponível'}
+                                                    </Typography>
+                                                ) : (
+                                                    <TextField
+                                                        label="Nickname"
+                                                        type="text"
+                                                        InputLabelProps={{ shrink: true }}
+                                                        fullWidth
+                                                        value={nome_utilizador || ''}
+                                                        onChange={(e) => setNomeUtilizador(e.target.value)}
+                                                    />
+                                                )}
                                             </div>
 
                                             {/* Nome */}

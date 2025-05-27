@@ -55,11 +55,10 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
             }
         }
 
-        if (to == "User") {
-            if (filtroTipo != "Todos" && post.tipo != filtroTipo) {
-                return false
-            }
+        if (filtroTipo != "Todos" && post.tipo != filtroTipo) {
+            return false
         }
+
 
         return true
     });
@@ -227,6 +226,30 @@ export default function TabelaPosts({ posts, tipo_user, id_perfil, tipo, onAceit
                                 >
                                     Editar
                                 </Button>
+                                <Button
+                                    size="small"
+                                    color="error"
+                                    variant="outlined"
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        onApagar(post)
+                                    }}
+                                >
+                                    Apagar
+                                </Button>
+                            </div>
+                        }
+
+                        {id_perfil != post.id_perfil && to == "Admin" &&
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'flex-end',
+                                    gap: 1,
+                                    cursor: 'default'
+                                }}
+                                onClick={(e) => e.stopPropagation()}
+                            >
                                 <Button
                                     size="small"
                                     color="error"

@@ -161,7 +161,7 @@ class HandleServices {
                 if (res.data.success) {
                     return res.data.message;
                 }
-            }, reason => { throw new Error('Erro a criar o comentario: ' + reason); });
+            }, reason => { throw new Error('Erro a criar o pedido de férias: ' + reason); });
     }
 
     apagarFeria(id_solicitacao){
@@ -172,7 +172,18 @@ class HandleServices {
                 if (res.data.success) {
                     return res.data.message;
                 }
-            }, reason => { throw new Error('Erro a criar o comentario: ' + reason); });
+            }, reason => { throw new Error('Erro a apagar o pedido de férias ' + reason); });
+    }
+
+    apagarFalta(id_falta){
+        let url = process.env.REACT_APP_BACKEND_LINK;
+
+        return axios.put(url + "faltas/delete/" + id_falta, null, authHeader())
+            .then(res => {
+                if (res.data.success) {
+                    return res.data.message;
+                }
+            }, reason => { throw new Error('Erro a apagar a falta: ' + reason); });
     }
 
     find_perfil(id_utilizador) {
@@ -182,7 +193,7 @@ class HandleServices {
                 if (res.data.success) {
                     return res.data.data[0];
                 }
-            }, reason => { throw new Error('Utilizador Inválido'); });
+            }, reason => { throw new Error('Erro a encontrar o perfil'); });
     }
 
     apagarTipoFalta(id){
@@ -192,7 +203,7 @@ class HandleServices {
                 if (res.data.success) {
                     return res.data.message;
                 }
-            }, reason => { throw new Error('Utilizador Inválido'); });
+            }, reason => { throw new Error('Erro a apagar o tipo de falta'); });
     }
 
     criarTipoFalta(datapost){
@@ -202,7 +213,7 @@ class HandleServices {
                 if (res.data.success) {
                     return res.data.message;
                 }
-            }, reason => { throw new Error('Utilizador Inválido'); });
+            }, reason => { throw new Error('Erro a criar o tipo de falta'); });
     }
 
     atualizarTipoFalta(id, datapost){
@@ -212,7 +223,7 @@ class HandleServices {
                 if (res.data.success) {
                     return res.data.message;
                 }
-            }, reason => { throw new Error('Utilizador Inválido'); });
+            }, reason => { throw new Error('Erro a atualizar o tipo de falta'); });
     }
 
     CriarManyFaltas(faltas){
@@ -222,7 +233,7 @@ class HandleServices {
                 if (res.data.success) {
                     return res.data;
                 }
-            }, reason => { throw new Error('Utilizador Inválido'); });
+            }, reason => { throw new Error('Erro a criar varias faltas'); });
     }
 
     carregarFeriados(){
@@ -232,7 +243,7 @@ class HandleServices {
                 if (res.data.success) {
                     return res.data.data;
                 }
-            }, reason => { throw new Error('Erro a listar todas as faltas'); });
+            }, reason => { throw new Error('Erro a listar todas os feriados'); });
     }
 
     apagarFeriado(id){
@@ -272,7 +283,7 @@ class HandleServices {
                 if (res.data.success) {
                     return res.data.message;
                 }
-            }, reason => { throw new Error('Erro a criar o feriado: ' + reason); });
+            }, reason => { throw new Error('Erro a atualizar o feriado: ' + reason); });
     }
 }
 

@@ -83,12 +83,8 @@ export default function Publicacao() {
         setIsPostLoading(true);
         try {
             const res = await handleServices.getPublicacao(id);
-            console.log(res)
             const processedPost = {
                 ...res[0],
-                data_noticia: convertDate(res[0].data_noticia),
-                data_visita: convertDate(res[0].data_visita),
-                created_at: convertDate(res[0].created_at)
             };
             setPost(processedPost);
         } catch (err) {
@@ -96,6 +92,10 @@ export default function Publicacao() {
         } finally {
             setIsPostLoading(false);
         }
+    }
+
+    function formatDateTime(isoString) {
+        return isoString.replace('T', ' ').split('.')[0];
     }
 
     function convertDate(d) {
@@ -106,19 +106,6 @@ export default function Publicacao() {
         const formattedDate = `${day}-${month}-${year}`;
 
         return formattedDate
-    }
-
-    function stringToColor(string) {
-        let hash = 0;
-        for (let i = 0; i < string.length; i++) {
-            hash = string.charCodeAt(i) + ((hash << 5) - hash);
-        }
-        let color = '#';
-        for (let i = 0; i < 3; i++) {
-            const value = (hash >> (i * 8)) & 0xFF;
-            color += `00${value.toString(16)}`.slice(-2);
-        }
-        return color;
     }
 
 
@@ -177,21 +164,6 @@ export default function Publicacao() {
                                                     <h2 className='mb-0' style={{ color: '#2c3e50', fontWeight: '600' }}>
                                                         {post && post.titulo}
                                                     </h2>
-                                                    <Chip
-                                                        label={post?.estado || ''}
-                                                        sx={{
-                                                            borderRadius: '20px',
-                                                            fontSize: '1rem',
-                                                            fontWeight: 500,
-                                                            height: '36px',
-                                                            padding: '0 12px'
-                                                        }}
-                                                        color={
-                                                            post?.estado === 'Aprovada' ? 'success' :
-                                                                post?.estado === 'Rejeitada' ? 'error' :
-                                                                    'warning'
-                                                        }
-                                                    />
                                                 </div>
                                                 <h7 className="mt-1">
                                                     Visualizações: {post && post.views + 1}
@@ -203,7 +175,7 @@ export default function Publicacao() {
                                                     <div className='dates-container p-3 d-flex align-items-center' style={{ backgroundColor: '#e9f7fe', borderRadius: '8px', flex: 1, marginRight: '15px' }}>
                                                         <div>
                                                             <div style={{ color: '#3498db' }}>
-                                                                Data de publicacao: {post && post.created_at}
+                                                                Data de publicacao: {post && formatDateTime(post.created_at)}
                                                                 {post.tipo == "Notícia" ?
                                                                     <div>
                                                                         Data da notícia: {post && post.data_noticia}

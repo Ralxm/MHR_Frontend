@@ -6,7 +6,7 @@ import '../../index.css'
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 import authService from '../Login/auth-service';
 import handleServices from './handle-services';
-import { Box, Modal, Paper, Typography, Button, TextField, Tab, Stack, FormControl, InputLabel, Select, MenuItem, List, ListItem, IconButton, ListItemText, Autocomplete } from '@mui/material';
+import { Box, Modal, Paper, Typography, Button, TextField, Tab, Stack, FormControl, InputLabel, Select, MenuItem, List, ListItem, IconButton, ListItemText, Autocomplete, Chip } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
 import { Delete, Close } from '@mui/icons-material'
 import FileDropZone from '../../Universal/FileDropZoneSingle';
@@ -38,6 +38,7 @@ export default function Projetos() {
     const [selectedProjetoApagar, setSelectedProjetoApagar] = useState();
 
     const [filtroEstado, setFiltroEstado] = useState("Todos")
+    const [filtroEstadoIdeias, setFiltroEstadoIdeias] = useState("Todos")
 
     {/* Variáveis para a criação de um projeto */ }
     const [perfis, setPerfis] = useState([]);
@@ -209,7 +210,32 @@ export default function Projetos() {
                                                         <Tab label="Ideias" value="2" sx={{ textTransform: 'none' }} />
                                                     </TabList>
 
+                                                    {tab == 1 &&
+                                                        <FormControl sx={{ minWidth: '210px', mx: 2, marginBottom: '10px' }}>
+                                                            <InputLabel shrink>Estado</InputLabel>
+                                                            <Select
+                                                                label="Estado"
+                                                                name="estado"
+                                                                InputLabelProps={{ shrink: true }}
+                                                                onChange={(value) => setFiltroEstado(value.target.value)}
+                                                                value={filtroEstado}
+                                                            >
+                                                                <MenuItem value={"Todos"} selected>Todos</MenuItem>
+                                                                <MenuItem value={"Em desenvolvimento"}>Em desenvolvimento</MenuItem>
+                                                                <MenuItem value={"Concluído"}>Concluído</MenuItem>
+                                                                <MenuItem value={"Parado"}>Parado</MenuItem>
+                                                            </Select>
+                                                        </FormControl>
+                                                    }
                                                     {tab == 1 && (tipo_user == 1 || tipo_user == 2) &&
+                                                        <>
+
+                                                            <button className='btn btn-outline-primary mb-2' onClick={() => setIsCreateProjetoModalOpen(true)}>
+                                                                Criar projeto
+                                                            </button>
+                                                        </>
+                                                    }
+                                                    {tab == 2 &&
                                                         <>
                                                             <FormControl sx={{ minWidth: '210px', mx: 2, marginBottom: '10px' }}>
                                                                 <InputLabel shrink>Estado</InputLabel>
@@ -217,24 +243,19 @@ export default function Projetos() {
                                                                     label="Estado"
                                                                     name="estado"
                                                                     InputLabelProps={{ shrink: true }}
-                                                                    onChange={(value) => setFiltroEstado(value.target.value)}
-                                                                    value={filtroEstado}
+                                                                    onChange={(value) => setFiltroEstadoIdeias(value.target.value)}
+                                                                    value={filtroEstadoIdeias}
                                                                 >
                                                                     <MenuItem value={"Todos"} selected>Todos</MenuItem>
-                                                                    <MenuItem value={"Em desenvolvimento"}>Em desenvolvimento</MenuItem>
-                                                                    <MenuItem value={"Concluído"}>Concluído</MenuItem>
-                                                                    <MenuItem value={"Parado"}>Parado</MenuItem>
+                                                                    <MenuItem value={"Em análise"}>Em análise</MenuItem>
+                                                                    <MenuItem value={"Aceite"}>Aceite</MenuItem>
+                                                                    <MenuItem value={"Rejeitada"}>Rejeitada</MenuItem>
                                                                 </Select>
                                                             </FormControl>
-                                                            <button className='btn btn-outline-primary mb-2' onClick={() => setIsCreateProjetoModalOpen(true)}>
-                                                                Criar projeto
+                                                            <button className='btn btn-outline-secondary mb-2' onClick={() => setIsCreateIdeiaModalOpen(true)}>
+                                                                Sugerir ideia
                                                             </button>
                                                         </>
-                                                    }
-                                                    {tab == 2 &&
-                                                        <button className='btn btn-outline-secondary mb-2' onClick={() => setIsCreateIdeiaModalOpen(true)}>
-                                                            Sugerir ideia
-                                                        </button>
                                                     }
                                                 </div>
                                             </Box>
@@ -249,7 +270,7 @@ export default function Projetos() {
                                             <TabPanel value="2">
                                                 <div className='container-fluid'>
                                                     <div className='row g-3'>
-                                                        <TabelaIdeias ideias={ideias} onVerDetalhes={setSelectedIdeia} onAceitar={setSelectedIdeiaTransformar} onApagar={setSelectedIdeiaApagar}></TabelaIdeias>
+                                                        <TabelaIdeias ideias={ideias} onVerDetalhes={setSelectedIdeia} onAceitar={setSelectedIdeiaTransformar} onApagar={setSelectedIdeiaApagar} filtro={filtroEstadoIdeias}></TabelaIdeias>
                                                     </div>
                                                 </div>
                                             </TabPanel>
@@ -488,12 +509,12 @@ export default function Projetos() {
     );
 
     function ModalCriarProjeto({ titulo_projeto, data_inicio, data_final_prevista, descricao, objetivos, perfis }) {
-        const [_titulo, set_Titulo] = useState(titulo_projeto || "");
-        const [_descricao, set_Descricao] = useState(descricao || "");
-        const [_requisitos, set_Objetivos] = useState(objetivos || "");
+        const [_titulo, set_Titulo] = useState("");
+        const [_descricao, set_Descricao] = useState("");
+        const [_requisitos, set_Objetivos] = useState("");
         const [_futuras_melhorias, set_Futuras_Melhorias] = useState();
-        const [_data_inicio, setData_Inicio] = useState(data_inicio || "");
-        const [_data_final_prevista, setData_Final_Prevista] = useState(data_final_prevista || "");
+        const [_data_inicio, setData_Inicio] = useState("");
+        const [_data_final_prevista, setData_Final_Prevista] = useState("");
 
 
         const [perfisSelecionados, setPerfisSelecionados] = useState([])
@@ -519,8 +540,8 @@ export default function Projetos() {
                 descricao: _descricao,
                 requisitos: _requisitos,
                 futuras_melhorias: _futuras_melhorias,
-                data_inicio: data_inicio,
-                data_final_prevista: data_final_prevista,
+                data_inicio: _data_inicio,
+                data_final_prevista: _data_final_prevista,
             }
 
             handleServices.criarProjeto(datapost)
@@ -770,8 +791,6 @@ export default function Projetos() {
         function handleSubmit(event) {
             event.preventDefault();
 
-            console.log(formData)
-
             handleServices.atualizarIdeia(formData)
                 .then(res => {
                     enqueueSnackbar(res, { variant: 'success' });
@@ -786,16 +805,20 @@ export default function Projetos() {
         return (
             <form onSubmit={{}}>
                 <div className='mb-3'>
-                    <label><strong>Nome do sugestor:</strong>&nbsp;<span>{ideia && ideia.perfil.nome}</span></label>
+                    <Typography>
+                        <strong>Nome do utilizador que sugeriu a ideia: </strong>{ideia && ideia.perfil.nome}
+                    </Typography>
                 </div>
 
                 <div className="mb-3">
-                    <div className='d-flex justify-content-between align-items-center my-2'>
+                    <div className={(tipo_user == 1 || tipo_user == 2) ? 'd-flex justify-content-between align-items-center my-2' : 'd-flex align-items-center my-2'}>
                         <label className="form-label"><strong>Anexo:</strong></label>
                         {ideia.ficheiro_complementar && (
-                            <a href={ideia.ficheiro_complementar} target="_blank" rel="noopener noreferrer">
-                                <button type="button" className='btn btn-outline-info btn-sm'>Abrir</button>
-                            </a>
+                            <>
+                                <a href={ideia.ficheiro_complementar} target="_blank" rel="noopener noreferrer" className={(tipo_user == 1 || tipo_user == 2) ? '' : 'mx-2'}>
+                                    <button type="button" className='btn btn-outline-info btn-sm'>Abrir</button>
+                                </a>
+                            </>
                         )}
                     </div>
                     <FileDropZone
@@ -813,66 +836,101 @@ export default function Projetos() {
                     ></FileDropZone>
                 </div>
 
-                <div className="mb-3">
-                    <TextField
-                        label="Título"
-                        type="text"
-                        name="titulo_ideia"
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={titulo_ideia}
-                        onChange={(value) => setTitulo_Ideia(value.target.value)}
-                        disabled={ideia.estado != "Em análise" || id_perfil != ideia.id_perfil}
-                    />
-                </div>
-                <div className="mb-3">
-                    <TextField
-                        label="Descrição"
-                        type="text"
-                        name="descricao"
-                        multiline
-                        rows={6}
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={descricao}
-                        onChange={(value) => setDescricao(value.target.value)}
-                        disabled={ideia.estado != "Em análise" || id_perfil != ideia.id_perfil}
-                    />
-                </div>
-                <div className="mb-3">
-                    <TextField
-                        label="Validador"
-                        type="text"
-                        name="validador"
-                        InputLabelProps={{ shrink: true }}
-                        fullWidth
-                        value={ideia.validador ? ideia.validadorPerfil.nome : "Sem validador"}
-                        onChange={{}}
-                        disabled
-                    />
-                </div>
-                <div className="mb-3">
-                    <FormControl fullWidth disabled={(ideia.estado != "Em análise" || id_perfil != ideia.id_perfil) || (tipo_user != 1 && tipo_user != 2)}>
-                        <InputLabel shrink>Estado</InputLabel>
-                        <Select
-                            label="Estado"
-                            name="estado"
-                            value={ideia.estado || ''}
-                            onChange={{}}
-                            InputLabelProps={{ shrink: true }}
-                        >
-                            <MenuItem value={"Rejeitada"}>Rejeitada</MenuItem>
-                            <MenuItem value={"Aceite"}>Aceite</MenuItem>
-                            <MenuItem value={"Em análise"}>Em análise</MenuItem>
-                        </Select>
-                    </FormControl>
+                {(tipo_user == 1 || tipo_user == 2) || (id_perfil == ideia.id_perfil && ideia.estado == "Em análise") ?
+                    <>
+                        <div className="mb-3">
+                            <TextField
+                                label="Título"
+                                type="text"
+                                name="titulo_ideia"
+                                InputLabelProps={{ shrink: true }}
+                                fullWidth
+                                value={titulo_ideia}
+                                onChange={(value) => setTitulo_Ideia(value.target.value)}
+                                disabled={ideia.estado != "Em análise" || id_perfil != ideia.id_perfil}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <TextField
+                                label="Descrição"
+                                type="text"
+                                name="descricao"
+                                multiline
+                                rows={6}
+                                InputLabelProps={{ shrink: true }}
+                                fullWidth
+                                value={descricao}
+                                onChange={(value) => setDescricao(value.target.value)}
+                                disabled={ideia.estado != "Em análise" || id_perfil != ideia.id_perfil}
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <TextField
+                                label="Validador"
+                                type="text"
+                                name="validador"
+                                InputLabelProps={{ shrink: true }}
+                                fullWidth
+                                value={ideia.validador ? ideia.validadorPerfil.nome : "Sem validador"}
+                                onChange={{}}
+                                disabled
+                            />
+                        </div>
+                        <div className="mb-3">
+                            <FormControl fullWidth disabled={(ideia.estado != "Em análise" || id_perfil != ideia.id_perfil) || (tipo_user != 1 && tipo_user != 2)}>
+                                <InputLabel shrink>Estado</InputLabel>
+                                <Select
+                                    label="Estado"
+                                    name="estado"
+                                    value={ideia.estado || ''}
+                                    onChange={{}}
+                                    InputLabelProps={{ shrink: true }}
+                                >
+                                    <MenuItem value={"Rejeitada"}>Rejeitada</MenuItem>
+                                    <MenuItem value={"Aceite"}>Aceite</MenuItem>
+                                    <MenuItem value={"Em análise"}>Em análise</MenuItem>
+                                </Select>
+                            </FormControl>
 
-                </div>
+                        </div>
 
 
-                <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1">
-                    Guardar
-                </button>
+
+                    </>
+                    :
+                    <>
+                        <Typography>
+                            <strong>Título: </strong>{titulo_ideia}
+                        </Typography>
+                        <Typography>
+                            <strong>Descrição: </strong>{descricao}
+                        </Typography>
+                        <Typography>
+                            <strong>Validador: </strong>{ideia.validador ? ideia.validadorPerfil.nome : "Sem validador"}
+                        </Typography>
+                        <Typography>
+                            <strong>Estado: </strong>
+                            <Chip
+                                label={ideia.estado}
+                                size="small"
+                                color={
+                                    ideia.estado === 'Em análise' ? 'warning' :
+                                        ideia.estado === 'Aceite' ? 'success' : 'error'
+                                }
+                                sx={{
+                                    fontWeight: 500,
+                                }}
+                            />
+                        </Typography>
+
+                    </>
+                }
+
+                {id_perfil == ideia.id_perfil && ideia.estado == "Em análise" &&
+                    <button onClick={handleSubmit} className="btn btn-primary col-md-12 mb-1">
+                        Guardar
+                    </button>
+                }
             </form>
         )
     }
@@ -889,7 +947,7 @@ export default function Projetos() {
 
         useEffect(() => {
             handleSelectPerfil({ target: { value: ideia.id_perfil } })
-        }, ideia, perfis)
+        }, [ideia, perfis])
 
         const handleSelectPerfil = (event) => {
             const id = event.target.value;

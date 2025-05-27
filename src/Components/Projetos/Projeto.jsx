@@ -96,6 +96,10 @@ export default function Projeto() {
         setSelectedLinhaTemporal(null)
     }
 
+    function formatDateTime(isoString) {
+        return isoString.replace('T', ' ').split('.')[0];
+    }
+
     async function carregarProjeto(id) {
         setIsProjetoLoading(true);
         try {
@@ -539,7 +543,7 @@ export default function Projeto() {
                                                         }}>
                                                             <CardContent className='p-2 pt-0'>
                                                                 <Stack direction="row" justifyContent="space-between" alignItems="center">
-                                                                    <Typography variant="subtitle2" color={registo.tipo === "Objetivo" ? "primary" : "error"}>
+                                                                    <Typography variant="subtitle2" color={registo.tipo === "Objetivo" ? "green" : registo.tipo == "Bloqueio" ? "red" : registo.tipo == "Melhorias" ? "blue" : registo.tipo == "Alerta" ? "orange" : "gray"}>
                                                                         {registo.tipo}
                                                                     </Typography>
                                                                     <IconButton sx={{ marginRight: '-5px' }} onClick={() => setSelectedLinhaTemporal(registo)}>
@@ -553,6 +557,9 @@ export default function Projeto() {
 
                                                                 <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
                                                                     Criado por: {registo && registo.perfil.nome}
+                                                                </Typography>
+                                                                <Typography variant="caption" color="text.secondary" sx={{ mt: 1, display: 'block' }}>
+                                                                    {registo && formatDateTime(registo.created_at)}
                                                                 </Typography>
                                                             </CardContent>
                                                         </Card>
@@ -699,7 +706,6 @@ export default function Projeto() {
 
         function handleCriarLinhaTemporal() {
             const datapost = {
-                id_ideia: projeto.id_ideia,
                 id_projeto: projeto.id_projeto,
                 autor: id_perfil,
                 tipo: tipo,
@@ -714,7 +720,7 @@ export default function Projeto() {
                     handleCloseLinhaTemporalModal();
                 })
                 .catch(err => {
-                    console.log(err)
+                    enqueueSnackbar("Alerta -> " + err, { variant: 'error' });
                 })
         }
 
