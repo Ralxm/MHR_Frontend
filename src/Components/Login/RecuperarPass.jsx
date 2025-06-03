@@ -36,7 +36,7 @@ export default function Recuperar() {
         authService.recuperar(USERNAME)
         .then(res => {
             if(res.success){
-                enqueueSnackbar("Foi enviado um token para o seu email", { variant: 'error' });
+                enqueueSnackbar("Foi enviado um token para o seu email", { variant: 'success' });
                 setTokenRecuperar(res.token)
                 setRecuperar(false)
                 setTokenP(true)

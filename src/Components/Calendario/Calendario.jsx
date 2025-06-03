@@ -38,6 +38,7 @@ export default function Calendario() {
     const [ferias, setFerias] = useState([])
 
     const [feriados, setFeriados] = useState([]);
+    const [mudarFeriado, setMudarFeriado] = useState(false)
 
     const [calendario, setCalendario] = useState()
     const [dias_restantes_ferias, setDias_Restantes_Ferias] = useState();
@@ -61,6 +62,8 @@ export default function Calendario() {
     const [tipo_falta, setTipo_Falta] = useState()
     const [data_falta, setData_Falta] = useState()
     const [motivo, setMotivo] = useState('')
+
+    const [mes, setMes] = useState();
 
     const handleCloseVerDetalhesFeria = () => {
         setSelectedFeria(null)
@@ -96,6 +99,10 @@ export default function Calendario() {
         if (user) {
             setUtilizador(user)
             setTipoUser(localStorage.getItem("tipo"))
+        }
+
+        if (tipo == 5) {
+            setMes(new Date('12-01-2022').getMonth())
         }
 
         document.title = "Calendário";
@@ -203,7 +210,7 @@ export default function Calendario() {
                     const dayOfWeek = current.getDay();
                     const currentMonthDay = `${current.getMonth()}-${current.getDate()}`;
 
-                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.has(currentMonthDay)){
+                    if (dayOfWeek !== 0 && dayOfWeek !== 6 && !holidays.has(currentMonthDay)) {
                         count++;
                     }
                     current.setDate(current.getDate() + 1);
@@ -234,6 +241,19 @@ export default function Calendario() {
             setIsLoading(false);
         }
     }, [ferias]);
+
+    useEffect(() => {
+        if(feriados){
+            let found = feriados.some((feriado) => feriado.tipo == "Móvel" &&
+                        new Date(feriado.data_feriado).getFullYear() <= new Date().getFullYear() &&
+                        new Date('12-12-2022').getMonth() == 11
+                        )
+            if(found == true){
+                setMudarFeriado(true)
+            }
+            
+        }
+    }, [feriados])
 
     const getShadowClass = (estado) => {
         switch (estado) {
@@ -646,7 +666,7 @@ export default function Calendario() {
 
             <Modal
                 open={selectedFaltaApagar}
-                onClose={() => {setSelectedFaltaApagar(null)}}
+                onClose={() => { setSelectedFaltaApagar(null) }}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
@@ -668,7 +688,7 @@ export default function Calendario() {
                         <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => {setSelectedFaltaApagar(null)}}
+                            onClick={() => { setSelectedFaltaApagar(null) }}
                             sx={{ width: '50%' }}
                         >
                             Fechar
@@ -676,10 +696,51 @@ export default function Calendario() {
                         <Button
                             variant="contained"
                             color="error"
-                            onClick={(event) => { handleApagarFalta(event);  setSelectedFaltaApagar(null) }}
+                            onClick={(event) => { handleApagarFalta(event); setSelectedFaltaApagar(null) }}
                             sx={{ width: '50%' }}
                         >
                             Apagar
+                        </Button>
+                    </Stack>
+                </Paper>
+            </Modal>
+
+            <Modal
+                open={mudarFeriado}
+                onClose={() => { setMudarFeriado(null) }}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <Paper
+                    sx={{
+                        position: 'absolute',
+                        top: '50%',
+                        left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        width: { xs: 300, sm: 570 },
+                        borderRadius: 4,
+                        p: 4,
+                    }}
+                >
+                    <Typography id="modal-modal-title" variant="h6" sx={{ mb: 2 }}>
+                        Lembre-se de alterar a data dos feriados móveis do ano seguinte!
+                    </Typography>
+                    <Stack direction="row" spacing={2}>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => { setMudarFeriado(null) }}
+                            sx={{ width: '50%' }}
+                        >
+                            Fechar
+                        </Button>
+                        <Button
+                            variant="contained"
+                            color="success"
+                            onClick={(event) => { navigate('/calendario/feriados'); setMudarFeriado(null) }}
+                            sx={{ width: '50%' }}
+                        >
+                            Alterar
                         </Button>
                     </Stack>
                 </Paper>
@@ -755,7 +816,6 @@ export default function Calendario() {
 
             const eventPropGetter = (event) => {
                 let backgroundColor = '';
-                console.log(event)
 
                 if (event.type == 'falta_feria') {
                     switch (event.resource.estado) {

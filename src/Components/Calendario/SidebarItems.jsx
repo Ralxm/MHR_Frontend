@@ -8,6 +8,7 @@ export default function SidebarItems({ tipo_user }) {
     const [id_user, setUtilizador] = useState();
     const [id_perfil, setPerfil] = useState()
     const [faltas, setFaltas] = useState([])
+    const [mes, setMes] = useState();
 
     const [faltas_por_justificar, setFaltas_Por_Justificar] = useState(0)
 
@@ -16,6 +17,7 @@ export default function SidebarItems({ tipo_user }) {
         if (user) {
             setUtilizador(user)
         }
+        setMes(new Date('12-01-2022').getMonth())
     }, []);
 
     useEffect(() => {
@@ -86,7 +88,7 @@ export default function SidebarItems({ tipo_user }) {
                 className="sidebar-item"
                 onClick={handleNavigation('/calendario/ferias_pessoais')}
                 style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
-                Ver férias 
+                Ver férias
             </a>
 
 
@@ -101,7 +103,7 @@ export default function SidebarItems({ tipo_user }) {
                         onClick={handleNavigation('/calendario/mapa_ferias')}
                         style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                         Mapa de férias
-                    </a>  
+                    </a>
 
                     <a href="/calendario/marcar_falta"
                         className="sidebar-item"
@@ -122,7 +124,7 @@ export default function SidebarItems({ tipo_user }) {
                         onClick={handleNavigation('/calendario/pedidos_ferias')}
                         style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                         Ver pedidos de férias
-                    </a>    
+                    </a>
 
                     <div className="mt-4">
                         <span><strong>Definições</strong></span>
@@ -133,14 +135,21 @@ export default function SidebarItems({ tipo_user }) {
                         onClick={handleNavigation('/calendario/tipos_faltas')}
                         style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
                         Tipos de faltas
-                    </a>   
+                    </a>
 
-                    <a href="/calendario/pedidos_ferias"
-                        className="sidebar-item"
+                    <a href="/calendario/feriados"
+                        className="sidebar-item d-flex justify-content-between align-items-center"
                         onClick={handleNavigation('/calendario/feriados')}
                         style={{ display: 'block', padding: '10px', margin: '5px 0', borderRadius: '4px', textDecoration: 'none', color: '#333' }}>
-                        Definir feriados
-                    </a>   
+                        <span>Definir feriados</span>
+                        <span>
+                            {mes == 11 && (
+                                <span className="notification-badge">
+                                    !
+                                </span>
+                            )}
+                        </span>
+                    </a>
                 </>
             }
         </div>

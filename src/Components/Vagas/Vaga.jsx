@@ -91,10 +91,15 @@ export default function Vagas() {
             navigate('/login')
         }
 
-        let user = localStorage.getItem("id_utilizador")
-        if (user) {
-            setUtilizador(user)
-            setTipoUser(localStorage.getItem("tipo"))
+        try {
+            let user = localStorage.getItem("id_utilizador")
+            if (user) {
+                setUtilizador(user)
+                setTipoUser(localStorage.getItem("tipo"))
+            }
+        }
+        catch(error){
+            console.log(error)
         }
 
         if (!vaga) {
@@ -106,17 +111,23 @@ export default function Vagas() {
             vaga.data_fecho = convertDate(vaga.data_fecho)
         }
 
-        const shouldOpen = sessionStorage.getItem('shouldOpenModal');
-        if (shouldOpen === 'true') {
-            setIsVerCandidaturasModalOpen(true);
-            sessionStorage.removeItem('shouldOpenModal');
+        try {
+            const shouldOpen = sessionStorage.getItem('shouldOpenModal');
+            if (shouldOpen === 'true') {
+                setIsVerCandidaturasModalOpen(true);
+                sessionStorage.removeItem('shouldOpenModal');
+            }
+
+            const checkState = sessionStorage.getItem('checkState');
+            if (checkState === 'true') {
+                carregarVaga(id)
+                sessionStorage.removeItem('checkState');
+            }
+        }
+        catch (error) {
+            console.log(error)
         }
 
-        const checkState = sessionStorage.getItem('checkState');
-        if (checkState === 'true') {
-            carregarVaga(id)
-            sessionStorage.removeItem('checkState');
-        }
     }, []);
 
     useEffect(() => {
@@ -1251,7 +1262,7 @@ export default function Vagas() {
                         <Button
                             variant="contained"
                             color="primary"
-                            onClick={() => setIsApagarCandidaturaModalOpen(false) }
+                            onClick={() => setIsApagarCandidaturaModalOpen(false)}
                             sx={{ width: '50%' }}
                         >
                             Fechar
