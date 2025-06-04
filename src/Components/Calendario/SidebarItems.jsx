@@ -17,7 +17,7 @@ export default function SidebarItems({ tipo_user }) {
         if (user) {
             setUtilizador(user)
         }
-        setMes(new Date('12-01-2022').getMonth())
+        setMes(new Date().getMonth())
     }, []);
 
     useEffect(() => {

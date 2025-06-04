@@ -246,12 +246,11 @@ export default function Calendario() {
         if(feriados){
             let found = feriados.some((feriado) => feriado.tipo == "Móvel" &&
                         new Date(feriado.data_feriado).getFullYear() <= new Date().getFullYear() &&
-                        new Date('12-12-2022').getMonth() == 11
+                        new Date().getMonth() == 11
                         )
             if(found == true){
                 setMudarFeriado(true)
-            }
-            
+            }  
         }
     }, [feriados])
 
