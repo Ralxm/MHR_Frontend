@@ -254,6 +254,8 @@ export default function Calendario() {
         }
     }, [feriados])
 
+    //
+
     const getShadowClass = (estado) => {
         switch (estado) {
             case "Aprovada":
